@@ -1,5 +1,5 @@
 # lib
-Library of single-file stb-like .h files.
+Library of single-file stb-like header files.
 
 ## Table of Contents
 1. [Flag](#flag)
