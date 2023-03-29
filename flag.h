@@ -52,8 +52,7 @@ void flag_parse(int argc, char **argv);
 
 #endif // FLAG_H_
 
-#ifndef FLAG_IMPLEMENTATION
-#define FLAG_IMPLEMENTATION
+#ifdef FLAG_IMPLEMENTATION
 
 Flag *flag_new(Flag_Type type, char *name, char *desc)
 {
