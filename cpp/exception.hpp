@@ -31,7 +31,8 @@ class Exception : public std::exception
         */
         Exception(const std::string message);
         /*
-        * @brief Operator << overlaod for an exception to aid in printing.
+        * @brief Overload to interface with the parent exception class.
+        * @return a const c string.
         */
         const char *what();
 };
