@@ -138,7 +138,12 @@ void logger_set_level(Logger *logger, LoggingLevel level)
     logger->level = level;
 }
 
-/*Create a new logger given a name and a LoggingLevel. This is the API entry point.*/
+/*
+* @brief Create a new logger given a name and a LoggingLevel. This is the API entry point.
+* @param name Name of the logger.
+* @param level LoggingLevel that indicates the minimal logging level that will be logged.
+* @returns A new static logger.
+*/
 Logger logger_new(char *name, LoggingLevel level)
 {
     Logger logger = {0};
