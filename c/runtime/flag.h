@@ -123,7 +123,11 @@ void flag_parse(int argc, char **argv);
 Flag *flag_new(Flag_Type type, char *name, char *desc)
 {
     // make sure the count doesn't exceed the capacity
-    assert(flag_count < FLAG_CAPACITY);
+    if (flag_count >= FLAG_CAPACITY)
+    {
+        fprintf(stderr, "ValueError: Amount of flags have exceeded capacity\n");
+        exit(1);
+    }
     // allocate a pointer on the stack to the address of the flag count after it's been incremented
     Flag *flag = &flags[flag_count++];
     // set values
@@ -177,10 +181,12 @@ void flag_uint64_range(uint64_t *flag, uint64_t min, uint64_t max)
     if (min == flag[DATA_MIN])
     {
         fprintf(stderr, "ERROR: Supplied minimum value of \"%"PRIu64"\" cannot be the same as the assigned default of %"PRIu64".", min, flag[DATA_MIN]);
+        exit(1);
     }
     if (max == flag[DATA_MAX])
     {
         fprintf(stderr, "ERROR: Supplied maximum value of \"%"PRIu64"\" cannot be the same as the assigned default of %"PRIu64".", max, flag[DATA_MAX]);
+        exit(1);
     }
     flag[DATA_MIN] = min;
     flag[DATA_MAX] = max;
@@ -207,9 +213,13 @@ char **flag_str(char *name, char *def, char *desc)
 * @param argv A pointer to a dynamic array of strings provided in `main`.
 * @returns A string representation of the parced argument.
 */
-static char *flag_shift_args(int *argc, char ***argv)
+static char *_flag_shift_args(int *argc, char ***argv)
 {
-    assert(*argc > 0);
+    if (*argc <= 0)
+    {
+        fprintf(stderr, "ValueError: argc is less than or equal to zero.\n");
+        exit(1);
+    }
     char *result = **argv;
     *argv += 1; // Pointer arithmatic - since the array is stored as the pointer to the first element, we increment what the pointer is pointing to.
     *argc -= 1;
@@ -221,7 +231,7 @@ static char *flag_shift_args(int *argc, char ***argv)
 * @param argc Argument count provided in `main`.
 * @param argv String array of runtime arguments provided in `main`.
 */
-static void flag_scan(int argc, char **argv)
+static void _flag_scan(int argc, char **argv)
 {
     flag_shift_args(&argc, &argv);
     while (argc > 0)
@@ -290,21 +300,26 @@ static void flag_scan(int argc, char **argv)
     };
 }
 
-static char *flag_show_data(Flag_Type type, uintptr_t data)
+static char *_uint64_to_string(uintptr_t data)
+{
+    int n = snprintf(NULL, 0, "%"PRIu64, *(uint64_t*) &data);
+    assert(n>=0);
+    assert(flag_tmp_str_size + n + 1 <= FLAG_TMP_STR_CAPACITY);
+    int m = snprintf(flag_tmp_str + flag_tmp_str_size, FLAG_TMP_STR_CAPACITY - flag_tmp_str_size, "%"PRIu64, *(uint64_t*) &data);
+    assert(n == m);
+    char *result = flag_tmp_str + flag_tmp_str_size;
+    flag_tmp_str_size += n + 1;
+    return result;
+}
+
+static char *_flag_show_data(Flag_Type type, uintptr_t data)
 {
     switch(type)
     {
         case FLAG_BOOL:
             return (*(bool*) &data) ? "true" : "false";
         case FLAG_UINT64: {
-            int n = snprintf(NULL, 0, "%"PRIu64, *(uint64_t*) &data);
-            assert(n>=0);
-            assert(flag_tmp_str_size + n + 1 <= FLAG_TMP_STR_CAPACITY);
-            int m = snprintf(flag_tmp_str + flag_tmp_str_size, FLAG_TMP_STR_CAPACITY - flag_tmp_str_size, "%"PRIu64, *(uint64_t*) &data);
-            assert(n == m);
-            char *result = flag_tmp_str + flag_tmp_str_size;
-            flag_tmp_str_size += n + 1;
-            return result;
+            return _uint64_to_string(data);
         }
         case FLAG_STR:
             return *(char**)&data;
