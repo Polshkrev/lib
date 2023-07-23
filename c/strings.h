@@ -20,4 +20,10 @@ typedef struct
 #define string_format "%.*s"
 #define string_arg(string) (int) (string).count, (string).data
 
+string_t new_string(const char *data, size_t count);
+string_t string_from_literal(const char *cstr);
+string_t string_trim_left(string_t *string);
+string_t string_trim_right(string_t *string);
+string_t string_trim(string_t *string);
+
 #endif // STRINGS_H_
