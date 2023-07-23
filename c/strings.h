@@ -3,6 +3,8 @@
 
 #include <stddef.h> // size_t
 
+typedef int char_t;
+
 typedef struct
 {
     size_t count;
@@ -25,5 +27,6 @@ string_t string_from_literal(const char *cstr);
 string_t string_trim_left(string_t *string);
 string_t string_trim_right(string_t *string);
 string_t string_trim(string_t *string);
+size_t string_find_last_of(string_t *string, char_t charactor);
 
 #endif // STRINGS_H_
