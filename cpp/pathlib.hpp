@@ -34,8 +34,6 @@ class Path
 };
 
 
-static bool _is_directory(const std::string path);
-static bool _path_is_file(const std::string path);
 static void _make_directory(const std::string path);
 static void _make_file(const std::string filename);
 static std::string _get_absolute(const std::string relative_path);
@@ -43,10 +41,40 @@ static std::string _path_append(const std::string parent, const std::string chil
 
 #endif // PATH_HPP_
 
-#ifdef PATH_IMPLEMENTATION
+#ifdef PATHLIB_IMPLEMENTATION
 
+static void _make_directory(const std::string path)
+{
+    int error = mkdir(path.data());
+    if (0 > error && (errno != EEXIST))
+    {
+        std::cerr << "Unable to create directory: " << path << "\n";
+        exit(1);
+    }
+    else if (errno == EEXIST)
+    {
+        std::cerr << path.data() << " already exits" << "\n";
+        exit(1);
+    }
+}
 
+static std::string _get_absolute(const std::string relative_path)
+{
+    char buffer[MAX_PATH_SIZE];
+    char *rel_path = _fullpath(buffer, relative_path.data(), MAX_PATH_SIZE);
+    if (NULL == rel_path)
+    {
+        std::cerr << "Unable to convert a relative path to absolute" << "\n";
+        exit(1);
+    }
+    return std::string(rel_path);
+}
 
-#endif // PATH_IMPLEMENTATION
+static std::string _path_append(const std::string parent, const std::string child)
+{
+    return parent + PATH_SEPERATOR + child;
+}
 
-#endif // PATHLIB_HPP_
+#endif // PATHLIB_IMPLEMENTATION
+
+// #endif // PATHLIB_HPP_
