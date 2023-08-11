@@ -33,4 +33,20 @@ class Path
         std::string __path;
 };
 
+
+static bool _is_directory(const std::string path);
+static bool _path_is_file(const std::string path);
+static void _make_directory(const std::string path);
+static void _make_file(const std::string filename);
+static std::string _get_absolute(const std::string relative_path);
+static std::string _path_append(const std::string parent, const std::string child);
+
+#endif // PATH_HPP_
+
+#ifdef PATH_IMPLEMENTATION
+
+
+
+#endif // PATH_IMPLEMENTATION
+
 #endif // PATHLIB_HPP_
