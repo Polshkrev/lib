@@ -76,12 +76,52 @@ string_t string_trim_right(string_t *string);
 string_t string_trim(string_t *string);
 
 /*
+* @brief Chop a string by a given delimetre.
+* @param string A pointer to the string that needs to be trimmed. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
+* @param delimetre A charactor by which to split the string.
+* @returns A string where the data is set to the first chunk of string before the given delimetre.
+*/
+string_t string_chop_by_delimetre(string_t *string, char delimetre);
+
+/*
+* @brief Find the first occurance of a given charactor within a given string.
+* @param string A pointer to the string that contains the given charactor. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
+* @param charactor The charactor to find within the given string.
+* @returns The index of the given charactor within the given string. Much like the `strchr` function, if the charactor is not found within the string, 0 is returned.
+*/
+size_t string_find_first_of(string_t *string, char_t charactor);
+
+/*
 * @brief Find the last occurance of a given charactor within a given string.
 * @param string A pointer to the string that contains the given charactor. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
 * @param charactor The charactor to find within the given string.
 * @returns The index of the given charactor within the given string. Much like the `strrchr` function, if the charactor is not found within the string, 0 is returned.
 */
 size_t string_find_last_of(string_t *string, char_t charactor);
+
+/*
+* @brief Determine whether a given string starts with a given expected string.
+* @param string A pointer to the string that contains the given string. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
+* @param expected The expected prefix to check against.
+* @returns A boolean on whether `string` starts with `expected`.
+*/
+bool string_starts_with(string_t *string, string_t expected);
+
+/*
+* @brief Determine whether a given string ends with a given expected string.
+* @param string A pointer to the string that contains the given string. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
+* @param expected The expected suffix to check against.
+* @returns A boolean on whether `string` ends with `expected`.
+*/
+bool string_ends_with(string_t *string, string_t expected);
+
+/*
+* @brief Compare two given — case sensitive — string types.
+* @param a The string to check against.
+* @param b The string to which a comparison will be made in parametre `a`.
+* @returns A boolean on wheather `a` and `b` are equal.
+*/
+bool string_equals(string_t a, string_t b);
 
 #endif // STRINGS_H_
 
@@ -153,6 +193,49 @@ string_t string_trim(string_t *string)
 }
 
 /*
+* @brief Chop a string by a given delimetre.
+* @param string A pointer to the string that needs to be trimmed. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
+* @param delimetre A charactor by which to split the string.
+* @returns A string where the data is set to the first chunk of string before the given delimetre.
+*/
+string_t string_chop_by_delimetre(string_t *string, char delimetre)
+{
+    size_t i = 0;
+    while (i < string->count && string->data[i] != delimetre)
+    {
+        i++;
+    }
+    string_t result = new_string(string->data, i);
+    if (i < string->count)
+    {
+        string->count -= i + 1;
+        string->data += i + 1;
+    }
+    else
+    {
+        string->count -= i;
+        string->data += i;
+    }
+    return result;
+}
+
+/*
+* @brief Find the first occurance of a given charactor within a given string.
+* @param string A pointer to the string that contains the given charactor. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
+* @param charactor The charactor to find within the given string.
+* @returns The index of the given charactor within the given string. Much like the `strchr` function, if the charactor is not found within the string, 0 is returned.
+*/
+size_t string_find_first_of(string_t *string, char_t charactor)
+{
+    char *rest = strchr(string->data, charactor);
+    if (NULL == rest)
+    {
+        return 0;
+    }
+    return rest - string->data;
+}
+
+/*
 * @brief Find the last occurance of a given charactor within a given string.
 * @param string A pointer to the string that contains the given charactor. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
 * @param charactor The charactor to find within the given string.
@@ -166,6 +249,53 @@ size_t string_find_last_of(string_t *string, char_t charactor)
         return 0;
     }
     return rest - string->data;
+}
+
+/*
+* @brief Determine whether a given string starts with a given expected string.
+* @param string A pointer to the string that contains the given string. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
+* @param expected The expected prefix to check against.
+* @returns A boolean on whether `string` starts with `expected`.
+*/
+bool string_starts_with(string_t *string, string_t expected)
+{
+    if (expected.count > string->count)
+    {
+        return false;
+    }
+    string_t actual = new_string(string->data, expected.count);
+    return string_equals(expected, actual);
+}
+
+/*
+* @brief Determine whether a given string ends with a given expected string.
+* @param string A pointer to the string that contains the given string. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
+* @param expected The expected suffix to check against.
+* @returns A boolean on whether `string` ends with `expected`.
+*/
+bool string_ends_with(string_t *string, string_t expected)
+{
+    if (expected.count > string->count)
+    {
+        return false;
+    }
+    string_t actual = new_string(string->data + string->count - expected.count, expected.count);
+    return string_equals(expected, actual);
+}
+
+/*
+* @brief Compare two given — case sensitive — string types.
+* @param a The string to check against.
+* @param b The string to which a comparison will be made in parametre `a`.
+* @returns A boolean on wheather `a` and `b` are equal.
+*/
+bool string_equals(string_t a, string_t b)
+{
+    if (a.count != b.count)
+    {
+        return false;
+    }
+    return memcmp(a.data, b.data, a.count) == 0;
 }
 
 #endif // STRINGS_IMPLEMENTATION
