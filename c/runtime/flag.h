@@ -103,6 +103,12 @@ char **flag_str(char *name, char *def, char *desc);
 void flag_print_help(FILE *stream, bool print_default);
 
 /*
+* @brief Set the name of the programme that takes in the flags. The name of the programme will be displayed in the help menu. A global `PROGRAMME_NAME` variable will be set to be used in the `flag_parse` function. If this function is not called, then the first argument supplied to `argv` will be used.
+* @param name String to set as the name of the programme marked with const.
+*/
+void flag_set_programme_name(const char *name);
+
+/*
 * @brief Parse the flags provided to the programme at runtime. This function must be called for any of the flags to be parsed.
 * @param argc Argument count provided in `main`.
 * @param argv String array of runtime arguments provided in `main`.
@@ -360,6 +366,15 @@ void flag_print_help(FILE *stream, bool print_default)
 }
 
 /*
+* @brief Set the name of the programme that takes in the flags. The name of the programme will be displayed in the help menu. A global `PROGRAMME_NAME` variable will be set to be used in the `flag_parse` function. If this function is not called, then the first argument supplied to `argv` will be used.
+* @param name String to set as the name of the programme marked with const.
+*/
+void flag_set_programme_name(const char *name)
+{
+    _PROGRAMME_NAME = name;
+}
+
+/*
 * @brief Parse the flags provided to the programme at runtime. This function must be called for any of the flags to be parsed.
 * @param argc Argument count provided in `main`.
 * @param argv String array of runtime arguments provided in `main`.
@@ -368,10 +383,10 @@ void flag_parse(int argc, char **argv)
 {
     char *programme = argv[0];
     bool *help = flag_bool("help", false, "Print this help to stdout and exit with 0.");
-    flag_scan(argc, argv);
+    _flag_scan(argc, argv);
     if (*help) {
         assert(argc >= 1);
-        fprintf(stdout, "Usage: %s [OPTIONS]\nOPTIONS:\n", programme);
+        fprintf(stdout, "Usage: %s [OPTIONS]\nOPTIONS:\n", _PROGRAMME_NAME ? _PROGRAMME_NAME : programme);
         flag_print_help(stdout, true);
         exit(1);
     };
