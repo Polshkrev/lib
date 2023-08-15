@@ -12,6 +12,8 @@
 
 #define FLAG_CAPACITY 256
 
+const char *_PROGRAMME_NAME;
+
 /*
 * @brief Type representation of the "psuedo-union" type defined in the Flag struct.
 */
