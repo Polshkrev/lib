@@ -3,6 +3,7 @@
 
 #include <string.h> // strlen, size_t, NULL
 #include <ctype.h> // isspace
+#include <stdbool.h>
 
 /*
 * @brief Typedef for a single charactor within a string.
@@ -89,7 +90,7 @@ string_t string_chop_by_delimetre(string_t *string, char delimetre);
 * @param charactor The charactor to find within the given string.
 * @returns The index of the given charactor within the given string. Much like the `strchr` function, if the charactor is not found within the string, 0 is returned.
 */
-size_t string_find_first_of(string_t *string, char_t charactor);
+size_t string_find_first_of(const string_t *string, const char_t charactor);
 
 /*
 * @brief Find the last occurance of a given charactor within a given string.
@@ -97,7 +98,7 @@ size_t string_find_first_of(string_t *string, char_t charactor);
 * @param charactor The charactor to find within the given string.
 * @returns The index of the given charactor within the given string. Much like the `strrchr` function, if the charactor is not found within the string, 0 is returned.
 */
-size_t string_find_last_of(string_t *string, char_t charactor);
+size_t string_find_last_of(const string_t *string, const char_t charactor);
 
 /*
 * @brief Determine whether a given string starts with a given expected string.
@@ -225,14 +226,15 @@ string_t string_chop_by_delimetre(string_t *string, char delimetre)
 * @param charactor The charactor to find within the given string.
 * @returns The index of the given charactor within the given string. Much like the `strchr` function, if the charactor is not found within the string, 0 is returned.
 */
-size_t string_find_first_of(string_t *string, char_t charactor)
+size_t string_find_first_of(const string_t *string, const char_t charactor)
 {
-    char *rest = strchr(string->data, charactor);
-    if (NULL == rest)
+    const char *result = strchr(string->data, charactor);
+    const size_t full_length = strlen(string->data);
+    if (!result)
     {
         return 0;
     }
-    return rest - string->data;
+    return full_length - strlen(result);
 }
 
 /*
@@ -241,14 +243,15 @@ size_t string_find_first_of(string_t *string, char_t charactor)
 * @param charactor The charactor to find within the given string.
 * @returns The index of the given charactor within the given string. Much like the `strrchr` function, if the charactor is not found within the string, 0 is returned.
 */
-size_t string_find_last_of(string_t *string, char_t charactor)
+size_t string_find_last_of(const string_t *string, const char_t charactor)
 {
-    char *rest = strrchr(string->data, charactor);
-    if (NULL == rest)
+    const char *result = strrchr(string->data, charactor);
+    const size_t full_length = strlen(string->data);
+    if (!result)
     {
         return 0;
     }
-    return rest - string->data;
+    return full_length - strlen(result);
 }
 
 /*
