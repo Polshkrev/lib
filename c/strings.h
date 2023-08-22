@@ -228,13 +228,13 @@ string_t string_chop_by_delimetre(string_t *string, char delimetre)
 */
 size_t string_find_first_of(const string_t *string, const char_t charactor)
 {
-    const char *rest = strchr(string->data, charactor);
-    if (NULL == rest)
+    const char *result = strchr(string->data, charactor);
+    const size_t full_length = strlen(string->data);
+    if (!result)
     {
         return 0;
     }
-    const size_t delta_length = strlen(rest);
-    return delta_length - string->count;
+    return full_length - strlen(result);
 }
 
 /*
@@ -245,13 +245,13 @@ size_t string_find_first_of(const string_t *string, const char_t charactor)
 */
 size_t string_find_last_of(const string_t *string, const char_t charactor)
 {
-    const char *rest = strchr(string->data, charactor);
-    if (NULL == rest)
+    const char *result = strrchr(string->data, charactor);
+    const size_t full_length = strlen(string->data);
+    if (!result)
     {
         return 0;
     }
-    const size_t delta_length = strlen(rest);
-    return delta_length - string->count;
+    return full_length - strlen(result);
 }
 
 /*
