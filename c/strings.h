@@ -225,14 +225,15 @@ string_t string_chop_by_delimetre(string_t *string, char delimetre)
 * @param charactor The charactor to find within the given string.
 * @returns The index of the given charactor within the given string. Much like the `strchr` function, if the charactor is not found within the string, 0 is returned.
 */
-size_t string_find_first_of(string_t *string, char_t charactor)
+size_t string_find_first_of(const string_t *string, const char_t charactor)
 {
-    char *rest = strchr(string->data, charactor);
+    const char *rest = strchr(string->data, charactor);
     if (NULL == rest)
     {
         return 0;
     }
-    return rest - string->data;
+    const size_t delta_length = strlen(rest);
+    return delta_length - string->count;
 }
 
 /*
@@ -242,13 +243,13 @@ size_t string_find_first_of(string_t *string, char_t charactor)
 * @returns The index of the given charactor within the given string. Much like the `strrchr` function, if the charactor is not found within the string, 0 is returned.
 */
 size_t string_find_last_of(string_t *string, char_t charactor)
-{
-    char *rest = strrchr(string->data, charactor);
+    const char *rest = strchr(string->data, charactor);
     if (NULL == rest)
     {
         return 0;
     }
-    return rest - string->data;
+    const size_t delta_length = strlen(rest);
+    return delta_length - string->count;
 }
 
 /*
