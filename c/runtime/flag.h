@@ -241,10 +241,10 @@ static char *_flag_shift_args(int *argc, char ***argv)
 */
 static void _flag_scan(int argc, char **argv)
 {
-    flag_shift_args(&argc, &argv);
+    _flag_shift_args(&argc, &argv);
     while (argc > 0)
     {
-        char *flag = flag_shift_args(&argc, &argv);
+        char *flag = _flag_shift_args(&argc, &argv);
         if (!strcmp(flag, "-"))
         {
             fprintf(stderr, "ERROR: Unknown Flag \"%s\".", flag);
@@ -265,7 +265,7 @@ static void _flag_scan(int argc, char **argv)
                             fprintf(stderr, "ERROR: No argument provided for \"-%s\".", flag);
                             exit(1);
                         }
-                        char *arg = flag_shift_args(&argc, &argv);
+                        char *arg = _flag_shift_args(&argc, &argv);
                         *(char**)&flags[i].data = arg;
                     } break;
                     case FLAG_UINT64: {
@@ -274,7 +274,7 @@ static void _flag_scan(int argc, char **argv)
                             fprintf(stderr, "ERROR: No argument provided for \"-%s\".", flag);
                             exit(1);
                         }
-                        char *arg = flag_shift_args(&argc, &argv);
+                        char *arg = _flag_shift_args(&argc, &argv);
                         static_assert(sizeof(unsigned long long int) == sizeof(uint64_t), "The original author designed this for x86_64 machine with the compiler that expects unsigned long long int and uint64_t to be the same thing, so they could use strtoull() function to parse it. Please adjust this code for your case and maybe even send the patch to upstream to make it work on a wider range of environments.");
                         char *endptr;
                         unsigned long long int result = strtoull(arg, &endptr, 10);
@@ -353,12 +353,12 @@ void flag_print_help(FILE *stream, bool print_default)
         }
         else if (print_default)
         {
-            fprintf(stream, " (Default: %s)\n", flag_show_data(flags[i].type, flags[i].data[DATA_DEF]));
+            fprintf(stream, " (Default: %s)\n", _flag_show_data(flags[i].type, flags[i].data[DATA_DEF]));
         }
         if (flags[i].type == FLAG_UINT64)
         {
-            fprintf(stream, "\t\tMinimum: %s\n", flag_show_data(flags[i].type, flags[i].data[DATA_MIN]));
-            fprintf(stream, "\t\tMaximum: %s\n", flag_show_data(flags[i].type, flags[i].data[DATA_MAX]));
+            fprintf(stream, "\t\tMinimum: %s\n", _flag_show_data(flags[i].type, flags[i].data[DATA_MIN]));
+            fprintf(stream, "\t\tMaximum: %s\n", _flag_show_data(flags[i].type, flags[i].data[DATA_MAX]));
         }
         else {
             fprintf(stream, "\n");
