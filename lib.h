@@ -11,6 +11,6 @@
 #include "./c/runtime/flag.h"
 
 #define PATHLIB_IMPLEMENTATION
-#include "./pathlib.h"
+#include "./c/pathlib.h"
 
 #endif // LIB_H_
