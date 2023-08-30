@@ -1,5 +1,5 @@
-#ifndef PATH_H_
-#define PATH_H_
+#ifndef PATHLIB_H_
+#define PATHLIB_H_
 
 #ifdef _WIN32
 #include <direct.h>
@@ -87,7 +87,7 @@ void path_mkdir(Path path);
 
 #endif // PATH_H_
 
-#ifdef PATH_IMPLEMENTATION
+#ifdef PATHLIB_IMPLEMENTATION
 
 /*
 * @brief Initialize a new path. The underlying path data is initialized to NULL after using this function.
@@ -252,4 +252,4 @@ void path_mkdir(Path path)
 #endif // _WIN32
 }
 
-#endif // PATH_IMPLEMENTATION
+#endif // PATHLIB_IMPLEMENTATION
