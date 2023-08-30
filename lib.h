@@ -10,7 +10,7 @@
 #define FLAG_IMPLEMENTATION
 #include "./c/runtime/flag.h"
 
-#define PATH_IMPLEMENTATION
-#include "./path.h"
+#define PATHLIB_IMPLEMENTATION
+#include "./pathlib.h"
 
 #endif // LIB_H_
