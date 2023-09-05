@@ -13,6 +13,8 @@
 #include <sys/stat.h>
 #include <fstream>
 
+#include <iostream>
+
 #ifndef MAX_PATH_SIZE
 #define MAX_PATH_SIZE _MAX_PATH
 #endif // MAX_PATH_SIZE
