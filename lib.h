@@ -13,4 +13,7 @@
 #define PATHLIB_IMPLEMENTATION
 #include "./c/pathlib.h"
 
+#define VERSION_IMPLEMENTATION
+#include "./c/version.h"
+
 #endif // LIB_H_
