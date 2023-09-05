@@ -119,7 +119,7 @@ Path path_from(const char *path)
 bool path_exists(const char *path)
 {
 #ifdef _WIN32
-    DWORD dwAttrib = GetFileAttributes((LPCWSTR)path);
+    DWORD dwAttrib = GetFileAttributes(path);
     return (dwAttrib != INVALID_FILE_ATTRIBUTES);
 #else
     struct stat stat_buffer = {0};
@@ -143,7 +143,7 @@ bool path_exists(const char *path)
 Path pasb(Path path)
 {
 #ifdef _WIN32
-    if(GetFullPathName((LPCWSTR)path.raw, MAX_PATH_SIZE, (LPWSTR)__path_buffer, NULL) == 0)
+    if(GetFullPathName(path.raw, MAX_PATH_SIZE, __path_buffer, NULL) == 0)
     {
         fprintf(stderr, "IOError: cannot get absolute path: %ld\n", GetLastError());
         exit(1);
