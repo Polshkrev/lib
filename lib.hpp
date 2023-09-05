@@ -7,4 +7,7 @@
 #define PATHLIB_IMPLEMENTATION
 #include "./cpp/pathlib.hpp"
 
+#define VERSION_IMPLEMENTATION
+#include "./cpp/structures/version.hpp"
+
 #endif // LIB_HPP_
