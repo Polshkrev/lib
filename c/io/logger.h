@@ -21,7 +21,7 @@ char timestamp[FORMAT_BUFFER_SIZE];
 #define FILE_BUFFER_SIZE 200
 #endif // FILE_BUFFER
 
-char file_buffer[FILE_BUFFER_SIZE];
+char file_buffer[FILE_BUFFER_SIZE] = {0};
 int output_count = 0;
 
 #ifndef TIMESTAMP_FORMAT
@@ -30,40 +30,40 @@ int output_count = 0;
 
 typedef enum
 {
-    DEBUG,
-    INFO,
-    WARNING,
-    ERROR,
-    CRITICAL
+    LOG_DEBUG,
+    LOG_INFO,
+    LOG_WARNING,
+    LOG_ERROR,
+    LOG_CRITICAL
 } LoggingLevel;
 
 typedef struct
 {
-    char *name;
+    const char *name;
     FILE *outputs[AVAILABLE_OUTPUTS];
     LoggingLevel level;
 } Logger;
 
-char *lltostr(LoggingLevel level);
+const char *lltostr(LoggingLevel level);
 void logger_set_level(Logger *logger, LoggingLevel level);
-Logger logger_new(char *name, LoggingLevel level);
+Logger logger_new(const char *name, LoggingLevel level);
 void logger_add_console(Logger *logger);
 void logger_add_file(Logger *logger, const char *filename);
 void logger_full_setup(Logger *logger, const char *filename);
 void logger_console_only(Logger *logger);
 void logger_file_only(Logger *logger, const char *filename);
-void logger_log(Logger *logger, const char *message, LoggingLevel level);
-void close_logger(Logger *logger);
+void logger_log(Logger logger, const char *message, LoggingLevel level);
+void close_logger(Logger logger);
 #endif // LOGGER_H_
 
-// #ifdef LOGGER_IMPLEMENTATION
+#ifdef LOGGER_IMPLEMENTATION
 
 /*
 * @brief Determine wheather a specific output stream is a file.
 * @param stream Output file stream to check against i/o output.
 * @returns A boolean of wheather a given file stream is composed of an i/o stream (e.g) stdout, stdin, etc. 
 */
-static bool is_file(FILE *stream)
+static bool is_file(const FILE *stream)
 {
     bool found = false;
     FILE *streams[3] = {stdout, stdin, stderr};
@@ -82,7 +82,7 @@ static bool is_file(FILE *stream)
 * @brief Set the locale of the timezone information.
 * @param locale Country code of target locale.
 */
-static void _set_locale(char *locale)
+static void _set_locale(const char *locale)
 {
     setlocale(LC_TIME, locale);
 }
@@ -104,23 +104,23 @@ static void set_timestamp()
 * @param level LoggingLevel enum to return as a string.
 * @returns String representation of LoggingLevel enum.
 */
-char *lltostr(LoggingLevel level)
+const char *lltostr(const LoggingLevel level)
 {
     switch (level)
     {
-        case DEBUG:
+        case LOG_DEBUG:
             return "DEBUG";
             break;
-        case INFO:
+        case LOG_INFO:
             return "INFO";
             break;
-        case WARNING:
+        case LOG_WARNING:
             return "WARNING";
             break;
-        case ERROR:
+        case LOG_ERROR:
             return "ERROR";
             break;
-        case CRITICAL:
+        case LOG_CRITICAL:
             return "CRITICAL";
             break;
     }
@@ -130,10 +130,10 @@ char *lltostr(LoggingLevel level)
 
 /*
 * @brief Set the minimum allowable LoggingLevel of the logger. This is inforced in the `logger_log` function.
-* @param logger A pointer to the logger as a result of OOP focused programming.
+* @param logger A pointer to the logger whose level will be set.
 * @param level LoggingLevel to set for the provided logger.
 */
-void logger_set_level(Logger *logger, LoggingLevel level)
+void logger_set_level(Logger *logger, const LoggingLevel level)
 {
     logger->level = level;
 }
@@ -142,9 +142,9 @@ void logger_set_level(Logger *logger, LoggingLevel level)
 * @brief Create a new logger given a name and a LoggingLevel. This is the API entry point.
 * @param name Name of the logger.
 * @param level LoggingLevel that indicates the minimal logging level that will be logged.
-* @returns A new static logger.
+* @returns A new logger.
 */
-Logger logger_new(char *name, LoggingLevel level)
+Logger logger_new(const char *name, LoggingLevel level)
 {
     Logger logger = {0};
     logger.name = name;
@@ -154,7 +154,7 @@ Logger logger_new(char *name, LoggingLevel level)
 
 /*
 * @brief Add `stdout` to the list of ouputs of the logger. If there's too many outputs that have been "allocated" to the struct, an error will be printed to `stderr` and the programme will exit with and exit code of 1.
-* @param logger A pointer to the Logger as a side effect of an OOP style of thinking and programming.
+* @param logger A pointer to the Logger whose list of outputs will be updated.
 * @exception If the number of outputs that have been "allocated" to the logger has exceeded the number of constant available outputs, an `AllocationError` will be printed to stderr.
 */
 void logger_add_console(Logger *logger)
@@ -169,7 +169,7 @@ void logger_add_console(Logger *logger)
 
 /*
 * @brief Add a file to the list of outputs of the logger. The file is opened in append mode and is not closed.
-* @param logger A pointer to the Logger as a side effect of an OOP style of thinking and programming.
+* @param logger A pointer to the Logger whose list of outputs will be updated.
 * @param filename A string – marked with const – that will be passed to `fopen`.
 * @exception If the file doesn't exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit with an exit code of 1.
 * @exception If the number of outputs that have been "allocated" to the logger has exceeded the number of constant available outputs, an `AllocationError` will be printed to `stderr` and the file will be closed.
@@ -193,7 +193,7 @@ void logger_add_file(Logger *logger, const char *filename)
 
 /*
 * @brief Setup the logger with both `stdout` and a file with a given filename.
-* @param logger A pointer to the Logger as a side effect of an OOP style of thinking and programming.
+* @param logger A pointer to a Logger.
 * @param filename A string – marked with const – that will be passed to `logger_add_file` that was previously defined.
 * @exception As defined in the `logger_add...` functions, if the file doesn't exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit with an exit code of 1.
 * @exception As defined in the `logger_add...` functions, if the number of outputs that have been "allocated" to the logger has exceeded the number of constant available outputs, an `AllocationError` will be printed to `stderr` and the file will be closed.
@@ -206,7 +206,7 @@ void logger_full_setup(Logger *logger, const char *filename)
 
 /*
 * @brief A prerequisite setup function that setups the logger with only `stdout`.
-* @param logger A pointer to the Logger as a side effect of an OOP style of thinking and programming.
+* @param logger A pointer to a Logger.
 */
 void logger_console_only(Logger *logger)
 {
@@ -225,27 +225,27 @@ void logger_file_only(Logger *logger, const char *filename)
 
 /*
 * @brief Helper function to publish a message to each of the outputs defined in the logger output array.
-* @param logger A pointer to the Logger as a side effect of an OOP style of thinking and programming.
+* @param logger A logger object from which to read.
 * @param message A string – marked with const – to publish to each of the elements in the array of outputs added to the logger.
 * @param level The level of the message.
 */
-static void _publish_message(Logger *logger, const char *message, LoggingLevel level)
+static void _publish_message(Logger logger, const char *message, LoggingLevel level)
 {
     for (int output_num = 0; output_num < output_count; ++output_num)
     {
-        fprintf(logger->outputs[output_num], "%s:%s[%s] - %s\n", timestamp, logger->name, lltostr(level), message);
+        fprintf(logger.outputs[output_num], "%s:%s[%s] - %s\n", timestamp, logger.name, lltostr(level), message);
     }
 }
 
 /*
 * @brief Close any file outputs linked to the logger.
-* @param logger A pointer to the Logger as a side effect of an OOP style of thinking and programming.
+* @param logger A logger object to close.
 */
-void close_logger(Logger *logger)
+void close_logger(Logger logger)
 {
     for (int output_num = 0; output_num < output_count; ++output_num)
     {
-        FILE *current_output = logger->outputs[output_num];
+        FILE *current_output = logger.outputs[output_num];
         if (!is_file(current_output))
         {
             continue;
@@ -264,13 +264,13 @@ void close_logger(Logger *logger)
 
 /*
 * @brief Log a message.
-* @param logger A pointer to the Logger as a side effect of an OOP style of thinking and programming.
+* @param logger A logger object to use.
 * @param message A string – marked with const – to publish to each of the elements in the array of outputs added to the logger.
 * @param level The level of the message.
 */
-void logger_log(Logger *logger, const char *message, LoggingLevel level)
+void logger_log(Logger logger, const char *message, LoggingLevel level)
 {
-    if (level < logger->level)
+    if (level < logger.level)
     {
         return;
     }
@@ -278,4 +278,4 @@ void logger_log(Logger *logger, const char *message, LoggingLevel level)
     _publish_message(logger, message, level);
 }
 
-// #endif // LOGGER_IMPLEMENTATION
+#endif // LOGGER_IMPLEMENTATION
