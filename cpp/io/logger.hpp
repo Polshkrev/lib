@@ -52,9 +52,9 @@ namespace logging
 
     /*
     * @brief Helper function to aid in deconstructing the object.
-    * @param outputs Reference to an array of outputs to close.
+    * @param outputs An array of outputs to close.
     */
-    void close_logger(std::array<FILE *, AVAILABLE_OUTPUTS> &outputs);
+    void close_logger(std::array<FILE *, AVAILABLE_OUTPUTS> outputs);
 
     /*
     * @brief A Logger.
@@ -99,9 +99,9 @@ namespace logging
             /*
             * @brief Log a message.
             * @param message Message to log.
-            * @param level level_t to set for the message. If the level is less than the level property of the logger, then the message is not logged.
+            * @param level level_t to set for the message. If the level is less than the level property of the logger, then the message is not logged. By default, this parametre is set to DEBUG.
             */
-            void log(const std::string message, const level_t level);
+            void log(const std::string message, const level_t level) const;
             ~Logger();
         private:
             std::array<FILE *, AVAILABLE_OUTPUTS> outputs;
@@ -128,7 +128,7 @@ namespace logging
         strftime(timestamp, FORMAT_BUFFER_SIZE, TIMESTAMP_FORMAT, &date);
     }
 
-    static void _publish_message(std::array<FILE *, AVAILABLE_OUTPUTS> &outputs, const std::string name, const std::string message, level_t level)
+    static void _publish_message(const std::array<FILE *, AVAILABLE_OUTPUTS> outputs, const std::string name, const std::string message, level_t level)
     {
         for (std::size_t output_num = 0; output_num < output_count; ++output_num)
         {
@@ -151,7 +151,7 @@ namespace logging
         return !found;
     }
 
-    void close_logger(std::array<FILE *, AVAILABLE_OUTPUTS> &outputs)
+    void close_logger(std::array<FILE *, AVAILABLE_OUTPUTS> outputs)
     {
         for (std::size_t output_num = 0; output_num < output_count; ++output_num)
         {
@@ -201,7 +201,7 @@ namespace logging
         exit(1);
     }
 
-    Logger::Logger(const std::string name, level_t level = DEBUG) noexcept
+    Logger::Logger(const std::string name, const level_t level = DEBUG) noexcept
     {
         this->name = name;
         this->level = level;
@@ -272,9 +272,9 @@ namespace logging
     /*
     * @brief Log a message.
     * @param message Message to log.
-    * @param level level_t to set for the message. If the level is less than the level property of the logger, then the message is not logged.
+    * @param level level_t to set for the message. If the level is less than the level property of the logger, then the message is not logged. By default, this parametre is set to DEBUG.
     */
-    void Logger::log(const std::string message, const level_t level = DEBUG)
+    void Logger::log(const std::string message, const level_t level = DEBUG) const
     {
         if (level < this->level)
         {
