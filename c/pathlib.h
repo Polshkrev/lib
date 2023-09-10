@@ -66,6 +66,30 @@ Path pasb(Path path);
 const char *passtr(Path path);
 
 /*
+* @brief Append a given path to another.
+* @param destination Base path to which to append.
+* @param source Path from which to be copied into the destination.
+* @returns A new path whose raw data is of the two concatenated parametres.
+*/
+Path path_append(const Path destination, const Path source);
+
+/*
+* @brief Append a given string to a path.
+* @param destination Base path to which to append.
+* @param source String to be converted into a path to be copied into the destination.
+* @returns A new path whose raw data is of the two concatenated parametres.
+*/
+Path path_append_as(const Path destination, const char *source);
+
+/*
+* @brief Append a given path to a string representing a path.
+* @param destination Base string to which to append.
+* @param source Path from which to be copied into the destination.
+* @returns A new path whose raw data is of the two concatenated parametres.
+*/
+Path path_append_to(const char *destination, const Path source);
+
+/*
 * @brief Get the parent directory of a given path.
 * @param path A path, either relative or absolute, to parse.
 * @returns A new path with the data as the path to the parent directory of the given path.
@@ -166,6 +190,57 @@ Path pasb(Path path)
 const char *passtr(Path path)
 {
     return path.raw;
+}
+
+/*
+* @brief Append a given path to another.
+* @param destination Base path to which to append.
+* @param source Path from which to be copied into the destination.
+* @returns A new path whose raw data is of the two concatenated parametres.
+*/
+Path path_append(const Path destination, const Path source)
+{
+    size_t dest_len = strlen(destination.raw);
+    size_t source_len = strlen(source.raw);
+    size_t full_length = (dest_len + source_len) + 2;
+    char *string = __path_buffer;
+    string[dest_len] = *PATH_SEPERATOR;
+    for (size_t i = 1; i < dest_len; ++i)
+    {
+        string[i] = destination.raw[i];
+    }
+    for (size_t j = 0; j < source_len; ++j)
+    {
+        string[(dest_len + 1) + j] = source.raw[j];
+    }
+    string[full_length - 1] = '\0';
+    return path_from(string);
+}
+
+/*
+* @brief Append a given string to a path.
+* @param destination Base path to which to append.
+* @param source String without a seperator to be converted into a path to be copied into the destination.
+* @returns A new path whose raw data is of the two concatenated parametres.
+*/
+Path path_append_as(const Path destination, const char *source)
+{
+    Path source_path = path_from(source);
+    Path new = path_append(destination, source_path);
+    return new;
+}
+
+/*
+* @brief Append a given path to a string representing a path.
+* @param destination Base string without a seperator to which to append.
+* @param source Path from which to be copied into the destination.
+* @returns A new path whose raw data is of the two concatenated parametres.
+*/
+Path path_append_to(const char *destination, const Path source)
+{
+    Path destination_path = path_from(destination);
+    Path new = path_append(destination_path, source);
+    return new;
 }
 
 /*
