@@ -29,20 +29,20 @@ char __path_buffer[MAX_PATH_SIZE];
 typedef struct
 {
     const char *raw;
-} Path;
+} path_t;
 
 /*
 * @brief Initialize a new path. The underlying path data is initialized to NULL after using this function.
 * @returns A new, 0-initialized, Path.
 */
-Path path_new();
+path_t path_new();
 
 /*
 * @brief Initialize a new path.
 * @param path String literal to initialize the path object.
 * @returns A new Path.
 */
-Path path_from(const char *path);
+path_t path_from(const char *path);
 
 /*
 * @brief Determine whether a given path exists. On Windows, the `windows.h` header is used.
@@ -56,14 +56,14 @@ bool path_exists(const char *path);
 * @param path Relative path to extract the absolute.
 * @returns A new path with the absolute path of the realtive given path.
 */
-Path pasb(Path path);
+path_t pasb(path_t path);
 
 /*
 * @brief Represent a path as a string.
 * @param path Read-Only Path to represent.
 * @returns The underlying path data within the given object.
 */
-const char *passtr(Path path);
+const char *passtr(path_t path);
 
 /*
 * @brief Append a given path to another.
@@ -71,7 +71,7 @@ const char *passtr(Path path);
 * @param source Path from which to be copied into the destination.
 * @returns A new path whose raw data is of the two concatenated parametres.
 */
-Path path_append(const Path destination, const Path source);
+path_t path_append(const path_t destination, const path_t source);
 
 /*
 * @brief Append a given string to a path.
@@ -79,7 +79,7 @@ Path path_append(const Path destination, const Path source);
 * @param source String to be converted into a path to be copied into the destination.
 * @returns A new path whose raw data is of the two concatenated parametres.
 */
-Path path_append_as(const Path destination, const char *source);
+path_t path_append_as(const path_t destination, const char *source);
 
 /*
 * @brief Append a given path to a string representing a path.
@@ -87,27 +87,27 @@ Path path_append_as(const Path destination, const char *source);
 * @param source Path from which to be copied into the destination.
 * @returns A new path whose raw data is of the two concatenated parametres.
 */
-Path path_append_to(const char *destination, const Path source);
+path_t path_append_to(const char *destination, const path_t source);
 
 /*
 * @brief Get the parent directory of a given path.
 * @param path A path, either relative or absolute, to parse.
 * @returns A new path with the data as the path to the parent directory of the given path.
 */
-Path path_get_parent(const Path path);
+path_t path_get_parent(const path_t path);
 
 // TODO: Implement a file type dispatch that calls a different function.
 /*
 * @brief Create a file.
 * @param path A path to a file to create.
 */
-void path_touch_file(Path path);
+void path_touch_file(path_t path);
 
 /*
 * @brief Create a directory.
 * @param path Path to a directory to create.
 */
-void path_mkdir(Path path);
+void path_mkdir(path_t path);
 
 #endif // PATH_H_
 
@@ -117,9 +117,9 @@ void path_mkdir(Path path);
 * @brief Initialize a new path. The underlying path data is initialized to NULL after using this function.
 * @returns A new, 0-initialized, Path.
 */
-Path path_new()
+path_t path_new()
 {
-    Path path = {0};
+    path_t path = {0};
     return path;
 }
 
@@ -128,9 +128,9 @@ Path path_new()
 * @param path String literal to initialize the path object.
 * @returns A new Path.
 */
-Path path_from(const char *path)
+path_t path_from(const char *path)
 {
-    Path return_path = {0};
+    path_t return_path = {0};
     return_path.raw = path;
     return return_path;
 }
@@ -164,7 +164,7 @@ bool path_exists(const char *path)
 * @param path Relative path to extract the absolute.
 * @returns A new path with the absolute path of the realtive given path.
 */
-Path pasb(Path path)
+path_t pasb(path_t path)
 {
 #ifdef _WIN32
     if(GetFullPathName(path.raw, MAX_PATH_SIZE, __path_buffer, NULL) == 0)
@@ -172,12 +172,12 @@ Path pasb(Path path)
         fprintf(stderr, "IOError: cannot get absolute path: %ld\n", GetLastError());
         exit(1);
     }
-    Path new_path;
+    path_t new_path;
     new_path.raw = __path_buffer;
     // printf("Error: %ld\n", GetLastError());
     return new_path;
 #else
-    Path new_path = {0};
+    path_t new_path = {0};
     return new_path; // TODOl Implement the linux version.
 #endif // _WIN32
 }
@@ -187,7 +187,7 @@ Path pasb(Path path)
 * @param path Read-Only Path to represent.
 * @returns The underlying path data within the given object.
 */
-const char *passtr(Path path)
+const char *passtr(path_t path)
 {
     return path.raw;
 }
@@ -198,7 +198,7 @@ const char *passtr(Path path)
 * @param source Path from which to be copied into the destination.
 * @returns A new path whose raw data is of the two concatenated parametres.
 */
-Path path_append(const Path destination, const Path source)
+path_t path_append(const path_t destination, const path_t source)
 {
     size_t dest_len = strlen(destination.raw);
     size_t source_len = strlen(source.raw);
@@ -223,10 +223,10 @@ Path path_append(const Path destination, const Path source)
 * @param source String without a seperator to be converted into a path to be copied into the destination.
 * @returns A new path whose raw data is of the two concatenated parametres.
 */
-Path path_append_as(const Path destination, const char *source)
+path_t path_append_as(const path_t destination, const char *source)
 {
-    Path source_path = path_from(source);
-    Path new = path_append(destination, source_path);
+    path_t source_path = path_from(source);
+    path_t new = path_append(destination, source_path);
     return new;
 }
 
@@ -236,10 +236,10 @@ Path path_append_as(const Path destination, const char *source)
 * @param source Path from which to be copied into the destination.
 * @returns A new path whose raw data is of the two concatenated parametres.
 */
-Path path_append_to(const char *destination, const Path source)
+path_t path_append_to(const char *destination, const path_t source)
 {
-    Path destination_path = path_from(destination);
-    Path new = path_append(destination_path, source);
+    path_t destination_path = path_from(destination);
+    path_t new = path_append(destination_path, source);
     return new;
 }
 
@@ -269,9 +269,9 @@ static size_t _find_last_stroke(const char *path)
 * @param path A path, either relative or absolute, to parse.
 * @returns A new path with the data as the path to the parent directory of the given path.
 */
-Path path_get_parent(const Path path)
+path_t path_get_parent(const path_t path)
 {
-    Path full_path = pasb(path);
+    path_t full_path = pasb(path);
     // printf("full: %s\n", full_path.raw);
     const size_t last_stroke = _find_last_stroke(full_path.raw);
     // printf("i: %d\n", last_stroke);
@@ -282,7 +282,7 @@ Path path_get_parent(const Path path)
         __path_buffer[i] = full_path.raw[i];
     }
     __path_buffer[last_stroke] = '\0';
-    Path new_path = {0};
+    path_t new_path = {0};
     new_path.raw = __path_buffer;
     return new_path;
     // return __path_buffer;
@@ -292,7 +292,7 @@ Path path_get_parent(const Path path)
 * @brief Create a file.
 * @param path A path to a file to create.
 */
-void path_touch_file(Path path)
+void path_touch_file(path_t path)
 {
     FILE *file = fopen(path.raw, "w");
     if (NULL == file || errno == EEXIST)
@@ -307,7 +307,7 @@ void path_touch_file(Path path)
 * @brief Create a directory.
 * @param path Path to a directory to create.
 */
-void path_mkdir(Path path)
+void path_mkdir(path_t path)
 {
 #ifdef _WIN32
     int error = _mkdir(path.raw);
