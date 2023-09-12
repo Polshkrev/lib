@@ -226,8 +226,8 @@ path_t path_append(const path_t destination, const path_t source)
 path_t path_append_as(const path_t destination, const char *source)
 {
     path_t source_path = path_from(source);
-    path_t new = path_append(destination, source_path);
-    return new;
+    path_t new_path = path_append(destination, source_path);
+    return new_path;
 }
 
 /*
@@ -239,8 +239,8 @@ path_t path_append_as(const path_t destination, const char *source)
 path_t path_append_to(const char *destination, const path_t source)
 {
     path_t destination_path = path_from(destination);
-    path_t new = path_append(destination_path, source);
-    return new;
+    path_t new_path = path_append(destination_path, source);
+    return new_path;
 }
 
 /*
@@ -320,7 +320,6 @@ void path_mkdir(path_t path)
     int error = mkdir(path.raw, 0755);
     if(error < 0 || errno == EEXIST || errno == ENOENT)
     {
-        printf("hit\n");
         fprintf(stderr, "IOError: Cannot create directory: %s\n", strerror(errno));
         exit(1);
     }

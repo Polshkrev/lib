@@ -3,21 +3,27 @@
 
 #ifdef _WIN32
 #include <direct.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #define PATH_SEPERATOR "\\"
 #else // TODO: Include the linux implementation
 #include <filesystem>
+#include <sys/stat.h>
 #define PATH_SEPERATOR "/"
 #endif // _WIN32
 
 #include <string> // std::string
-#include <sys/stat.h>
-#include <fstream>
 
-#include <iostream>
+#include <fstream> // std::ofstream
+#include <iostream> // std::cerr
 
 #ifndef MAX_PATH_SIZE
 #define MAX_PATH_SIZE _MAX_PATH
 #endif // MAX_PATH_SIZE
+
+
+std::string __path_buffer;
+
 
 class Path
 {
@@ -30,7 +36,7 @@ class Path
         Path operator/(Path &child);
         Path operator/(const std::string child);
         bool is_relative();
-        Path &get_parent();
+        Path get_parent();
         void mkdir();
         void touch();
     private:
@@ -38,8 +44,8 @@ class Path
 };
 
 
-static bool _is_directory(const std::string path);
-static bool _path_is_file(const std::string path);
+// static bool _is_directory(const std::string path);
+// static bool _path_is_file(const std::string path);
 static void _make_directory(const std::string path);
 static void _make_file(const std::string filename);
 static std::string _get_absolute(const std::string relative_path);
@@ -47,57 +53,25 @@ static std::string _path_append(const std::string parent, const std::string chil
 
 #endif // PATH_HPP_
 
-#ifdef PATHLIB_IMPLEMENTATION
-
-static bool _is_directory(const std::string path)
-{
-    struct stat info;
-    if (stat(path.data(), &info) != 0)
-    {
-        return false;
-    }
-    else if (!(info.st_mode & S_IFDIR))
-    {
-        return false;
-    }
-    else if (info.st_mode & S_IFREG)
-    {
-        return false;
-    }
-    return true;
-}
-
-static bool _path_is_file(const std::string path)
-{
-    struct stat info;
-    if (stat(path.data(), &info) != 0)
-    {
-        return false;
-    }
-    else if (info.st_mode & S_IFDIR)
-    {
-        return false;
-    }
-    else if (!(info.st_mode & S_IFREG))
-    {
-        return false;
-    }
-    return true;
-}
+// #ifdef PATHLIB_IMPLEMENTATION
 
 static void _make_directory(const std::string path)
 {
-    int error = mkdir(path.data());
-    if (0 > error && (errno != EEXIST))
+#ifdef _WIN32
+    int error = _mkdir(path.data());
+    if(error < 0 || errno == EEXIST || errno == ENOENT)
+    {
+        fprintf(stderr, "IOError: Cannot create directory: %s\n", strerror(errno));
+        exit(1);
+    }
+#else
+    int error = mkdir(path.raw, 0755);
+    if(error < 0 || errno == EEXIST || errno == ENOENT)
     {
         std::cerr << "Unable to create directory: " << path << "\n";
         exit(1);
     }
-    else if (errno == EEXIST)
-    {
-        std::cerr << path.data() << " already exits" << "\n";
-        exit(1);
-    }
+#endif // _WIN32
 }
 
 static void _make_file(const std::string filename)
@@ -108,14 +82,16 @@ static void _make_file(const std::string filename)
 
 static std::string _get_absolute(const std::string relative_path)
 {
-    char buffer[MAX_PATH_SIZE];
-    char *rel_path = _fullpath(buffer, relative_path.data(), MAX_PATH_SIZE);
-    if (NULL == rel_path)
+#ifdef _WIN32
+    if(GetFullPathName(relative_path.c_str(), MAX_PATH_SIZE, const_cast<char*>(__path_buffer.c_str()), NULL) == 0)
     {
-        std::cerr << "Unable to convert a relative path to absolute" << "\n";
+        std::cerr << "Unable to get the full path of " << relative_path << "\n";
         exit(1);
     }
-    return std::string(rel_path);
+    return std::string(__path_buffer.c_str());
+#else
+    // TODO: Implement the linux version.
+#endif // _WIN32
 }
 
 static std::string _path_append(const std::string parent, const std::string child)
@@ -135,8 +111,23 @@ Path::Path(const std::string path)
 
 bool Path::exists()
 {
-    return _path_is_file(this->to_string()) || _is_directory(this->to_string());
+#ifdef _WIN32
+    DWORD dwAttrib = GetFileAttributes(this->to_string().c_str());
+    return (dwAttrib != INVALID_FILE_ATTRIBUTES);
+#else
+    struct stat stat_buffer = {0};
+    if (stat(this->to_string().c_str(), &stat_buffer) < 0)
+    {
+        if (errno == ENOENT)
+        {
+            errno = 0;
+            return false;
+        }
+    }
+    return S_ISDIR(stat_buffer.st_mode);
+#endif // _WIN32
 }
+
 
 Path Path::absolute()
 {
@@ -174,17 +165,9 @@ bool Path::is_relative()
     return true;
 }
 
-Path &Path::get_parent()
+Path Path::get_parent()
 {
-    std::string full_path;
-    if (this->is_relative())
-    {
-        full_path = this->to_string();
-    }
-    else if (!this->is_relative())
-    {
-        full_path = this->absolute().to_string();
-    }
+    std::string full_path = this->absolute().to_string();
     std::size_t last_stroke = full_path.find_last_of(PATH_SEPERATOR);
     std::string temp;
     for (std::size_t i = 0; i < last_stroke; ++i)
@@ -199,46 +182,22 @@ Path &Path::get_parent()
 
 void Path::mkdir()
 {
-    std::string full_path;
     if (this->exists())
     {
         return;
     }
-    else if (this->is_relative())
-    {
-        if (!full_path.empty())
-        {
-            full_path.clear();
-        }
-        full_path = this->absolute().to_string();
-    }
-    else if (!(this->is_relative()))
-    {
-        if (!full_path.empty())
-        {
-            full_path.clear();
-        }
-        full_path = this->to_string();
-    }
+    std::string full_path = this->absolute().to_string();
     _make_directory(full_path);
 }
 
 void Path::touch()
 {
-    std::string full_path;
     if (this->exists())
     {
         return;
     }
-    else if (!(this->is_relative()))
-    {
-        full_path = this->absolute().to_string();
-    }
-    else if (this->is_relative())
-    {
-        full_path = this->to_string();
-    }
+    std::string full_path = this->absolute().to_string();
     _make_file(full_path);
 }
 
-#endif // PATHLIB_IMPLEMENTATION
+// #endif // PATHLIB_IMPLEMENTATION
