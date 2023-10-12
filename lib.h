@@ -4,6 +4,9 @@
 #define STRINGS_IMPLEMENTATION
 #include "./c/strings.h"
 
+#define STRING_BUFFER_IMPLEMENTATION
+#include "./c/string_buffer.h"
+
 #define LOGGER_IMPLEMENTATION
 #include "./c/io/logger.h"
 
