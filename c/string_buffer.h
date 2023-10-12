@@ -9,6 +9,9 @@
 
 #define ARRAY_INITIAL_CAPACITY 256
 
+/*
+* @brief Classical dynamic array of strings.
+*/
 typedef struct
 {
     const char **items;
@@ -16,17 +19,55 @@ typedef struct
     size_t capacity;
 } string_buffer_t;
 
+/*
+* @brief Initialize a new string buffer.
+* @returns A new heap allocated structure.
+*/
 string_buffer_t string_buffer_init();
+
+/*
+* @brief Append a single element to the buffer.
+* @param buffer A pointer to the specific buffer to which to append.
+* @param item Item from which to append to the buffer.
+*/
 void string_buffer_append(string_buffer_t *buffer, const char *item);
+
+/*
+* @brief Retrieve the underlying data in the buffer at a given index.
+* @param buffer Specific buffer from which to read.
+* @param index Index in the buffer where the underlying data is located.
+* @returns String data at the given index.
+*/
 const char *string_buffer_at(string_buffer_t buffer, size_t index);
+
+/*
+* @brief Remove a string in the buffer at a given index.
+* @param buffer Buffer where the data is located.
+* @param index Index within the buffer where the data is located.
+*/
 void string_buffer_remove(const string_buffer_t *buffer, size_t index);
+
+/*
+* @brief Print the buffer.
+* @param buffer Buffer from which to print.
+*/
 void string_buffer_print(string_buffer_t buffer);
+
+/*
+* @brief Deallocate the buffer.
+* @param buffer Buffer to deallocate.
+*/
 void string_buffer_delete(string_buffer_t *buffer);
 
 #endif // STRING_BUFFER_H
 
 #ifdef STRING_BUFFER_IMPLEMENTATION
 
+/*
+* @brief Internal way of allocated the item array.
+* @param buffer Buffer to fill-up.
+* @param capacity Capacity to "cap-off" the array.
+*/
 static void _string_buffer_fill(string_buffer_t *buffer, size_t capacity)
 {
     buffer->capacity = capacity;
@@ -39,6 +80,10 @@ static void _string_buffer_fill(string_buffer_t *buffer, size_t capacity)
     }
 }
 
+/*
+* @brief Initialize a new string buffer.
+* @returns A new heap allocated structure.
+*/
 string_buffer_t string_buffer_init()
 {
     string_buffer_t buffer = {0};
@@ -46,6 +91,11 @@ string_buffer_t string_buffer_init()
     return buffer;
 }
 
+/*
+* @brief Append a single element to the buffer.
+* @param buffer A pointer to the specific buffer to which to append.
+* @param item Item from which to append to the buffer.
+*/
 void string_buffer_append(string_buffer_t *buffer, const char *item)
 {
     if (buffer->size >= buffer->capacity)
@@ -55,6 +105,12 @@ void string_buffer_append(string_buffer_t *buffer, const char *item)
     buffer->items[buffer->size++] = item;
 }
 
+/*
+* @brief Retrieve the underlying data in the buffer at a given index.
+* @param buffer Specific buffer from which to read.
+* @param index Index in the buffer where the underlying data is located.
+* @returns String data at the given index.
+*/
 const char *string_buffer_at(string_buffer_t buffer, size_t index)
 {
     if (index > buffer.capacity)
@@ -65,6 +121,11 @@ const char *string_buffer_at(string_buffer_t buffer, size_t index)
     return buffer.items[index];
 }
 
+/*
+* @brief Remove a string in the buffer at a given index.
+* @param buffer Buffer where the data is located.
+* @param index Index within the buffer where the data is located.
+*/
 void string_buffer_remove(const string_buffer_t *buffer, size_t index)
 {
     if (index > buffer->capacity)
@@ -80,6 +141,10 @@ void string_buffer_remove(const string_buffer_t *buffer, size_t index)
     buffer->items[index] = NULL;
 }
 
+/*
+* @brief Print the buffer.
+* @param buffer Buffer from which to print.
+*/
 void string_buffer_print(string_buffer_t buffer)
 {
     for (size_t i = 0; i < buffer.size; ++i)
@@ -92,6 +157,10 @@ void string_buffer_print(string_buffer_t buffer)
     }
 }
 
+/*
+* @brief Deallocate the buffer.
+* @param buffer Buffer to deallocate.
+*/
 void string_buffer_delete(string_buffer_t *buffer)
 {
     if (!(buffer->items))
