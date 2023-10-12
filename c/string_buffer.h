@@ -41,6 +41,13 @@ void string_buffer_append(string_buffer_t *buffer, const char *item);
 const char *string_buffer_at(string_buffer_t buffer, size_t index);
 
 /*
+* @brief Flatten the two-dimensional string array into one constant contiguous string.
+* @param buffer The buffer to flatten.
+* @returns A string representation of the data within the dynamic array.
+*/
+const char *string_buffer_data(string_buffer_t buffer);
+
+/*
 * @brief Remove a string in the buffer at a given index.
 * @param buffer Buffer where the data is located.
 * @param index Index within the buffer where the data is located.
@@ -119,6 +126,57 @@ const char *string_buffer_at(string_buffer_t buffer, size_t index)
         exit(1);
     }
     return buffer.items[index];
+}
+
+/*
+* @brief Internal way of splitting responsibilities from appending once from many. Simmilar to the way `strcat` works
+* @param destination Destination buffer to which to append.
+* @param source Source buffer from which to add to the destination.
+* @returns A pointer to a new appended string buffer.
+*/
+const char *__buffer_append(const char *destination, const char *source)
+{
+    size_t dest_len = strlen(destination);
+    size_t source_len = strlen(source);
+    size_t full_length = (dest_len + source_len) + 1;
+    char *string = __tmp_buffer;
+    for (size_t i = 0; i < dest_len; ++i)
+    {
+        string[i] = destination[i];
+    }
+    for (size_t j = 0; j < source_len; ++j)
+    {
+        string[dest_len + j] = source[j];
+    }
+    string[full_length - 1] = '\0';
+    return string;
+}
+
+/*
+* @brief Flatten the two-dimensional string array into one constant contiguous string.
+* @param buffer The buffer to flatten.
+* @returns A string representation of the data within the dynamic array.
+*/
+const char *string_buffer_data(string_buffer_t buffer)
+{
+    char *string = __buffer_append(buffer.items[0], buffer.items[1]);
+    for (size_t i = 2; i < buffer.size; ++i)
+    {
+        __buffer_append(string, buffer.items[i]);
+    }
+    return string;
+}
+
+void string_buffer_print(string_buffer_t buffer)
+{
+    for (size_t i = 0; i < buffer.size; ++i)
+    {
+        if (NULL == buffer.items[i])
+        {
+            continue;
+        }
+        printf("%s", buffer.items[i]);
+    }
 }
 
 /*
