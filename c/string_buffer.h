@@ -81,7 +81,7 @@ static void _string_buffer_fill(string_buffer_t *buffer, size_t capacity)
 {
     buffer->capacity = capacity;
     buffer->size = 0;
-    buffer->items = malloc((buffer->capacity * sizeof(const char *)));
+    buffer->items = (const char **)malloc((buffer->capacity * sizeof(const char *)));
     if (NULL == buffer->items)
     {
         fprintf(stderr, "BadAllocationError: Cannot allocate memory: %s\n", strerror(errno));
@@ -109,7 +109,7 @@ void string_buffer_append(string_buffer_t *buffer, const char *item)
 {
     if (buffer->size >= buffer->capacity)
     {
-        buffer->items = realloc(buffer->items, ((buffer->capacity * 2) * sizeof(const char *)));
+        buffer->items = (const char **)realloc(buffer->items, ((buffer->capacity * 2) * sizeof(const char *)));
     }
     buffer->items[buffer->size++] = item;
 }
@@ -161,7 +161,7 @@ const char *__buffer_append(const char *destination, const char *source)
 */
 const char *string_buffer_data(string_buffer_t buffer)
 {
-    char *string = __buffer_append(buffer.items[0], buffer.items[1]);
+    const char *string = __buffer_append(buffer.items[0], buffer.items[1]);
     for (size_t i = 2; i < buffer.size; ++i)
     {
         __buffer_append(string, buffer.items[i]);
@@ -199,22 +199,6 @@ void string_buffer_remove(const string_buffer_t *buffer, size_t index)
         exit(1);
     }
     buffer->items[index] = NULL;
-}
-
-/*
-* @brief Print the buffer.
-* @param buffer Buffer from which to print.
-*/
-void string_buffer_print(string_buffer_t buffer)
-{
-    for (size_t i = 0; i < buffer.size; ++i)
-    {
-        if (NULL == buffer.items[i])
-        {
-            continue;
-        }
-        printf("%s", buffer.items[i]);
-    }
 }
 
 /*
