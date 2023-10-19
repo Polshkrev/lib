@@ -1,5 +1,5 @@
-#ifndef STRING_BUFFER_H
-#define STRING_BUFFER_H
+#ifndef STRING_BUFFER_H_
+#define STRING_BUFFER_H_
 
 #include <stddef.h> // size_t
 #include <stdio.h> // printf, fprintf, stdout, stderr
@@ -8,6 +8,8 @@
 #include <stdlib.h> // malloc, realloc, exit
 
 #define ARRAY_INITIAL_CAPACITY 256
+
+static char __tmp_buffer[ARRAY_INITIAL_CAPACITY];
 
 /*
 * @brief Classical dynamic array of strings.
@@ -66,7 +68,7 @@ void string_buffer_print(string_buffer_t buffer);
 */
 void string_buffer_delete(string_buffer_t *buffer);
 
-#endif // STRING_BUFFER_H
+#endif // STRING_BUFFER_H_
 
 #ifdef STRING_BUFFER_IMPLEMENTATION
 
