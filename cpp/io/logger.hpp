@@ -22,8 +22,8 @@ char timestamp[FORMAT_BUFFER_SIZE];
 #define FILE_BUFFER_SIZE 200
 #endif // FILE_BUFFER
 
-char file_buffer[FILE_BUFFER_SIZE];
-std::size_t output_count = 0;
+static char __file_buffer[FILE_BUFFER_SIZE];
+static std::size_t output_count = 0;
 
 #ifndef TIMESTAMP_FORMAT
 #define TIMESTAMP_FORMAT "%Y-%m-%d %X"
@@ -201,11 +201,7 @@ namespace logging
         exit(1);
     }
 
-    Logger::Logger(const std::string name, const level_t level = DEBUG) noexcept
-    {
-        this->name = name;
-        this->level = level;
-    }
+    Logger::Logger(const std::string name, const level_t level = DEBUG) : name(name), level(level) noexcept {}
 
     /*
     * @brief Add `stdout` to the array of outputs.
@@ -217,7 +213,7 @@ namespace logging
             std::cerr << "Too many outputs assigned.\n";
             exit(1);
         }
-        this->outputs[output_count++] = stdout;
+        outputs[output_count++] = stdout;
     }
 
     /*
@@ -238,7 +234,7 @@ namespace logging
             fclose(file);
             exit(1);
         }
-        this->outputs[output_count++] = file;
+        outputs[output_count++] = file;
         // fclose(file);
     }
 
@@ -248,8 +244,8 @@ namespace logging
     */
     void Logger::full_setup(const std::string filename = "./log.log")
     {
-        this->add_console();
-        this->add_file(filename);
+        add_console();
+        add_file(filename);
     }
 
     /*
@@ -257,7 +253,7 @@ namespace logging
     */
     void Logger::console_only()
     {
-        this->add_console();
+        add_console();
     }
 
     /*
@@ -266,7 +262,7 @@ namespace logging
     */
     void Logger::file_only(const std::string filename = "./log.log")
     {
-        this->add_file(filename);
+        add_file(filename);
     }
 
     /*
@@ -281,12 +277,12 @@ namespace logging
             return;
         }
         _set_timestamp();
-        _publish_message(this->outputs, this->name, message, level);
+        _publish_message(outputs, name, message, level);
     }
 
     Logger::~Logger()
     {
-        close_logger(this->outputs);
+        close_logger(outputs);
     }
 }
 
