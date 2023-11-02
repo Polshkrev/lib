@@ -26,6 +26,10 @@ class Exception : public std::exception
         void _assign_repr() noexcept;
     public:
         /*
+        * @brief Default constructor for an exception.
+        */
+        explicit Exception() noexcept;
+        /*
         * @brief Standard constructor for an exception.
         * @param message A message string (without newline) to be displayed when the exception is thrown. The parametre is marked with const.
         */
@@ -47,14 +51,23 @@ void operator<<(std::ostream &stream, Exception &exception);
 #ifdef EXCEPTION_IMPLEMENTATION
 
 /*
+* @brief Default constructor for an exception.
+*/
+Exception::Exception() noexcept
+{
+    _assign_name("Exception");
+    _assing_repr();
+}
+
+/*
 * @brief Standard constructor for an exception.
 * @param message A message string (without newline) to be displayed when the exception is thrown. The parametre is marked with const.
 */
 Exception::Exception(const std::string message)
 {
-    Exception::_assign_name("Exception");
-    Exception::__message = message;
-    Exception::_assign_repr();
+    _assign_name("Exception");
+    __message = message;
+    _assign_repr();
 }
 
 /*
@@ -63,7 +76,7 @@ Exception::Exception(const std::string message)
 */
 void Exception::_assign_name(std::string name) noexcept
 {
-    Exception::__name = name;
+    __name = name;
 }
 
 /*
@@ -71,7 +84,7 @@ void Exception::_assign_name(std::string name) noexcept
 */
 void Exception::_assign_repr() noexcept
 {
-    Exception::__repr = Exception::__name + ": " + Exception::__message;
+    __repr = __name + ": " + __message;
 }
 
 /*
@@ -80,7 +93,7 @@ void Exception::_assign_repr() noexcept
 */
 const char *Exception::what()
 {
-    return (Exception::__repr).c_str();
+    return (__repr).c_str();
 }
 
 /*
