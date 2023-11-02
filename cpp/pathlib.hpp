@@ -28,13 +28,13 @@ std::string __path_buffer;
 class Path
 {
     public:
-        Path();
-        Path(const std::string path);
-        bool exists();
+        explicit Path() noexcept;
+        Path(const std::string path) noexcept;
+        bool exists() const;
         Path absolute();
-        std::string to_string();
-        Path operator/(Path &child);
-        Path operator/(const std::string child);
+        const std::string to_string() const noexcept;
+        Path operator/(Path &child) const noexcept;
+        Path operator/(const std::string child) const noexcept;
         bool is_relative();
         Path get_parent();
         void mkdir();
@@ -53,7 +53,7 @@ static std::string _path_append(const std::string parent, const std::string chil
 
 #endif // PATH_HPP_
 
-// #ifdef PATHLIB_IMPLEMENTATION
+#ifdef PATHLIB_IMPLEMENTATION
 
 static void _make_directory(const std::string path)
 {
@@ -99,24 +99,24 @@ static std::string _path_append(const std::string parent, const std::string chil
     return parent + PATH_SEPERATOR + child;
 }
 
-Path::Path()
+Path::Path() noexcept
 {
-    this->__path = ".";
+    __path = ".";
 }
 
-Path::Path(const std::string path)
+Path::Path(const std::string path) noexcept
 {
-    this->__path = path.data();
+    __path = path.data();
 }
 
-bool Path::exists()
+bool Path::exists() const
 {
 #ifdef _WIN32
-    DWORD dwAttrib = GetFileAttributes(this->to_string().c_str());
+    DWORD dwAttrib = GetFileAttributes(to_string().c_str());
     return (dwAttrib != INVALID_FILE_ATTRIBUTES);
 #else
     struct stat stat_buffer = {0};
-    if (stat(this->to_string().c_str(), &stat_buffer) < 0)
+    if (stat(to_string().c_str(), &stat_buffer) < 0)
     {
         if (errno == ENOENT)
         {
@@ -128,37 +128,36 @@ bool Path::exists()
 #endif // _WIN32
 }
 
-
 Path Path::absolute()
 {
-    std::string abs = _get_absolute(this->__path);
-    this->__path.clear();
-    this->__path = abs;
+    const std::string abs = _get_absolute(__path);
+    __path.clear();
+    __path = abs;
     return *this;
 }
 
-std::string Path::to_string()
+const std::string Path::to_string() const noexcept
 {
-    return this->__path;
+    return __path;
 }
 
-Path Path::operator/(Path &child)
+Path Path::operator/(Path &child) const noexcept
 {
-    return Path(_path_append(this->to_string(), child.to_string()));
+    return Path(_path_append(to_string(), child.to_string()));
 }
 
-Path Path::operator/(const std::string child)
+Path Path::operator/(const std::string child) const noexcept
 {
-    return Path(_path_append(this->to_string(), child.data()));
+    return Path(_path_append(to_string(), child.data()));
 }
 
 bool Path::is_relative()
 {
-    if ((this->to_string().find(".") != 0) && (this->to_string().find("..") != 0))
+    if ((to_string().find(".") != 0) && (to_string().find("..") != 0))
     {
         return false;
     }
-    else if ((this->to_string().find(".") != this->to_string().find_last_of(".")) && (this->to_string().find("..") != this->to_string().find_last_of("..")))
+    else if ((to_string().find(".") != to_string().find_last_of(".")) && (to_string().find("..") != to_string().find_last_of("..")))
     {
         return false;
     }
@@ -167,37 +166,37 @@ bool Path::is_relative()
 
 Path Path::get_parent()
 {
-    std::string full_path = this->absolute().to_string();
-    std::size_t last_stroke = full_path.find_last_of(PATH_SEPERATOR);
-    std::string temp;
+    const std::string full_path = absolute().to_string();
+    const std::size_t last_stroke = full_path.find_last_of(PATH_SEPERATOR);
+    std::string temp = std::string();
     for (std::size_t i = 0; i < last_stroke; ++i)
     {
-        temp += full_path[i];
+        temp.push_back(full_path[i]);
     }
     // std::string::iterator it;
-    this->__path.clear();
-    this->__path = temp;
+    __path.clear();
+    __path = temp;
     return *this;
 }
 
 void Path::mkdir()
 {
-    if (this->exists())
+    if (exists())
     {
         return;
     }
-    std::string full_path = this->absolute().to_string();
+    std::string full_path = absolute().to_string();
     _make_directory(full_path);
 }
 
 void Path::touch()
 {
-    if (this->exists())
+    if (exists())
     {
         return;
     }
-    std::string full_path = this->absolute().to_string();
+    std::string full_path = absolute().to_string();
     _make_file(full_path);
 }
 
-// #endif // PATHLIB_IMPLEMENTATION
+#endif // PATHLIB_IMPLEMENTATION
