@@ -165,7 +165,7 @@ void Version::fix()
 * @brief Operator << overload.
 * @param stream Stream to push.
 */
-void Version::operator<<(std::ostream &stream)
+void Version::operator<<(std::ostream &stream) const noexcept
 {
     if (name.empty())
     {
