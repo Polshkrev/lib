@@ -77,6 +77,7 @@ Exception::Exception(const std::string message)
 void Exception::_assign_name(std::string name) noexcept
 {
     __name = name;
+    _assign_repr();
 }
 
 /*
