@@ -56,7 +56,7 @@ void operator<<(std::ostream &stream, Exception &exception);
 Exception::Exception() noexcept
 {
     _assign_name("Exception");
-    _assing_repr();
+    _assign_repr();
 }
 
 /*
