@@ -1,7 +1,7 @@
 #ifndef LIB_HPP_
 #define LIB_HPP_
 
-#define EXCPETION_IMPLEMENTATION
+#define EXCEPTION_IMPLEMENTATION
 #include "./cpp/exception.hpp"
 
 #define PATHLIB_IMPLEMENTATION
