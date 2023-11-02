@@ -15,13 +15,13 @@ struct Version
     /*
     * @brief Initialize a new version object.
     */
-    Version();
+    explicit Version() noexcept;
 
     /*
     * @brief Initialize a new version object with a given name.
     * @param name Name to give to the object.
     */
-    Version(const std::string name);
+    Version(const std::string name) noexcept;
 
     /*
     * @brief Initialize a new version with given major, minor, and patch version numbers.
@@ -29,7 +29,7 @@ struct Version
     * @param minor Minor version number.
     * @param patch Patch version number.
     */
-    Version(std::size_t major, std::size_t minor, std::size_t patch);
+    Version(std::size_t major, std::size_t minor, std::size_t patch) noexcept;
 
     /*
     * @brief Initialize a new version object with a given name, major, minor, and patch version numbers.
@@ -38,34 +38,34 @@ struct Version
     * @param minor Minor version number.
     * @param patch Patch version number.
     */
-    Version(const std::string name, std::size_t major, std::size_t minor, std::size_t patch);
+    Version(const std::string name, std::size_t major, std::size_t minor, std::size_t patch) noexcept;
 
     /*
     * @brief Update the name of the version object.
     * @param name Name with whitch to update the version object.
     */
-    void update_name(const std::string name);
+    void update_name(const std::string name) noexcept;
 
     /*
     * @brief Operator << overload.
     * @param stream Stream to push.
     */
-    void operator<<(std::ostream &stream);
+    void operator<<(std::ostream &stream) const noexcept;
 
     /*
     * @brief Release the version object.
     */
-    void release();
+    void release() noexcept;
 
     /*
     * @brief Update the version object.
     */
-    void update();
+    void update() noexcept;
 
     /*
     * @brief Patch the version object.
     */
-    void fix();
+    void fix() noexcept;
 };
 
 void operator<<(std::ostream &stream, Version &version);
@@ -79,10 +79,10 @@ void operator<<(std::ostream &stream, Version &version);
 */
 Version::Version()
 {
-    this->name = std::string();
-    this->major = 0;
-    this->minor = 0;
-    this->patch = 0;
+    name = std::string();
+    major = 0;
+    minor = 0;
+    patch = 0;
 }
 
 /*
@@ -92,9 +92,9 @@ Version::Version()
 Version::Version(const std::string name)
 {
     this->name = name;
-    this->major = 0;
-    this->minor = 0;
-    this->patch = 0;
+    major = 0;
+    minor = 0;
+    patch = 0;
 }
 
 /*
@@ -139,9 +139,9 @@ void Version::update_name(const std::string name)
 */
 void Version::release()
 {
-    this->major++;
-    this->minor = 0;
-    this->patch = 0;
+    major++;
+    minor = 0;
+    patch = 0;
 }
 
 /*
@@ -149,8 +149,8 @@ void Version::release()
 */
 void Version::update()
 {
-    this->minor++;
-    this->patch = 0;
+    minor++;
+    patch = 0;
 }
 
 /*
@@ -158,7 +158,7 @@ void Version::update()
 */
 void Version::fix()
 {
-    this->patch++;
+    patch++;
 }
 
 /*
@@ -167,12 +167,12 @@ void Version::fix()
 */
 void Version::operator<<(std::ostream &stream)
 {
-    if (this->name.empty())
+    if (name.empty())
     {
-        stream << this->major << "." << this->minor << "." << this->patch << "\n";
+        stream << major << "." << minor << "." << patch << "\n";
         return;
     }
-    stream << this->name << ": " << this->major << "." << this->minor << "." << this->patch << "\n";
+    stream << name << ": " << major << "." << minor << "." << patch << "\n";
 }
 
 void operator<<(std::ostream &stream, Version &version)
