@@ -103,6 +103,11 @@ path_t path_get_parent(const path_t path);
 */
 path_t path_get_root(const path_t path);
 
+/*
+* @brief Obtain a path suffix (file extension) from a given path.
+* @param path Path from which to obtain a suffix.
+* @returns A path representation of a path suffix.
+*/
 path_t path_get_suffix(const path_t path);
 
 // TODO: Implement a file type dispatch that calls a different function.
@@ -318,6 +323,11 @@ path_t path_get_root(const path_t path)
     return new_path;
 }
 
+/*
+* @brief Obtain a path suffix (file extension) from a given path.
+* @param path Path from which to obtain a suffix.
+* @returns A path representation of a path suffix.
+*/
 path_t path_get_suffix(const path_t path)
 {
     const path_t absolute = pasb(path);
