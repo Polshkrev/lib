@@ -97,7 +97,7 @@ path_t path_append_to(const char *destination, const path_t source);
 path_t path_get_parent(const path_t path);
 
 /*
-* @brief Obtain the root directory of the a given path.
+* @brief Obtain the root directory of a given path.
 * @param path Either absolute or realtive path from which to extract the root.
 * @returns A path object representation of the root directory.
 */
@@ -296,7 +296,7 @@ path_t path_get_parent(const path_t path)
 }
 
 /*
-* @brief Obtain the root directory of the a given path.
+* @brief Obtain the root directory of a given path.
 * @param path Either absolute or realtive path from which to extract the root.
 * @returns A path object representation of the root directory.
 */

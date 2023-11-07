@@ -75,6 +75,10 @@ class Path
         */
         Path get_parent();
         /*
+        * @breif Obtain the root directory of a path.
+        */
+        Path get_root();
+        /*
         * @brief Create a directory on the filesystem. If the path already exists, the function returns with no error.
         */
         void mkdir();
@@ -291,6 +295,23 @@ Path Path::get_parent()
         temp.push_back(full_path[i]);
     }
     // std::string::iterator it;
+    __path.clear();
+    __path = temp;
+    return *this;
+}
+
+/*
+* @brief Obtain the root directory of a path.
+*/
+Path Path::get_root()
+{
+    const std::string full_path = absolute().to_string();
+    const std::size_t first_stroke = full_path.find_first_of(PATH_SEPERATOR);
+    std::string temp = std::string();
+    for (std::size_t i = 0; i < first_stroke; ++i)
+    {
+        temp.push_back(full_path.at(i));
+    }
     __path.clear();
     __path = temp;
     return *this;
