@@ -96,6 +96,13 @@ path_t path_append_to(const char *destination, const path_t source);
 */
 path_t path_get_parent(const path_t path);
 
+/*
+* @brief Obtain the root directory of the a given path.
+* @param path Either absolute or realtive path from which to extract the root.
+* @returns A path object representation of the root directory.
+*/
+path_t path_get_root(const path_t path);
+
 // TODO: Implement a file type dispatch that calls a different function.
 /*
 * @brief Create a file.
@@ -288,6 +295,26 @@ path_t path_get_parent(const path_t path)
     // return __path_buffer;
 }
 
+/*
+* @brief Obtain the root directory of the a given path.
+* @param path Either absolute or realtive path from which to extract the root.
+* @returns A path object representation of the root directory.
+*/
+path_t path_get_root(const path_t path)
+{
+    const path_t absolute = pasb(path);
+    const char *result = strchr(absolute.raw, *PATH_SEPERATOR);
+    const size_t full_length = strlen(absolute.raw);
+    const size_t result_length = full_length - strlen(result);
+    for (size_t i = 0; i < result_length; ++i)
+    {
+        __path_buffer[i] = absolute.raw[i];
+    }
+    __path_buffer[result_length] = '\0';
+    path_t new_path = {0};
+    new_path.raw = __path_buffer;
+    return new_path;
+}
 /*
 * @brief Create a file.
 * @param path A path to a file to create.
