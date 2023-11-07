@@ -20,7 +20,7 @@
 #define MAX_PATH_SIZE 256
 #endif // MAX_PATH_SIZE
 
-char __path_buffer[MAX_PATH_SIZE];
+static char __path_buffer[MAX_PATH_SIZE];
 
 /*
 * @brief Representation of a system path.
@@ -103,6 +103,13 @@ path_t path_get_parent(const path_t path);
 */
 path_t path_get_root(const path_t path);
 
+/*
+* @brief Obtain a path suffix (file extension) from a given path.
+* @param path Path from which to obtain a suffix.
+* @returns A path representation of a path suffix.
+*/
+path_t path_get_suffix(const path_t path);
+
 // TODO: Implement a file type dispatch that calls a different function.
 /*
 * @brief Create a file.
@@ -179,7 +186,7 @@ path_t pasb(path_t path)
         fprintf(stderr, "IOError: cannot get absolute path: %ld\n", GetLastError());
         exit(1);
     }
-    path_t new_path;
+    path_t new_path = {0};
     new_path.raw = __path_buffer;
     // printf("Error: %ld\n", GetLastError());
     return new_path;
@@ -315,6 +322,27 @@ path_t path_get_root(const path_t path)
     new_path.raw = __path_buffer;
     return new_path;
 }
+
+/*
+* @brief Obtain a path suffix (file extension) from a given path.
+* @param path Path from which to obtain a suffix.
+* @returns A path representation of a path suffix.
+*/
+path_t path_get_suffix(const path_t path)
+{
+    const path_t absolute = pasb(path);
+    const char *result = strrchr(absolute.raw, '.');
+    const size_t result_length = strlen(result);
+    for (size_t i = 0; i < result_length; ++i)
+    {
+        __path_buffer[i] = result[i];
+    }
+    __path_buffer[result_length] = '\0';
+    path_t new_path = {0};
+    new_path.raw = __path_buffer;
+    return new_path;
+}
+
 /*
 * @brief Create a file.
 * @param path A path to a file to create.

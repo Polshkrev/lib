@@ -79,6 +79,10 @@ class Path
         */
         Path get_root();
         /*
+        * @breif Obtain the path suffix (file extension) of a path.
+        */
+        Path get_suffix();
+        /*
         * @brief Create a directory on the filesystem. If the path already exists, the function returns with no error.
         */
         void mkdir();
@@ -309,6 +313,23 @@ Path Path::get_root()
     const std::size_t first_stroke = full_path.find_first_of(PATH_SEPERATOR);
     std::string temp = std::string();
     for (std::size_t i = 0; i < first_stroke; ++i)
+    {
+        temp.push_back(full_path.at(i));
+    }
+    __path.clear();
+    __path = temp;
+    return *this;
+}
+
+/*
+* @breif Obtain the path suffix (file extension) of a path.
+*/
+Path Path::get_suffix()
+{
+    const std::string full_path = absolute().to_string();
+    const std::size_t last_dot = full_path.find_last_of(".");
+    std::string temp = std::string();
+    for (std::size_t i = last_dot; i < full_path.length(); ++i)
     {
         temp.push_back(full_path.at(i));
     }
