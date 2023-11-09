@@ -22,7 +22,7 @@ char timestamp[FORMAT_BUFFER_SIZE];
 #endif // FILE_BUFFER
 
 char file_buffer[FILE_BUFFER_SIZE] = {0};
-int output_count = 0;
+size_t output_count = 0;
 
 #ifndef TIMESTAMP_FORMAT
 #define TIMESTAMP_FORMAT "%Y-%m-%d %X"
@@ -40,13 +40,13 @@ typedef enum
 typedef struct
 {
     const char *name;
-    FILE *outputs[AVAILABLE_OUTPUTS];
     LoggingLevel level;
+    FILE *outputs[AVAILABLE_OUTPUTS];
 } Logger;
 
-const char *lltostr(LoggingLevel level);
-void logger_set_level(Logger *logger, LoggingLevel level);
-Logger logger_new(const char *name, LoggingLevel level);
+const char *lltostr(const LoggingLevel level);
+void logger_set_level(Logger *logger, const LoggingLevel level);
+Logger logger_new(const char *name, const LoggingLevel level);
 void logger_add_console(Logger *logger);
 void logger_add_file(Logger *logger, const char *filename);
 void logger_full_setup(Logger *logger, const char *filename);
@@ -63,7 +63,7 @@ void close_logger(Logger logger);
 * @param stream Output file stream to check against i/o output.
 * @returns A boolean of wheather a given file stream is composed of an i/o stream (e.g) stdout, stdin, etc. 
 */
-static bool is_file(const FILE *stream)
+bool is_file(const FILE *stream)
 {
     bool found = false;
     FILE *streams[3] = {stdout, stdin, stderr};
@@ -82,7 +82,7 @@ static bool is_file(const FILE *stream)
 * @brief Set the locale of the timezone information.
 * @param locale Country code of target locale.
 */
-static void _set_locale(const char *locale)
+void _set_locale(const char *locale)
 {
     setlocale(LC_TIME, locale);
 }
@@ -90,7 +90,7 @@ static void _set_locale(const char *locale)
 /*
 * @brief Set a timestamp to be used in the logging format.
 */
-static void set_timestamp()
+void set_timestamp()
 {
     time_t t = time(NULL);
     struct tm date = *localtime(&t);
@@ -133,7 +133,7 @@ const char *lltostr(const LoggingLevel level)
 * @param logger A pointer to the logger whose level will be set.
 * @param level LoggingLevel to set for the provided logger.
 */
-void logger_set_level(Logger *logger, const LoggingLevel level)
+void logger_set_level(Logger *logger, LoggingLevel level)
 {
     logger->level = level;
 }
@@ -144,7 +144,7 @@ void logger_set_level(Logger *logger, const LoggingLevel level)
 * @param level LoggingLevel that indicates the minimal logging level that will be logged.
 * @returns A new logger.
 */
-Logger logger_new(const char *name, LoggingLevel level)
+Logger logger_new(const char *name, const LoggingLevel level)
 {
     Logger logger = {0};
     logger.name = name;
@@ -231,7 +231,7 @@ void logger_file_only(Logger *logger, const char *filename)
 */
 static void _publish_message(Logger logger, const char *message, LoggingLevel level)
 {
-    for (int output_num = 0; output_num < output_count; ++output_num)
+    for (size_t output_num = 0; output_num < output_count; ++output_num)
     {
         fprintf(logger.outputs[output_num], "%s:%s[%s] - %s\n", timestamp, logger.name, lltostr(level), message);
     }
@@ -243,7 +243,7 @@ static void _publish_message(Logger logger, const char *message, LoggingLevel le
 */
 void close_logger(Logger logger)
 {
-    for (int output_num = 0; output_num < output_count; ++output_num)
+    for (size_t output_num = 0; output_num < output_count; ++output_num)
     {
         FILE *current_output = logger.outputs[output_num];
         if (!is_file(current_output))
