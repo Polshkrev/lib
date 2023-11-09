@@ -22,8 +22,8 @@ char timestamp[FORMAT_BUFFER_SIZE];
 #define FILE_BUFFER_SIZE 200
 #endif // FILE_BUFFER
 
-static char __file_buffer[FILE_BUFFER_SIZE];
-static std::size_t output_count = 0;
+char __file_buffer[FILE_BUFFER_SIZE];
+std::size_t output_count = 0;
 
 #ifndef TIMESTAMP_FORMAT
 #define TIMESTAMP_FORMAT "%Y-%m-%d %X"
@@ -48,7 +48,7 @@ namespace logging
     * @param level Level to interpret.
     * @returns An upper-case representation of the given logging level.
     */
-    const std::string lltostr(level_t level);
+    const std::string lltostr(const level_t level);
 
     /*
     * @brief Helper function to aid in deconstructing the object.
@@ -64,7 +64,7 @@ namespace logging
         public:
             std::string name;
             level_t level;
-            explicit Logger(const std::string name, const level_t level) noexcept;
+            explicit Logger(const std::string name, const level_t level = DEBUG) noexcept;
 
             // explicit Logger(const std::string name) noexcept;
 
@@ -77,13 +77,13 @@ namespace logging
             * @brief Add a file to the array of outputs.
             * @param filename Name of the file to add.
             */
-            void add_file(const std::string filename);
+            void add_file(const std::string filename = "./log.log");
 
             /*
             * @brief Setup the logger with both `stdout` and a file. Under the hood, this function calls both `add_console();` and `add_file(const std::string filename);`.
             * @param filename Name of the file to pass to `add_file(const std::string filename);`.
             */
-            void full_setup(const std::string filename);
+            void full_setup(const std::string filename = "./log.log");
 
             /*
             * @brief Setup the logger with only `stdout`.
@@ -102,7 +102,7 @@ namespace logging
             * @param level level_t to set for the message. If the level is less than the level property of the logger, then the message is not logged. By default, this parametre is set to DEBUG.
             */
             void log(const std::string message, const level_t level) const;
-            ~Logger();
+            virtual ~Logger();
         private:
             std::array<FILE *, AVAILABLE_OUTPUTS> outputs;
     };
@@ -115,12 +115,12 @@ namespace logging
 namespace logging
 {
 
-    static void _set_locale(const std::string locale)
+    void _set_locale(const std::string locale)
     {
         setlocale(LC_TIME, locale.data());
     }
 
-    static void _set_timestamp()
+    void _set_timestamp()
     {
         time_t t = time(nullptr);
         struct tm date = *localtime(&t);
@@ -128,7 +128,7 @@ namespace logging
         strftime(timestamp, FORMAT_BUFFER_SIZE, TIMESTAMP_FORMAT, &date);
     }
 
-    static void _publish_message(const std::array<FILE *, AVAILABLE_OUTPUTS> outputs, const std::string name, const std::string message, level_t level)
+    void _publish_message(const std::array<FILE *, AVAILABLE_OUTPUTS> outputs, const std::string name, const std::string message, const level_t level)
     {
         for (std::size_t output_num = 0; output_num < output_count; ++output_num)
         {
@@ -136,7 +136,7 @@ namespace logging
         }
     }
 
-    static bool _is_file(FILE *stream)
+    bool _is_file(const FILE *stream)
     {
         bool found = false;
         std::array<FILE *, 3> streams = {stdout, stdin, stderr};
@@ -177,7 +177,7 @@ namespace logging
     * @param level Level to interpret.
     * @returns An upper-case representation of the given logging level.
     */
-    const std::string lltostr(level_t level)
+    const std::string lltostr(const level_t level)
     {
         switch (level)
         {
@@ -201,7 +201,7 @@ namespace logging
         exit(1);
     }
 
-    Logger::Logger(const std::string name, const level_t level = DEBUG) : name(name), level(level) noexcept {}
+    Logger::Logger(const std::string name, const level_t level) noexcept : name(name), level(level) {}
 
     /*
     * @brief Add `stdout` to the array of outputs.
@@ -220,7 +220,7 @@ namespace logging
     * @brief Add a file to the array of outputs.
     * @param filename Name of the file to add.
     */
-    void Logger::add_file(const std::string filename = "./log.log")
+    void Logger::add_file(const std::string filename)
     {
         FILE *file = fopen(filename.data(), "a");
         if (NULL == file)
@@ -242,7 +242,7 @@ namespace logging
     * @brief Setup the logger with both `stdout` and a file. Under the hood, this function calls both `add_console();` and `add_file(const std::string filename);`.
     * @param filename Name of the file to pass to `add_file(const std::string filename);`.
     */
-    void Logger::full_setup(const std::string filename = "./log.log")
+    void Logger::full_setup(const std::string filename)
     {
         add_console();
         add_file(filename);
