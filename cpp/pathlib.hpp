@@ -101,25 +101,25 @@ class Path
 * @brief Protected helper function to split responsibilities when creating a directory on the filesystem.
 * @param path Standard string-path to create on the filesystem.
 */
-static void _make_directory(const std::string path);
+void _make_directory(const std::string path);
 /*
 * @brief Protected helper function to split responsibilities when creating a file on the filesystem.
 * @param filename Standard string-path to create on the filesystem.
 */
-static void _make_file(const std::string filename);
+void _make_file(const std::string filename);
 /*
 * @brief Protected helper function to split responsibilities when obtaining an absolute path.
 * @param realtive_path Standard string-path from which to obtain an absolute path.
 * @returns A string representation of an absolute path.
 */
-static std::string _get_absolute(const std::string relative_path);
+std::string _get_absolute(const std::string relative_path);
 /*
 * @brief Protected helper function to help with path appendation.
 * @param parent A string representation of the destination parent path to which to appened.
 * @param child A string representation of the source child from which to append to its parent.
 * @returns A full representation of an appended child to its parent with a path seperator.
 */
-static std::string _path_append(const std::string parent, const std::string child);
+std::string _path_append(const std::string parent, const std::string child);
 
 #endif // PATH_HPP_
 
@@ -129,7 +129,7 @@ static std::string _path_append(const std::string parent, const std::string chil
 * @brief Protected helper function to split responsibilities when creating a directory on the filesystem.
 * @param path Standard string-path to create on the filesystem.
 */
-static void _make_directory(const std::string path)
+void _make_directory(const std::string path)
 {
 #ifdef _WIN32
     int error = _mkdir(path.data());
@@ -152,7 +152,7 @@ static void _make_directory(const std::string path)
 * @brief Protected helper function to split responsibilities when creating a file on the filesystem.
 * @param filename Standard string-path to create on the filesystem.
 */
-static void _make_file(const std::string filename)
+void _make_file(const std::string filename)
 {
     std::ofstream file{filename};
 }
@@ -162,7 +162,7 @@ static void _make_file(const std::string filename)
 * @param realtive_path Standard string-path from which to obtain an absolute path.
 * @returns A string representation of an absolute path.
 */
-static std::string _get_absolute(const std::string relative_path)
+std::string _get_absolute(const std::string relative_path)
 {
 #ifdef _WIN32
     if(GetFullPathName(relative_path.c_str(), MAX_PATH_SIZE, const_cast<char*>(__path_buffer.c_str()), NULL) == 0)
@@ -182,7 +182,7 @@ static std::string _get_absolute(const std::string relative_path)
 * @param child A string representation of the source child from which to append to its parent.
 * @returns A full representation of an appended child to its parent with a path seperator.
 */
-static std::string _path_append(const std::string parent, const std::string child)
+std::string _path_append(const std::string parent, const std::string child)
 {
     return parent + PATH_SEPERATOR + child;
 }
