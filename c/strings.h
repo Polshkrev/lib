@@ -46,7 +46,7 @@ typedef struct
 * @param count The provided length of the given data.
 * @returns A new string with a given count and data.
 */
-string_t new_string(const char *data, size_t count);
+string_t new_string(const char *data, const size_t count);
 
 /*
 * @brief Allocate a new string structure from a c-string literal marked with const.
@@ -60,21 +60,21 @@ string_t string_from_literal(const char *cstr);
 * @param string A pointer to the string that needs to be trimmed. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
 * @returns A copy of the same string passed into the function without its following spaces.
 */
-string_t string_trim_left(string_t *string);
+string_t string_trim_left(const string_t *string);
 
 /*
 * @brief Trim a string of its preceeding spaces.
 * @param string A pointer to the string that needs to be trimmed. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
 * @returns A copy of the same string passed into the function without its preceeding spaces.
 */
-string_t string_trim_right(string_t *string);
+string_t string_trim_right(const string_t *string);
 
 /*
 * @brief Trim a string of both its preceeding and following spaces. This function is a combination of both the `string_trim_left` and the `string_trim_right` functions. This function is similar to the default behaviour of Python's `string.strip()` function.
 * @param string A pointer to the string that needs to be trimmed. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
 * @returns A copy of the same string passed into the function without its preceeding or following spaces.
 */
-string_t string_trim(string_t *string);
+string_t string_trim(const string_t *string);
 
 /*
 * @brief Chop a string by a given delimetre.
@@ -82,7 +82,7 @@ string_t string_trim(string_t *string);
 * @param delimetre A charactor by which to split the string.
 * @returns A string where the data is set to the first chunk of string before the given delimetre.
 */
-string_t string_chop_by_delimetre(string_t *string, char delimetre);
+string_t string_chop_by_delimetre(string_t *string, const char delimetre);
 
 /*
 * @brief Find the first occurance of a given charactor within a given string.
@@ -106,7 +106,7 @@ size_t string_find_last_of(const string_t *string, const char_t charactor);
 * @param expected The expected prefix to check against.
 * @returns A boolean on whether `string` starts with `expected`.
 */
-bool string_starts_with(string_t *string, string_t expected);
+bool string_starts_with(const string_t *string, const string_t expected);
 
 /*
 * @brief Determine whether a given string ends with a given expected string.
@@ -114,7 +114,7 @@ bool string_starts_with(string_t *string, string_t expected);
 * @param expected The expected suffix to check against.
 * @returns A boolean on whether `string` ends with `expected`.
 */
-bool string_ends_with(string_t *string, string_t expected);
+bool string_ends_with(const string_t *string, const string_t expected);
 
 /*
 * @brief Compare two given — case sensitive — string types.
@@ -134,9 +134,9 @@ bool string_equals(string_t a, string_t b);
 * @param count The provided length of the given data.
 * @returns A new string with a given count and data.
 */
-string_t new_string(const char *data, size_t count)
+string_t new_string(const char *data, const size_t count)
 {
-    string_t string;
+    string_t string = {0};
     string.count = count;
     string.data = data;
     return string;
@@ -157,7 +157,7 @@ string_t string_from_literal(const char *cstr)
 * @param string A pointer to the string that needs to be trimmed. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
 * @returns A copy of the same string passed into the function without its following spaces.
 */
-string_t string_trim_left(string_t *string)
+string_t string_trim_left(const string_t *string)
 {
     size_t i = 0;
     while (i < string->count && isspace(string->data[i]))
@@ -172,7 +172,7 @@ string_t string_trim_left(string_t *string)
 * @param string A pointer to the string that needs to be trimmed. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
 * @returns A copy of the same string passed into the function without its preceeding spaces.
 */
-string_t string_trim_right(string_t *string)
+string_t string_trim_right(const string_t *string)
 {
     size_t i = 0;
     while (i < string->count && isspace(string->data[string->count - 1 - i]))
@@ -187,7 +187,7 @@ string_t string_trim_right(string_t *string)
 * @param string A pointer to the string that needs to be trimmed. It is passed by pointer because it is mutable — or changeable — and shouldn't be localized or passed by value.
 * @returns A copy of the same string passed into the function without its preceeding or following spaces.
 */
-string_t string_trim(string_t *string)
+string_t string_trim(const string_t *string)
 {
     string_t left_trim = string_trim_left(string);
     return string_trim_right(&left_trim);
@@ -199,7 +199,7 @@ string_t string_trim(string_t *string)
 * @param delimetre A charactor by which to split the string.
 * @returns A string where the data is set to the first chunk of string before the given delimetre.
 */
-string_t string_chop_by_delimetre(string_t *string, char delimetre)
+string_t string_chop_by_delimetre(string_t *string, const char delimetre)
 {
     size_t i = 0;
     while (i < string->count && string->data[i] != delimetre)
@@ -260,7 +260,7 @@ size_t string_find_last_of(const string_t *string, const char_t charactor)
 * @param expected The expected prefix to check against.
 * @returns A boolean on whether `string` starts with `expected`.
 */
-bool string_starts_with(string_t *string, string_t expected)
+bool string_starts_with(const string_t *string, const string_t expected)
 {
     if (expected.count > string->count)
     {
@@ -276,7 +276,7 @@ bool string_starts_with(string_t *string, string_t expected)
 * @param expected The expected suffix to check against.
 * @returns A boolean on whether `string` ends with `expected`.
 */
-bool string_ends_with(string_t *string, string_t expected)
+bool string_ends_with(const string_t *string, const string_t expected)
 {
     if (expected.count > string->count)
     {
@@ -292,7 +292,7 @@ bool string_ends_with(string_t *string, string_t expected)
 * @param b The string to which a comparison will be made in parametre `a`.
 * @returns A boolean on wheather `a` and `b` are equal.
 */
-bool string_equals(string_t a, string_t b)
+bool string_equals(const string_t a, const string_t b)
 {
     if (a.count != b.count)
     {
