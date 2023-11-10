@@ -20,7 +20,7 @@
 #define MAX_PATH_SIZE 256
 #endif // MAX_PATH_SIZE
 
-static char __path_buffer[MAX_PATH_SIZE];
+char __path_buffer[MAX_PATH_SIZE];
 
 /*
 * @brief Representation of a system path.
@@ -56,14 +56,14 @@ bool path_exists(const char *path);
 * @param path Relative path to extract the absolute.
 * @returns A new path with the absolute path of the realtive given path.
 */
-path_t pasb(path_t path);
+path_t pasb(const path_t path);
 
 /*
 * @brief Represent a path as a string.
 * @param path Read-Only Path to represent.
 * @returns The underlying path data within the given object.
 */
-const char *passtr(path_t path);
+const char *passtr(const path_t path);
 
 /*
 * @brief Append a given path to another.
@@ -115,13 +115,13 @@ path_t path_get_suffix(const path_t path);
 * @brief Create a file.
 * @param path A path to a file to create.
 */
-void path_touch_file(path_t path);
+void path_touch_file(const path_t path);
 
 /*
 * @brief Create a directory.
 * @param path Path to a directory to create.
 */
-void path_mkdir(path_t path);
+void path_mkdir(const path_t path);
 
 #endif // PATH_H_
 
@@ -178,7 +178,7 @@ bool path_exists(const char *path)
 * @param path Relative path to extract the absolute.
 * @returns A new path with the absolute path of the realtive given path.
 */
-path_t pasb(path_t path)
+path_t pasb(const path_t path)
 {
 #ifdef _WIN32
     if(GetFullPathName(path.raw, MAX_PATH_SIZE, __path_buffer, NULL) == 0)
@@ -201,7 +201,7 @@ path_t pasb(path_t path)
 * @param path Read-Only Path to represent.
 * @returns The underlying path data within the given object.
 */
-const char *passtr(path_t path)
+const char *passtr(const path_t path)
 {
     return path.raw;
 }
@@ -347,7 +347,7 @@ path_t path_get_suffix(const path_t path)
 * @brief Create a file.
 * @param path A path to a file to create.
 */
-void path_touch_file(path_t path)
+void path_touch_file(const path_t path)
 {
     FILE *file = fopen(path.raw, "w");
     if (NULL == file || errno == EEXIST)
@@ -362,7 +362,7 @@ void path_touch_file(path_t path)
 * @brief Create a directory.
 * @param path Path to a directory to create.
 */
-void path_mkdir(path_t path)
+void path_mkdir(const path_t path)
 {
 #ifdef _WIN32
     int error = _mkdir(path.raw);
