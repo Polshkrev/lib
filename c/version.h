@@ -29,7 +29,7 @@ version_t version_init();
 * @param patch Patch fix number.
 * @returns A new version object with each of the properties set to the given parametres.
 */
-version_t version_convert(size_t major, size_t minor, size_t patch);
+version_t version_convert(const size_t major, const size_t minor, const size_t patch);
 
 /*
 * @brief Initialize a new version object with a given name.
@@ -67,7 +67,7 @@ void version_fix(version_t *version);
 * @param version Version object to check.
 * @returns False if the given version object's major release number is less than 1, else true.
 */
-bool version_is_public(version_t version);
+bool version_is_public(const version_t version);
 
 /*
 * @brief Compare the major release of a given version object.
@@ -75,7 +75,7 @@ bool version_is_public(version_t version);
 * @param major Major release number to compare.
 * @returns False if the given version object's major version is not equal to the given major parametre, else true.
 */
-bool version_compare_major(version_t version, size_t major);
+bool version_compare_major(const version_t version, const size_t major);
 
 /*
 * @brief Compare the minor release of a given version object.
@@ -83,7 +83,7 @@ bool version_compare_major(version_t version, size_t major);
 * @param minor Minor release number to compare.
 * @returns False if the given version object's minor version is not equal to the given minor parametre, else true.
 */
-bool version_compare_minor(version_t version, size_t minor);
+bool version_compare_minor(const version_t version, const size_t minor);
 
 /*
 * @brief Compare the patch release of a given version object.
@@ -91,7 +91,7 @@ bool version_compare_minor(version_t version, size_t minor);
 * @param patch Patch release number to compare.
 * @returns False if the given version object's patch version is not equal to the given patch parametre, else true.
 */
-bool version_compare_patch(version_t version, size_t patch);
+bool version_compare_patch(const version_t version, const size_t patch);
 
 /*
 * @brief Compare one given version object to another.
@@ -99,14 +99,14 @@ bool version_compare_patch(version_t version, size_t patch);
 * @param other Version object to compare.
 * @returns False if all of one given version object's properties are not equal to each other, else true.
 */
-bool version_comapre(version_t version, version_t other);
+bool version_comapre(const version_t version, const version_t other);
 
 /*
 * @brief Print a given version in a given output stream. If the version's name is not given or NULL, then the name is not printed.
 * @param stream Output stream to print the given version.
 * @param version Version object to print. 
 */
-void version_print(FILE *stream, version_t version);
+void version_print(const FILE *stream, const version_t version);
 
 #endif // VERSION_H_
 
@@ -141,7 +141,7 @@ version_t version_init_with_name(const char *name)
 * @param patch Patch fix number.
 * @returns A new version object with each of the properties set to the given parametres.
 */
-version_t version_convert(size_t major, size_t minor, size_t patch)
+version_t version_convert(const size_t major, const size_t minor, const size_t patch)
 {
     version_t version = version_init();
     version.major = major;
@@ -216,7 +216,7 @@ void version_fix(version_t *version)
 * @param major Major release number to compare.
 * @returns False if the given version object's major version is not equal to the given major parametre, else true.
 */
-bool version_compare_major(version_t version, size_t major)
+bool version_compare_major(const version_t version, const size_t major)
 {
     return version.major == major;
 }
@@ -227,7 +227,7 @@ bool version_compare_major(version_t version, size_t major)
 * @param minor Minor release number to compare.
 * @returns False if the given version object's minor version is not equal to the given minor parametre, else true.
 */
-bool version_compare_minor(version_t version, size_t minor)
+bool version_compare_minor(const version_t version, const size_t minor)
 {
     return version.minor == minor;
 }
@@ -238,7 +238,7 @@ bool version_compare_minor(version_t version, size_t minor)
 * @param patch Patch release number to compare.
 * @returns False if the given version object's patch version is not equal to the given patch parametre, else true.
 */
-bool version_compare_patch(version_t version, size_t patch)
+bool version_compare_patch(const version_t version, const size_t patch)
 {
     return version.patch == patch;
 }
@@ -248,7 +248,7 @@ bool version_compare_patch(version_t version, size_t patch)
 * @param version Version object to check.
 * @returns False if the given version object's major release number is less than 1, else true.
 */
-bool version_is_public(version_t version)
+bool version_is_public(const version_t version)
 {
     if (version.major < 1)
     {
@@ -263,7 +263,7 @@ bool version_is_public(version_t version)
 * @param other Version object to compare.
 * @returns False if all of one given version object's properties are not equal to each other, else true.
 */
-bool version_comapre(version_t version, version_t other)
+bool version_comapre(const version_t version, const version_t other)
 {
     return (version_compare_major(version, other.major)) && (version_compare_minor(version, other.minor)) && (version_compare_patch(version, other.patch));
 }
@@ -273,7 +273,7 @@ bool version_comapre(version_t version, version_t other)
 * @param stream Output stream to print the given version.
 * @param version Version object to print. 
 */
-void version_print(FILE *stream, version_t version)
+void version_print(const FILE *stream, const version_t version)
 {
     if (NULL == version.name)
     {

@@ -9,7 +9,7 @@
 
 #define ARRAY_INITIAL_CAPACITY 256
 
-static char __tmp_buffer[ARRAY_INITIAL_CAPACITY];
+char __tmp_buffer[ARRAY_INITIAL_CAPACITY];
 
 /*
 * @brief Classical dynamic array of strings.
@@ -40,27 +40,27 @@ void string_buffer_append(string_buffer_t *buffer, const char *item);
 * @param index Index in the buffer where the underlying data is located.
 * @returns String data at the given index.
 */
-const char *string_buffer_at(string_buffer_t buffer, size_t index);
+const char *string_buffer_at(const string_buffer_t buffer, const size_t index);
 
 /*
 * @brief Flatten the two-dimensional string array into one constant contiguous string.
 * @param buffer The buffer to flatten.
 * @returns A string representation of the data within the dynamic array.
 */
-const char *string_buffer_data(string_buffer_t buffer);
+const char *string_buffer_data(const string_buffer_t buffer);
 
 /*
 * @brief Remove a string in the buffer at a given index.
 * @param buffer Buffer where the data is located.
 * @param index Index within the buffer where the data is located.
 */
-void string_buffer_remove(const string_buffer_t *buffer, size_t index);
+void string_buffer_remove(const string_buffer_t *buffer, const size_t index);
 
 /*
 * @brief Print the buffer.
 * @param buffer Buffer from which to print.
 */
-void string_buffer_print(string_buffer_t buffer);
+void string_buffer_print(const string_buffer_t buffer);
 
 /*
 * @brief Deallocate the buffer.
@@ -77,7 +77,7 @@ void string_buffer_delete(string_buffer_t *buffer);
 * @param buffer Buffer to fill-up.
 * @param capacity Capacity to "cap-off" the array.
 */
-static void _string_buffer_fill(string_buffer_t *buffer, size_t capacity)
+static void _string_buffer_fill(string_buffer_t *buffer, const size_t capacity)
 {
     buffer->capacity = capacity;
     buffer->size = 0;
@@ -120,7 +120,7 @@ void string_buffer_append(string_buffer_t *buffer, const char *item)
 * @param index Index in the buffer where the underlying data is located.
 * @returns String data at the given index.
 */
-const char *string_buffer_at(string_buffer_t buffer, size_t index)
+const char *string_buffer_at(const string_buffer_t buffer, const size_t index)
 {
     if (index > buffer.capacity)
     {
@@ -159,7 +159,7 @@ const char *__buffer_append(const char *destination, const char *source)
 * @param buffer The buffer to flatten.
 * @returns A string representation of the data within the dynamic array.
 */
-const char *string_buffer_data(string_buffer_t buffer)
+const char *string_buffer_data(const string_buffer_t buffer)
 {
     const char *string = __buffer_append(buffer.items[0], buffer.items[1]);
     for (size_t i = 2; i < buffer.size; ++i)
@@ -169,7 +169,7 @@ const char *string_buffer_data(string_buffer_t buffer)
     return string;
 }
 
-void string_buffer_print(string_buffer_t buffer)
+void string_buffer_print(const string_buffer_t buffer)
 {
     for (size_t i = 0; i < buffer.size; ++i)
     {
@@ -186,7 +186,7 @@ void string_buffer_print(string_buffer_t buffer)
 * @param buffer Buffer where the data is located.
 * @param index Index within the buffer where the data is located.
 */
-void string_buffer_remove(const string_buffer_t *buffer, size_t index)
+void string_buffer_remove(const string_buffer_t *buffer, const size_t index)
 {
     if (index > buffer->capacity)
     {
