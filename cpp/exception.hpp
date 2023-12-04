@@ -13,13 +13,13 @@ class Exception : public std::exception
         /* @brief Full string representation of the exception. Composed of the name, a colon, and the message.*/
         std::string __repr;
         /* @brief Message to occompany the exception.*/
-        std::string  __message;
+        const std::string  __message;
     protected:
         /*
         * @brief Assign the name – the main type of exception – to be displayed. This function is marked with the noexcept keyword.
         * @param name name to assign.
         */
-        void _assign_name(std::string name) noexcept;
+        void _assign_name(const std::string name) noexcept;
         /*
         * @brief Assign the representation – a combination of the name and message seperated by a colon – to be displayed. This function is marked with the noexcept keyword.
         */
@@ -28,7 +28,7 @@ class Exception : public std::exception
         /*
         * @brief Default constructor for an exception.
         */
-        explicit Exception() noexcept;
+        explicit Exception();
         /*
         * @brief Standard constructor for an exception.
         * @param message A message string (without newline) to be displayed when the exception is thrown. The parametre is marked with const.
@@ -38,13 +38,13 @@ class Exception : public std::exception
         * @brief Overload to interface with the parent exception class.
         * @return a const c string.
         */
-        const char *what();
+        const char *what() const noexcept override;
 };
 
 /*
 * @brief Operator << overlaod for an exception to aid in printing.
 */
-void operator<<(std::ostream &stream, Exception &exception);
+void operator<<(const std::ostream &stream, const Exception &exception);
 
 #endif // EXCEPTION_HPP_
 
@@ -53,7 +53,7 @@ void operator<<(std::ostream &stream, Exception &exception);
 /*
 * @brief Default constructor for an exception.
 */
-Exception::Exception() noexcept
+Exception::Exception()
 {
     _assign_name("Exception");
     _assign_repr();
@@ -63,10 +63,9 @@ Exception::Exception() noexcept
 * @brief Standard constructor for an exception.
 * @param message A message string (without newline) to be displayed when the exception is thrown. The parametre is marked with const.
 */
-Exception::Exception(const std::string message)
+Exception::Exception(const std::string message) : __message(message)
 {
     _assign_name("Exception");
-    __message = message;
     _assign_repr();
 }
 
@@ -74,9 +73,8 @@ Exception::Exception(const std::string message)
 * @brief Assign the name – the main type of exception – to be displayed. This function is marked with the noexcept keyword.
 * @param name name to assign.
 */
-void Exception::_assign_name(std::string name) noexcept
+void Exception::_assign_name(const std::string name) noexcept : __name(name)
 {
-    __name = name;
     _assign_repr();
 }
 
@@ -92,7 +90,7 @@ void Exception::_assign_repr() noexcept
 * @brief Overload to interface with the parent exception class.
 * @return a const c string.
 */
-const char *Exception::what()
+const char *Exception::what() const noexcept
 {
     return (__repr).c_str();
 }
@@ -100,7 +98,7 @@ const char *Exception::what()
 /*
 * @brief Operator << overlaod for an exception to aid in printing.
 */
-void operator<<(std::ostream &stream, Exception &exception)
+void operator<<(const std::ostream &stream, const Exception &exception)
 {
     stream << exception.what() << "\n";
 }
