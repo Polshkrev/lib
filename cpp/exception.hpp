@@ -4,7 +4,7 @@
 #include <string>
 #include <ostream>
 
-/*Base Exception class to wrap the cpp `std::exception`.*/
+/* @brief Base Exception class to wrap the cpp `std::exception`.*/
 class Exception : public std::exception
 {
     private:
