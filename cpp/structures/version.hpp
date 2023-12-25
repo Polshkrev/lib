@@ -11,6 +11,7 @@
 struct Version
 {
     std::string name;
+    std::string description;
     std::size_t major;
     std::size_t minor;
     std::size_t patch;
@@ -24,6 +25,13 @@ struct Version
     * @param name Name to give to the object.
     */
     Version(const std::string_view name) noexcept;
+
+    /*
+    * @brief Initialize a new version object with a given name.
+    * @param description Description, or changelog, of the version.
+    * @param name Name to give to the object.
+    */
+    Version(const std::string_view name, const std::string_view description) noexcept;
 
     /*
     * @brief Initialize a new version with given major, minor, and patch version numbers.
@@ -43,10 +51,26 @@ struct Version
     Version(const std::string_view name, const std::size_t major, const std::size_t minor, const std::size_t patch) noexcept;
 
     /*
+    * @brief Initialize a new version object with a given name, major, minor, and patch version numbers.
+    * @param name Name with which to construct the version object.
+    * @param description Description, or changelog, of the version.
+    * @param major Major version number.
+    * @param minor Minor version number.
+    * @param patch Patch version number.
+    */
+    Version(const std::string_view name, const std::string_view description, const std::size_t major, const std::size_t minor, const std::size_t patch) noexcept;
+
+    /*
     * @brief Update the name of the version object.
     * @param name Name with whitch to update the version object.
     */
     void update_name(const std::string_view name) noexcept;
+
+    /*
+    * @brief Update the description of the version.
+    * @param description New description from which to update.
+    */
+    void update_description(const std::string_view description) noexcept;
 
     /*
     * @brief Operator << overload.
@@ -83,6 +107,13 @@ Version::Version() noexcept : name(std::string_view()), major(0), minor(0), patc
 
 /*
 * @brief Initialize a new version object with a given name.
+* @param description Description, or changelog, of the version.
+* @param name Name to give to the object.
+*/
+Version::Version(const std::string_view name, const std::string_view description) noexcept : name(name), description(description) {}
+
+/*
+* @brief Initialize a new version object with a given name.
 * @param name Name to give to the object.
 */
 Version::Version(const std::string_view name) noexcept : name(name), major(0), minor(0), patch(0) {}
@@ -105,12 +136,27 @@ Version::Version(std::size_t major, std::size_t minor, std::size_t patch) noexce
 Version::Version(const std::string_view name, const std::size_t major, const std::size_t minor, const std::size_t patch) noexcept : name(name), major(major), minor(minor), patch(patch) {}
 
 /*
+* @brief Initialize a new version object with a given name, major, minor, and patch version numbers.
+* @param name Name with which to construct the version object.
+* @param description Description, or changelog, of the version.
+* @param major Major version number.
+* @param minor Minor version number.
+* @param patch Patch version number.
+*/
+Version::Version(const std::string_view name, const std::string_view description, const std::size_t major, const std::size_t minor, const std::size_t patch) noexcept : name(name), description(description), major(major), minor(minor), patch(patch) {}
+
+/*
 * @brief Update the name of the version object.
 * @param name Name with whitch to update the version object.
 */
 void Version::update_name(const std::string_view name) noexcept
 {
     this->name = name;
+}
+
+void Version::update_description(const std::string_view description) noexcept
+{
+    this->description = description;
 }
 
 /*
@@ -146,22 +192,32 @@ void Version::fix() noexcept
 */
 void Version::operator<<(std::ostream &stream) const noexcept
 {
-    if (name.empty())
+    if (name.empty() && description.empty())
     {
         stream << major << "." << minor << "." << patch << "\n";
         return;
     }
-    stream << name << ": " << major << "." << minor << "." << patch << "\n";
+    else if ((name.empty()) && (!(description.empty())))
+    {
+        stream << major << "." << minor << "." << patch << " - " << description << "\n";
+        return;
+    }
+    stream << name << ": " << major << "." << minor << "." << patch << " - " << description << "\n";
 }
 
 void operator<<(std::ostream &stream, const Version &version) noexcept
 {
-    if (version.name.empty())
+    if (version.name.empty() && version.description.empty())
     {
         stream << version.major << "." << version.minor << "." << version.patch << "\n";
         return;
     }
-    stream << version.name << ": " << version.major << "." << version.minor << "." << version.patch << "\n";
+    else if ((version.name.empty()) && (!(version.description.empty())))
+    {
+        stream << verison.major << "." << version.minor << "." << version.patch << " - " << version.description << "\n";
+        return;
+    }
+    stream << version.name << ": " << version.major << "." << version.minor << "." << version.patch << " - " << version.description << "\n";
 }
 
 #endif // VERSION_IMPLEMENTATION
