@@ -40,6 +40,13 @@ version_t version_convert(const size_t major, const size_t minor, const size_t p
 */
 version_t version_init_with_name(const char *name);
 
+/*
+* @brief Initialize a version object using only the string properties.
+* @param name Name to set for the version object.
+* @param description Description, or changlog, of a version object.
+* @returns A new version with its string realted properties set as the given arguments
+* and its numeric properties set to 0.
+*/
 version_t version_strings_init(const char *name, const char *description);
 
 /*
@@ -138,6 +145,13 @@ version_t version_init_with_name(const char *name)
     return version;
 }
 
+/*
+* @brief Initialize a version object using only the string properties.
+* @param name Name to set for the version object.
+* @param description Description, or changlog, of a version object.
+* @returns A new version with its string realted properties set as the given arguments
+* and its numeric properties set to 0.
+*/
 version_t version_strings_init(const char *name, const char *description)
 {
     version_t version = {
