@@ -1,9 +1,10 @@
 #ifndef VERSION_HPP_
 #define VERSION_HPP_
 
+#include <string_view>
 #include <string>
 #include <ostream>
-#include <string_view>
+#include <sstream>
 
 /*
 * @brief Representation of a semantic-versioning object.
@@ -92,6 +93,7 @@ struct Version
     * @brief Patch the version object.
     */
     void fix() noexcept;
+    const std::string to_string() const noexcept;
 };
 
 void operator<<(std::ostream &stream, const Version &version) noexcept;
@@ -103,20 +105,20 @@ void operator<<(std::ostream &stream, const Version &version) noexcept;
 /*
 * @brief Initialize a new version object.
 */
-Version::Version() noexcept : name(std::string_view()), major(0), minor(0), patch(0) {}
+Version::Version() noexcept : name(std::string()), description(std::string()), major(0), minor(0), patch(0) {}
 
 /*
 * @brief Initialize a new version object with a given name.
 * @param description Description, or changelog, of the version.
 * @param name Name to give to the object.
 */
-Version::Version(const std::string_view name, const std::string_view description) noexcept : name(name), description(description) {}
+Version::Version(const std::string_view name, const std::string_view description) noexcept : name(name.data()), description(description.data()), major(0), minor(0), patch(0) {}
 
 /*
 * @brief Initialize a new version object with a given name.
 * @param name Name to give to the object.
 */
-Version::Version(const std::string_view name) noexcept : name(name), major(0), minor(0), patch(0) {}
+Version::Version(const std::string_view name) noexcept : name(name.data()), description(description.data()), major(0), minor(0), patch(0) {}
 
 /*
 * @brief Initialize a new version with given major, minor, and patch version numbers.
@@ -124,7 +126,7 @@ Version::Version(const std::string_view name) noexcept : name(name), major(0), m
 * @param minor Minor version number.
 * @param patch Patch version number.
 */
-Version::Version(std::size_t major, std::size_t minor, std::size_t patch) noexcept : name(std::string_view()), major(major), minor(minor), patch(patch) {}
+Version::Version(std::size_t major, std::size_t minor, std::size_t patch) noexcept : name(std::string()), major(major), minor(minor), patch(patch) {}
 
 /*
 * @brief Initialize a new version object with a given name, major, minor, and patch version numbers.
@@ -133,7 +135,7 @@ Version::Version(std::size_t major, std::size_t minor, std::size_t patch) noexce
 * @param minor Minor version number.
 * @param patch Patch version number.
 */
-Version::Version(const std::string_view name, const std::size_t major, const std::size_t minor, const std::size_t patch) noexcept : name(name), major(major), minor(minor), patch(patch) {}
+Version::Version(const std::string_view name, const std::size_t major, const std::size_t minor, const std::size_t patch) noexcept : name(name.data()), major(major), minor(minor), patch(patch) {}
 
 /*
 * @brief Initialize a new version object with a given name, major, minor, and patch version numbers.
@@ -143,7 +145,7 @@ Version::Version(const std::string_view name, const std::size_t major, const std
 * @param minor Minor version number.
 * @param patch Patch version number.
 */
-Version::Version(const std::string_view name, const std::string_view description, const std::size_t major, const std::size_t minor, const std::size_t patch) noexcept : name(name), description(description), major(major), minor(minor), patch(patch) {}
+Version::Version(const std::string_view name, const std::string_view description, const std::size_t major, const std::size_t minor, const std::size_t patch) noexcept : name(name.data()), description(description.data()), major(major), minor(minor), patch(patch) {}
 
 /*
 * @brief Update the name of the version object.
@@ -186,38 +188,70 @@ void Version::fix() noexcept
     patch++;
 }
 
+const std::string Version::to_string() const noexcept
+{
+    std::stringstream result = std::stringstream();
+    if (name.empty() && description.empty())
+    {
+        result << major;
+        result << ".";
+        result << minor;
+        result << ".";
+        result << patch;
+        return result.str();
+    }
+    else if ((name.empty()) && (!(description.empty())))
+    {
+        result << major;
+        result << ".";
+        result << minor;
+        result << ".";
+        result << patch;
+        result << " - ";
+        result << description;
+        return result.str();
+    }
+    else if ((!(name.empty())) && (description.empty()))
+    {
+        result << name;
+        result << ": ";
+        result << major;
+        result << ".";
+        result << minor;
+        result << ".";
+        result << patch;
+        return result.str();
+    }
+    result << name;
+    result << ": ";
+    result << major;
+    result << ".";
+    result << minor;
+    result << ".";
+    result << patch;
+    result << " - ";
+    result << description;
+    return result.str();
+}
+
 /*
 * @brief Operator << overload.
 * @param stream Stream to push.
 */
 void Version::operator<<(std::ostream &stream) const noexcept
 {
-    if (name.empty() && description.empty())
-    {
-        stream << major << "." << minor << "." << patch << "\n";
-        return;
-    }
-    else if ((name.empty()) && (!(description.empty())))
-    {
-        stream << major << "." << minor << "." << patch << " - " << description << "\n";
-        return;
-    }
-    stream << name << ": " << major << "." << minor << "." << patch << " - " << description << "\n";
+    std::stringstream full = std::stringstream();
+    full << to_string();
+    full << "\n";
+    stream << full.str();
 }
 
 void operator<<(std::ostream &stream, const Version &version) noexcept
 {
-    if (version.name.empty() && version.description.empty())
-    {
-        stream << version.major << "." << version.minor << "." << version.patch << "\n";
-        return;
-    }
-    else if ((version.name.empty()) && (!(version.description.empty())))
-    {
-        stream << verison.major << "." << version.minor << "." << version.patch << " - " << version.description << "\n";
-        return;
-    }
-    stream << version.name << ": " << version.major << "." << version.minor << "." << version.patch << " - " << version.description << "\n";
+    std::stringstream full = std::stringstream();
+    full << version.to_string();
+    full << "\n";
+    stream << full.str();
 }
 
 #endif // VERSION_IMPLEMENTATION
