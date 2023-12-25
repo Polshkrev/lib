@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*
 * @brief Representation of a semantic-versioning object.
@@ -11,6 +12,7 @@
 typedef struct
 {
     const char *name;
+    const char *description;
     size_t major;
     size_t minor;
     size_t patch;
@@ -37,6 +39,8 @@ version_t version_convert(const size_t major, const size_t minor, const size_t p
 * @returns A new version with the given name and each of its release properties set to zero.
 */
 version_t version_init_with_name(const char *name);
+
+version_t version_strings_init(const char *name, const char *description);
 
 /*
 * @brief Publish a new version. Sets the given version's major release number to 1. If the version object's major release number is already greater than 1, an error is raised and the programme exits.
@@ -106,7 +110,7 @@ bool version_comapre(const version_t version, const version_t other);
 * @param stream Output stream to print the given version.
 * @param version Version object to print. 
 */
-void version_print(const FILE *stream, const version_t version);
+void version_print(FILE *stream, const version_t version);
 
 #endif // VERSION_H_
 
@@ -134,6 +138,15 @@ version_t version_init_with_name(const char *name)
     return version;
 }
 
+version_t version_strings_init(const char *name, const char *description)
+{
+    version_t version = {
+        .name = name,
+        .description = description
+    };
+    return version;
+}
+
 /*
 * @brief Alternatively initialize a new version object from a given major, minor, and patch numbers.
 * @param major Major release number.
@@ -154,14 +167,14 @@ version_t version_convert(const size_t major, const size_t minor, const size_t p
 * @brief Internal way of printing a given version object for error reporting.
 * @param version Version object to print.
 */
-void _version_error_print(version_t version)
+void _version_error_print(FILE *stream, version_t version)
 {
     if (NULL == version.name)
     {
-        printf("%d.%d.%d", (int)version.major, (int)version.minor, (int)version.patch);
+        fprintf(stream, "%d.%d.%d", (int)version.major, (int)version.minor, (int)version.patch);
         return;
     }
-    printf("%s: %d.%d.%d", version.name, (int)version.major, (int)version.minor, (int)version.patch);
+    fprintf(stream, "%s: %d.%d.%d", version.name, (int)version.major, (int)version.minor, (int)version.patch);
 }
 
 /*
@@ -173,7 +186,7 @@ void version_publish(version_t *version)
     if (version_is_public(*version))
     {
         fprintf(stderr, "VersionError: Version - ");
-        _version_error_print(*version);
+        _version_error_print(stderr, *version);
         fprintf(stderr, " is already public.");
         exit(1);
     }
@@ -273,14 +286,23 @@ bool version_comapre(const version_t version, const version_t other)
 * @param stream Output stream to print the given version.
 * @param version Version object to print. 
 */
-void version_print(const FILE *stream, const version_t version)
+void version_print(FILE *stream, const version_t version)
 {
-    if (NULL == version.name)
+    if ((NULL == version.name) && (NULL == version.description))
     {
         fprintf(stream, "%d.%d.%d\n", (int)version.major, (int)version.minor, (int)version.patch);
         return;
     }
-    fprintf(stream, "%s: %d.%d.%d\n", version.name, (int)version.major, (int)version.minor, (int)version.patch);
+    else if ((NULL == version.name) && (!(NULL == version.description)))
+    {
+        fprintf(stream, "%d.%d.%d - %s\n", (int)version.major, (int)version.minor, (int)version.patch, version.description);
+    }
+    else if ((!(NULL == version.name)) && (NULL == version.description))
+    {
+        fprintf(stream, "%s: %d.%d.%d\n", version.name, (int)version.major, (int)version.minor, (int)version.patch);
+
+    }
+    fprintf(stream, "%s: %d.%d.%d - %s\n", version.name, (int)version.major, (int)version.minor, (int)version.patch, version.description);
 }
 
 #endif // VERSION_IMPLEMENTATION
