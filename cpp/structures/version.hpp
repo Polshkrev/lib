@@ -93,6 +93,10 @@ struct Version
     * @brief Patch the version object.
     */
     void fix() noexcept;
+    /*
+    * @brief Obtain a string representation of the version object.
+    * @returns A string representing a symantic version.
+    */
     const std::string to_string() const noexcept;
 };
 
@@ -188,6 +192,10 @@ void Version::fix() noexcept
     patch++;
 }
 
+/*
+* @brief Obtain a string representation of the version object.
+* @returns A string representing a symantic version.
+*/
 const std::string Version::to_string() const noexcept
 {
     std::stringstream result = std::stringstream();
