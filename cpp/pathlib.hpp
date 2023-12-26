@@ -21,9 +21,10 @@
 #define MAX_PATH_SIZE _MAX_PATH
 #endif // MAX_PATH_SIZE
 
-
-std::string __path_buffer;
-
+namespace
+{
+    std::string __path_buffer;
+}
 
 class Path
 {
