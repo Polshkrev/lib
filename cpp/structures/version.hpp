@@ -11,11 +11,11 @@
 */
 struct Version
 {
-    std::string name;
-    std::string description;
     std::size_t major;
     std::size_t minor;
     std::size_t patch;
+    std::string name;
+    std::string description;
     /*
     * @brief Initialize a new version object.
     */
@@ -97,7 +97,7 @@ struct Version
     * @brief Obtain a string representation of the version object.
     * @returns A string representing a symantic version.
     */
-    const std::string to_string() const noexcept;
+    const char *to_string() const noexcept;
 };
 
 void operator<<(std::ostream &stream, const Version &version) noexcept;
@@ -196,7 +196,7 @@ void Version::fix() noexcept
 * @brief Obtain a string representation of the version object.
 * @returns A string representing a symantic version.
 */
-const std::string Version::to_string() const noexcept
+const char *Version::to_string() const noexcept
 {
     std::stringstream result = std::stringstream();
     if (name.empty() && description.empty())
@@ -206,7 +206,7 @@ const std::string Version::to_string() const noexcept
         result << minor;
         result << ".";
         result << patch;
-        return result.str();
+        return result.str().c_str();
     }
     else if ((name.empty()) && (!(description.empty())))
     {
@@ -217,7 +217,7 @@ const std::string Version::to_string() const noexcept
         result << patch;
         result << " - ";
         result << description;
-        return result.str();
+        return result.str().c_str();
     }
     else if ((!(name.empty())) && (description.empty()))
     {
@@ -228,7 +228,7 @@ const std::string Version::to_string() const noexcept
         result << minor;
         result << ".";
         result << patch;
-        return result.str();
+        return result.str().c_str();
     }
     result << name;
     result << ": ";
@@ -239,7 +239,7 @@ const std::string Version::to_string() const noexcept
     result << patch;
     result << " - ";
     result << description;
-    return result.str();
+    return result.str().c_str();
 }
 
 /*
