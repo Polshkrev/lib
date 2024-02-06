@@ -20,6 +20,7 @@ string_builder_t *string_builder_init();
 void string_builder_append(string_builder_t *builder, char item);
 const char string_builder_at(const string_builder_t *builder, size_t index);
 const char *string_builder_data(const string_builder_t *builder);
+void string_builder_combine(string_builder_t *destination, const string_builder_t *source);
 void string_builder_resize(string_builder_t *builder);
 void string_builder_resize_by(string_builder_t *builder, size_t scaler);
 void string_builder_delete(string_builder_t *builder);
@@ -69,6 +70,14 @@ const char string_builder_at(const string_builder_t *builder, size_t index)
 const char *string_builder_data(const string_builder_t *builder)
 {
     return builder->items;
+}
+
+void string_builder_combine(string_builder_t *destination, const string_builder_t *source)
+{
+    for (size_t i = 0; i < source->size; ++i)
+    {
+        string_builder_append(destination, string_builder_at(source, i));
+    }
 }
 
 void string_builder_resize(string_builder_t *builder)
