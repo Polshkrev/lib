@@ -18,6 +18,7 @@ typedef struct
 
 string_builder_t *string_builder_init();
 void string_builder_append(string_builder_t *builder, char item);
+const char string_builder_at(const string_builder_t *builder, size_t index);
 const char *string_builder_data(const string_builder_t *builder);
 void string_builder_delete(string_builder_t *builder);
 
@@ -57,6 +58,16 @@ void string_builder_append(string_builder_t *builder, char item)
         }
     }
     builder->items[builder->size++] = item;
+}
+
+const char string_builder_at(const string_builder_t *builder, size_t index)
+{
+    if (index > builder->size)
+    {
+        fprintf(stderr, "IndexError: Can not access an element outside of array.\n");
+        exit(1);
+    }
+    return builder->items[index];
 }
 
 const char *string_builder_data(const string_builder_t *builder)
