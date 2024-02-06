@@ -21,6 +21,7 @@ void string_builder_append(string_builder_t *builder, char item);
 const char string_builder_at(const string_builder_t *builder, size_t index);
 const char *string_builder_data(const string_builder_t *builder);
 void string_builder_resize(string_builder_t *builder);
+void string_builder_resize_by(string_builder_t *builder, size_t scaler);
 void string_builder_delete(string_builder_t *builder);
 
 #endif // STRING_BUILDER_H_
@@ -72,11 +73,16 @@ const char *string_builder_data(const string_builder_t *builder)
 
 void string_builder_resize(string_builder_t *builder)
 {
-    builder->capacity *= 2;
+    string_builder_resize_by(builder, 2);
+}
+
+void string_builder_resize_by(string_builder_t *builder, size_t scaler)
+{
+    builder->capacity *= scaler;
     builder->items = (char *)realloc(builder->items, builder->capacity);
     if (NULL == builder->items)
     {
-        fprintf(stderr, "AllocationError: Can not rallocate array.\n");
+        fprintf(stderr, "AllocationErorr: Can not resize array.\n");
         exit(1);
     }
 }
