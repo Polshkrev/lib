@@ -52,8 +52,8 @@ void logger_add_file(Logger *logger, const char *filename);
 void logger_full_setup(Logger *logger, const char *filename);
 void logger_console_only(Logger *logger);
 void logger_file_only(Logger *logger, const char *filename);
-void logger_log(Logger logger, const char *message, LoggingLevel level);
-void close_logger(Logger logger);
+void logger_log(const Logger *logger, const char *message, LoggingLevel level);
+void close_logger(const Logger *logger);
 #endif // LOGGER_H_
 
 #ifdef LOGGER_IMPLEMENTATION
@@ -229,11 +229,11 @@ void logger_file_only(Logger *logger, const char *filename)
 * @param message A string – marked with const – to publish to each of the elements in the array of outputs added to the logger.
 * @param level The level of the message.
 */
-static void _publish_message(Logger logger, const char *message, LoggingLevel level)
+static void _publish_message(const Logger *logger, const char *message, LoggingLevel level)
 {
     for (size_t output_num = 0; output_num < output_count; ++output_num)
     {
-        fprintf(logger.outputs[output_num], "%s:%s[%s] - %s\n", timestamp, logger.name, lltostr(level), message);
+        fprintf(logger->outputs[output_num], "%s:%s[%s] - %s\n", timestamp, logger->name, lltostr(level), message);
     }
 }
 
@@ -241,11 +241,11 @@ static void _publish_message(Logger logger, const char *message, LoggingLevel le
 * @brief Close any file outputs linked to the logger.
 * @param logger A logger object to close.
 */
-void close_logger(Logger logger)
+void close_logger(const Logger *logger)
 {
     for (size_t output_num = 0; output_num < output_count; ++output_num)
     {
-        FILE *current_output = logger.outputs[output_num];
+        FILE *current_output = logger->outputs[output_num];
         if (!is_file(current_output))
         {
             continue;
@@ -268,9 +268,9 @@ void close_logger(Logger logger)
 * @param message A string – marked with const – to publish to each of the elements in the array of outputs added to the logger.
 * @param level The level of the message.
 */
-void logger_log(Logger logger, const char *message, LoggingLevel level)
+void logger_log(const Logger *logger, const char *message, LoggingLevel level)
 {
-    if (level < logger.level)
+    if (level < logger->level)
     {
         return;
     }
