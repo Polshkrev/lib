@@ -17,6 +17,7 @@ typedef struct
 } string_builder_t;
 
 string_builder_t *string_builder_init();
+void string_builder_append(string_builder_t *builder, char item);
 
 #endif // STRING_BUILDER_H_
 
@@ -39,6 +40,21 @@ string_builder_t *string_builder_init()
         exit(1);
     }
     return builder;
+}
+
+void string_builder_append(string_builder_t *builder, char item)
+{
+    if (builder->size >= builder->capacity)
+    {
+        builder->capacity *= 2;
+        builder->items = (char *)realloc(builder->items, builder->capacity);
+        if (NULL == builder->items)
+        {
+            fprintf(stderr, "AllocationError: Can not rallocate array.\n");
+            exit(1);
+        }
+    }
+    builder->items[builder->size++] = item;
 }
 
 #endif // STRING_BUILDER_IMPLEMENTATION
