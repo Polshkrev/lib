@@ -18,11 +18,12 @@ typedef struct
 
 string_builder_t *string_builder_init();
 void string_builder_append(string_builder_t *builder, char item);
+const char *string_builder_data(const string_builder_t *builder);
 void string_builder_delete(string_builder_t *builder);
 
 #endif // STRING_BUILDER_H_
 
-// #ifdef STRING_BUILDER_IMPLEMENTATION
+#ifdef STRING_BUILDER_IMPLEMENTATION
 
 string_builder_t *string_builder_init()
 {
@@ -58,6 +59,11 @@ void string_builder_append(string_builder_t *builder, char item)
     builder->items[builder->size++] = item;
 }
 
+const char *string_builder_data(const string_builder_t *builder)
+{
+    return builder->items;
+}
+
 void string_builder_delete(string_builder_t *builder)
 {
     if (!(builder))
@@ -75,4 +81,4 @@ void string_builder_delete(string_builder_t *builder)
     builder = NULL;
 }
 
-// #endif // STRING_BUILDER_IMPLEMENTATION
+#endif // STRING_BUILDER_IMPLEMENTATION
