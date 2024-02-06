@@ -39,7 +39,7 @@ void string_builder_append(string_builder_t *builder, char item);
 * @returns A character stored within the array at the given index.
 * @throws If the given index is outside of the size of the underlying array, then an `IndexError` is thrown and the programme exits.
 */
-const char string_builder_at(const string_builder_t *builder, size_t index);
+char string_builder_at(const string_builder_t *builder, size_t index);
 
 /*
 * @brief Access the underlying flattened array. This 'string' is not null-terminated unless explicitly appended to the array.
@@ -128,7 +128,7 @@ void string_builder_append(string_builder_t *builder, char item)
 * @returns A character stored within the array at the given index.
 * @throws If the given index is outside of the size of the underlying array, then an `IndexError` is thrown and the programme exits.
 */
-const char string_builder_at(const string_builder_t *builder, size_t index)
+char string_builder_at(const string_builder_t *builder, size_t index)
 {
     if (index > builder->size)
     {
