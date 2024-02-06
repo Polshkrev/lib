@@ -98,22 +98,26 @@ class Path
 
 // static bool _is_directory(const std::string path);
 // static bool _path_is_file(const std::string path);
+
 /*
 * @brief Protected helper function to split responsibilities when creating a directory on the filesystem.
 * @param path Standard string-path to create on the filesystem.
 */
 void _make_directory(const std::string &path);
+
 /*
 * @brief Protected helper function to split responsibilities when creating a file on the filesystem.
 * @param filename Standard string-path to create on the filesystem.
 */
 void _make_file(const std::string &filename);
+
 /*
 * @brief Protected helper function to split responsibilities when obtaining an absolute path.
 * @param realtive_path Standard string-path from which to obtain an absolute path.
 * @returns A string representation of an absolute path.
 */
 std::string _get_absolute(const std::string &relative_path);
+
 /*
 * @brief Protected helper function to help with path appendation.
 * @param parent A string representation of the destination parent path to which to appened.
