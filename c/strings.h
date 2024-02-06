@@ -46,7 +46,7 @@ typedef struct
 * @param count The provided length of the given data.
 * @returns A new string with a given count and data.
 */
-string_t new_string(const char *data, const size_t count);
+string_t new_string(const char *data, size_t count);
 
 /*
 * @brief Allocate a new string structure from a c-string literal marked with const.
@@ -82,7 +82,7 @@ string_t string_trim(const string_t *string);
 * @param delimetre A charactor by which to split the string.
 * @returns A string where the data is set to the first chunk of string before the given delimetre.
 */
-string_t string_chop_by_delimetre(string_t *string, const char delimetre);
+string_t string_chop_by_delimetre(string_t *string, char delimetre);
 
 /*
 * @brief Find the first occurance of a given charactor within a given string.
@@ -90,7 +90,7 @@ string_t string_chop_by_delimetre(string_t *string, const char delimetre);
 * @param charactor The charactor to find within the given string.
 * @returns The index of the given charactor within the given string. Much like the `strchr` function, if the charactor is not found within the string, 0 is returned.
 */
-size_t string_find_first_of(const string_t *string, const char_t charactor);
+size_t string_find_first_of(const string_t *string, char_t charactor);
 
 /*
 * @brief Find the last occurance of a given charactor within a given string.
@@ -98,7 +98,7 @@ size_t string_find_first_of(const string_t *string, const char_t charactor);
 * @param charactor The charactor to find within the given string.
 * @returns The index of the given charactor within the given string. Much like the `strrchr` function, if the charactor is not found within the string, 0 is returned.
 */
-size_t string_find_last_of(const string_t *string, const char_t charactor);
+size_t string_find_last_of(const string_t *string, char_t charactor);
 
 /*
 * @brief Determine whether a given string starts with a given expected string.
@@ -106,7 +106,7 @@ size_t string_find_last_of(const string_t *string, const char_t charactor);
 * @param expected The expected prefix to check against.
 * @returns A boolean on whether `string` starts with `expected`.
 */
-bool string_starts_with(const string_t *string, const string_t expected);
+bool string_starts_with(const string_t *string, string_t expected);
 
 /*
 * @brief Determine whether a given string ends with a given expected string.
@@ -114,7 +114,7 @@ bool string_starts_with(const string_t *string, const string_t expected);
 * @param expected The expected suffix to check against.
 * @returns A boolean on whether `string` ends with `expected`.
 */
-bool string_ends_with(const string_t *string, const string_t expected);
+bool string_ends_with(const string_t *string, string_t expected);
 
 /*
 * @brief Compare two given — case sensitive — string types.
@@ -134,7 +134,7 @@ bool string_equals(string_t a, string_t b);
 * @param count The provided length of the given data.
 * @returns A new string with a given count and data.
 */
-string_t new_string(const char *data, const size_t count)
+string_t new_string(const char *data, size_t count)
 {
     string_t string = {0};
     string.count = count;
@@ -199,7 +199,7 @@ string_t string_trim(const string_t *string)
 * @param delimetre A charactor by which to split the string.
 * @returns A string where the data is set to the first chunk of string before the given delimetre.
 */
-string_t string_chop_by_delimetre(string_t *string, const char delimetre)
+string_t string_chop_by_delimetre(string_t *string, char delimetre)
 {
     size_t i = 0;
     while (i < string->count && string->data[i] != delimetre)
@@ -226,7 +226,7 @@ string_t string_chop_by_delimetre(string_t *string, const char delimetre)
 * @param charactor The charactor to find within the given string.
 * @returns The index of the given charactor within the given string. Much like the `strchr` function, if the charactor is not found within the string, 0 is returned.
 */
-size_t string_find_first_of(const string_t *string, const char_t charactor)
+size_t string_find_first_of(const string_t *string, char_t charactor)
 {
     const char *result = strchr(string->data, charactor);
     const size_t full_length = strlen(string->data);
@@ -243,7 +243,7 @@ size_t string_find_first_of(const string_t *string, const char_t charactor)
 * @param charactor The charactor to find within the given string.
 * @returns The index of the given charactor within the given string. Much like the `strrchr` function, if the charactor is not found within the string, 0 is returned.
 */
-size_t string_find_last_of(const string_t *string, const char_t charactor)
+size_t string_find_last_of(const string_t *string, char_t charactor)
 {
     const char *result = strrchr(string->data, charactor);
     const size_t full_length = strlen(string->data);
@@ -260,7 +260,7 @@ size_t string_find_last_of(const string_t *string, const char_t charactor)
 * @param expected The expected prefix to check against.
 * @returns A boolean on whether `string` starts with `expected`.
 */
-bool string_starts_with(const string_t *string, const string_t expected)
+bool string_starts_with(const string_t *string, string_t expected)
 {
     if (expected.count > string->count)
     {
@@ -276,7 +276,7 @@ bool string_starts_with(const string_t *string, const string_t expected)
 * @param expected The expected suffix to check against.
 * @returns A boolean on whether `string` ends with `expected`.
 */
-bool string_ends_with(const string_t *string, const string_t expected)
+bool string_ends_with(const string_t *string, string_t expected)
 {
     if (expected.count > string->count)
     {
@@ -292,7 +292,7 @@ bool string_ends_with(const string_t *string, const string_t expected)
 * @param b The string to which a comparison will be made in parametre `a`.
 * @returns A boolean on wheather `a` and `b` are equal.
 */
-bool string_equals(const string_t a, const string_t b)
+bool string_equals(string_t a, string_t b)
 {
     if (a.count != b.count)
     {
