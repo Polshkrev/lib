@@ -16,9 +16,9 @@ char __tmp_buffer[ARRAY_INITIAL_CAPACITY];
 */
 typedef struct
 {
-    const char **items;
     size_t size;
     size_t capacity;
+    const char **items;
 } string_buffer_t;
 
 /*
@@ -40,27 +40,27 @@ void string_buffer_append(string_buffer_t *buffer, const char *item);
 * @param index Index in the buffer where the underlying data is located.
 * @returns String data at the given index.
 */
-const char *string_buffer_at(const string_buffer_t buffer, const size_t index);
+const char *string_buffer_at(const string_buffer_t *buffer, size_t index);
 
 /*
 * @brief Flatten the two-dimensional string array into one constant contiguous string.
 * @param buffer The buffer to flatten.
 * @returns A string representation of the data within the dynamic array.
 */
-const char *string_buffer_data(const string_buffer_t buffer);
+const char *string_buffer_data(const string_buffer_t *buffer);
 
 /*
 * @brief Remove a string in the buffer at a given index.
 * @param buffer Buffer where the data is located.
 * @param index Index within the buffer where the data is located.
 */
-void string_buffer_remove(const string_buffer_t *buffer, const size_t index);
+void string_buffer_remove(const string_buffer_t *buffer, size_t index);
 
 /*
 * @brief Print the buffer.
 * @param buffer Buffer from which to print.
 */
-void string_buffer_print(const string_buffer_t buffer);
+void string_buffer_print(const string_buffer_t *buffer);
 
 /*
 * @brief Deallocate the buffer.
@@ -120,14 +120,14 @@ void string_buffer_append(string_buffer_t *buffer, const char *item)
 * @param index Index in the buffer where the underlying data is located.
 * @returns String data at the given index.
 */
-const char *string_buffer_at(const string_buffer_t buffer, const size_t index)
+const char *string_buffer_at(const string_buffer_t *buffer, size_t index)
 {
-    if (index > buffer.capacity)
+    if (index > buffer->capacity)
     {
-        fprintf(stderr, "IndexError: Cannot acces buffer with capcaity %d at %d\n", (int)buffer.capacity, (int)index);
+        fprintf(stderr, "IndexError: Cannot acces buffer with capcaity %d at %d\n", (int)buffer->capacity, (int)index);
         exit(1);
     }
-    return buffer.items[index];
+    return buffer->items[index];
 }
 
 /*
@@ -159,25 +159,25 @@ const char *__buffer_append(const char *destination, const char *source)
 * @param buffer The buffer to flatten.
 * @returns A string representation of the data within the dynamic array.
 */
-const char *string_buffer_data(const string_buffer_t buffer)
+const char *string_buffer_data(const string_buffer_t *buffer)
 {
-    const char *string = __buffer_append(buffer.items[0], buffer.items[1]);
-    for (size_t i = 2; i < buffer.size; ++i)
+    const char *string = __buffer_append(buffer->items[0], buffer->items[1]);
+    for (size_t i = 2; i < buffer->size; ++i)
     {
-        __buffer_append(string, buffer.items[i]);
+        __buffer_append(string, buffer->items[i]);
     }
     return string;
 }
 
-void string_buffer_print(const string_buffer_t buffer)
+void string_buffer_print(const string_buffer_t *buffer)
 {
-    for (size_t i = 0; i < buffer.size; ++i)
+    for (size_t i = 0; i < buffer->size; ++i)
     {
-        if (NULL == buffer.items[i])
+        if (NULL == buffer->items[i])
         {
             continue;
         }
-        printf("%s", buffer.items[i]);
+        printf("%s", buffer->items[i]);
     }
 }
 
@@ -186,7 +186,7 @@ void string_buffer_print(const string_buffer_t buffer)
 * @param buffer Buffer where the data is located.
 * @param index Index within the buffer where the data is located.
 */
-void string_buffer_remove(const string_buffer_t *buffer, const size_t index)
+void string_buffer_remove(const string_buffer_t *buffer, size_t index)
 {
     if (index > buffer->capacity)
     {
