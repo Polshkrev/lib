@@ -7,9 +7,6 @@
 #define STRING_BUILDER_IMPLEMENTATION
 #include "./c/string_builder.h"
 
-#define STRING_BUFFER_IMPLEMENTATION
-#include "./c/string_buffer.h"
-
 #define LOGGER_IMPLEMENTATION
 #include "./c/io/logger.h"
 
