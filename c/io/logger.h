@@ -45,8 +45,8 @@ typedef struct
 } Logger;
 
 const char *lltostr(const LoggingLevel level);
-void logger_set_level(Logger *logger, const LoggingLevel level);
-Logger logger_new(const char *name, const LoggingLevel level);
+void logger_set_level(Logger *logger, LoggingLevel level);
+Logger logger_new(const char *name, LoggingLevel level);
 void logger_add_console(Logger *logger);
 void logger_add_file(Logger *logger, const char *filename);
 void logger_full_setup(Logger *logger, const char *filename);
@@ -104,7 +104,7 @@ void set_timestamp()
 * @param level LoggingLevel enum to return as a string.
 * @returns String representation of LoggingLevel enum.
 */
-const char *lltostr(const LoggingLevel level)
+const char *lltostr(LoggingLevel level)
 {
     switch (level)
     {
@@ -144,7 +144,7 @@ void logger_set_level(Logger *logger, LoggingLevel level)
 * @param level LoggingLevel that indicates the minimal logging level that will be logged.
 * @returns A new logger.
 */
-Logger logger_new(const char *name, const LoggingLevel level)
+Logger logger_new(const char *name, LoggingLevel level)
 {
     Logger logger = {0};
     logger.name = name;
