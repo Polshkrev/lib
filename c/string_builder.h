@@ -89,7 +89,7 @@ void string_builder_delete(string_builder_t *builder);
 */
 string_builder_t *string_builder_init()
 {
-    string_builder_t *builder = (string_builder_t *)malloc(sizeof(string_builder_t));
+    string_builder_t *builder = (string_builder_t *)malloc(sizeof(string_builder_t) + (STRING_BUILDER_CAPACITY * sizeof(char)));
     if (NULL == builder)
     {
         fprintf(stderr, "AllocationError: Can not allocate enough memory to build a string.\n");
@@ -100,6 +100,7 @@ string_builder_t *string_builder_init()
     builder->items = (char *)malloc(sizeof(char) * STRING_BUILDER_CAPACITY);
     if (NULL == builder->items)
     {
+        free(builder);
         fprintf(stderr, "AllocationError: Can not allocate enough memory to build a string array.\n");
         exit(1);
     }
