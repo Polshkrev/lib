@@ -36,17 +36,17 @@ void string_builder_append(string_builder_t *builder, char item);
 * @brief Access an element within the array at a given index.
 * @param builder Array from which to access the element.
 * @param index Index at which the element can be found.
-* @returns A character stored within the array at the given index.
+* @returns The address of a character stored within the array at the given index.
 * @throws If the given index is outside of the size of the underlying array, then an `IndexError` is thrown and the programme exits.
 */
-char string_builder_at(const string_builder_t *builder, size_t index);
+char *string_builder_at(const string_builder_t *builder, size_t index);
 
 /*
-* @brief Access the underlying flattened array. This 'string' is not null-terminated unless explicitly appended to the array.
+* @brief Access the underlying flattened array.
 * @param builder Structure from which to access the array.
-* @returns A non-null-terminated pointer to a character array.
+* @returns A null-terminated pointer to a character array.
 */
-const char *string_builder_data(const string_builder_t *builder);
+const char *string_builder_data(string_builder_t *builder);
 
 /*
 * @brief Append the underlying data of one string builder with that of another. Because the implementation is using the `string_builder_append` function, it has the same error signature as that function.
@@ -89,7 +89,7 @@ void string_builder_delete(string_builder_t *builder);
 */
 string_builder_t *string_builder_init()
 {
-    string_builder_t *builder = (string_builder_t *)malloc(sizeof(string_builder_t));
+    string_builder_t *builder = (string_builder_t *)malloc(sizeof(string_builder_t) + (STRING_BUILDER_CAPACITY * sizeof(char)));
     if (NULL == builder)
     {
         fprintf(stderr, "AllocationError: Can not allocate enough memory to build a string.\n");
@@ -100,6 +100,7 @@ string_builder_t *string_builder_init()
     builder->items = (char *)malloc(sizeof(char) * STRING_BUILDER_CAPACITY);
     if (NULL == builder->items)
     {
+        free(builder);
         fprintf(stderr, "AllocationError: Can not allocate enough memory to build a string array.\n");
         exit(1);
     }
@@ -125,26 +126,27 @@ void string_builder_append(string_builder_t *builder, char item)
 * @brief Access an element within the array at a given index.
 * @param builder Array from which to access the element.
 * @param index Index at which the element can be found.
-* @returns A character stored within the array at the given index.
+* @returns The address of a character stored within the array at the given index.
 * @throws If the given index is outside of the size of the underlying array, then an `IndexError` is thrown and the programme exits.
 */
-char string_builder_at(const string_builder_t *builder, size_t index)
+char *string_builder_at(const string_builder_t *builder, size_t index)
 {
     if (index > builder->size)
     {
         fprintf(stderr, "IndexError: Can not access an element outside of array.\n");
         exit(1);
     }
-    return builder->items[index];
+    return &builder->items[index];
 }
 
 /*
-* @brief Access the underlying flattened array. This 'string' is not null-terminated unless explicitly appended to the array.
+* @brief Access the underlying flattened array.
 * @param builder Structure from which to access the array.
-* @returns A non-null-terminated pointer to a character array.
+* @returns A null-terminated pointer to a character array.
 */
-const char *string_builder_data(const string_builder_t *builder)
+const char *string_builder_data(string_builder_t *builder)
 {
+    string_builder_append(builder, '\0');
     return builder->items;
 }
 
@@ -158,7 +160,7 @@ void string_builder_combine(string_builder_t *destination, const string_builder_
 {
     for (size_t i = 0; i < source->size; ++i)
     {
-        string_builder_append(destination, string_builder_at(source, i));
+        string_builder_append(destination, *string_builder_at(source, i));
     }
 }
 
