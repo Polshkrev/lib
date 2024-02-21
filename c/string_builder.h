@@ -36,7 +36,7 @@ void string_builder_append(string_builder_t *builder, char item);
 * @brief Access an element within the array at a given index.
 * @param builder Array from which to access the element.
 * @param index Index at which the element can be found.
-* @returns A character stored within the array at the given index.
+* @returns The address of a character stored within the array at the given index.
 * @throws If the given index is outside of the size of the underlying array, then an `IndexError` is thrown and the programme exits.
 */
 char string_builder_at(const string_builder_t *builder, size_t index);
@@ -125,7 +125,7 @@ void string_builder_append(string_builder_t *builder, char item)
 * @brief Access an element within the array at a given index.
 * @param builder Array from which to access the element.
 * @param index Index at which the element can be found.
-* @returns A character stored within the array at the given index.
+* @returns The address of a character stored within the array at the given index.
 * @throws If the given index is outside of the size of the underlying array, then an `IndexError` is thrown and the programme exits.
 */
 char string_builder_at(const string_builder_t *builder, size_t index)
@@ -135,7 +135,7 @@ char string_builder_at(const string_builder_t *builder, size_t index)
         fprintf(stderr, "IndexError: Can not access an element outside of array.\n");
         exit(1);
     }
-    return builder->items[index];
+    return &builder->items[index];
 }
 
 /*
