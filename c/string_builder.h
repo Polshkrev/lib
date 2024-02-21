@@ -42,11 +42,11 @@ void string_builder_append(string_builder_t *builder, char item);
 char *string_builder_at(const string_builder_t *builder, size_t index);
 
 /*
-* @brief Access the underlying flattened array. This 'string' is not null-terminated unless explicitly appended to the array.
+* @brief Access the underlying flattened array.
 * @param builder Structure from which to access the array.
-* @returns A non-null-terminated pointer to a character array.
+* @returns A null-terminated pointer to a character array.
 */
-const char *string_builder_data(const string_builder_t *builder);
+const char *string_builder_data(string_builder_t *builder);
 
 /*
 * @brief Append the underlying data of one string builder with that of another. Because the implementation is using the `string_builder_append` function, it has the same error signature as that function.
@@ -139,12 +139,13 @@ char *string_builder_at(const string_builder_t *builder, size_t index)
 }
 
 /*
-* @brief Access the underlying flattened array. This 'string' is not null-terminated unless explicitly appended to the array.
+* @brief Access the underlying flattened array.
 * @param builder Structure from which to access the array.
-* @returns A non-null-terminated pointer to a character array.
+* @returns A null-terminated pointer to a character array.
 */
-const char *string_builder_data(const string_builder_t *builder)
+const char *string_builder_data(string_builder_t *builder)
 {
+    string_builder_append(builder, '\0');
     return builder->items;
 }
 
