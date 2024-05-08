@@ -1,12 +1,12 @@
 #ifndef LOGGER_H_
 #define LOGGER_H_
 
-#include <time.h>
-#include <locale.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
+#include <time.h> // time_t, struct tm, strftime
+#include <locale.h> // setlocale, LC_TIME
+#include <stdio.h> // FILE, size_t, fprintf, stderr, fopen, fclose
+#include <stdlib.h> // malloc, exit, free
+#include <string.h> // memset
+#include <stdbool.h> // bool
 
 #ifndef LOCALE
 #define LOCALE "en_US.UTF-8"
