@@ -1,10 +1,9 @@
 #ifndef VERSION_H_
 #define VERSION_H_
 
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdio.h> // FILE, fprintf, stderr
+#include <stdbool.h> // bool
+#include <stdlib.h> // exit
 
 /*
 * @brief Representation of a semantic-versioning object.
