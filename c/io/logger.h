@@ -1,5 +1,5 @@
-#ifndef LOGGER_H_
-#define LOGGER_H_
+// #ifndef LOGGER_H_
+// #define LOGGER_H_
 
 #include <time.h> // time_t, struct tm, strftime
 #include <locale.h> // setlocale, LC_TIME
@@ -46,7 +46,7 @@ typedef struct
 
 const char *lltostr(LoggingLevel level);
 void logger_set_level(Logger *logger, LoggingLevel level);
-Logger logger_new(const char *name, LoggingLevel level);
+Logger *logger_new(const char *name, LoggingLevel level);
 void logger_add_console(Logger *logger);
 void logger_add_file(Logger *logger, const char *filename);
 void logger_full_setup(Logger *logger, const char *filename);
@@ -54,9 +54,9 @@ void logger_console_only(Logger *logger);
 void logger_file_only(Logger *logger, const char *filename);
 void logger_log(const Logger *logger, const char *message, LoggingLevel level);
 void close_logger(const Logger *logger);
-#endif // LOGGER_H_
+// #endif // LOGGER_H_
 
-#ifdef LOGGER_IMPLEMENTATION
+// #ifdef LOGGER_IMPLEMENTATION
 
 /*
 * @brief Determine wheather a specific output stream is a file.
@@ -144,11 +144,16 @@ void logger_set_level(Logger *logger, LoggingLevel level)
 * @param level LoggingLevel that indicates the minimal logging level that will be logged.
 * @returns A new logger.
 */
-Logger logger_new(const char *name, LoggingLevel level)
+Logger *logger_new(const char *name, LoggingLevel level)
 {
-    Logger logger = {0};
-    logger.name = name;
-    logger_set_level(&logger, level);
+    Logger *logger = (Logger *)malloc(sizeof(Logger));
+    if (NULL == logger)
+    {
+        fprintf(stderr, "AllocationError: Can not allocate enough memory to initialize logger.\n");
+        exit(1);
+    }
+    logger->name = name;
+    logger_set_level(logger, level);
     return logger;
 }
 
@@ -278,4 +283,4 @@ void logger_log(const Logger *logger, const char *message, LoggingLevel level)
     _publish_message(logger, message, level);
 }
 
-#endif // LOGGER_IMPLEMENTATION
+// #endif // LOGGER_IMPLEMENTATION
