@@ -87,7 +87,7 @@ void string_builder_delete(string_builder_t *builder);
 
 #endif // STRING_BUILDER_H_
 
-// #ifdef STRING_BUILDER_IMPLEMENTATION
+#ifdef STRING_BUILDER_IMPLEMENTATION
 
 /*
 * @brief Initialize a dynamic array of characters.
@@ -236,4 +236,4 @@ void string_builder_delete(string_builder_t *builder)
     builder = NULL;
 }
 
-// #endif // STRING_BUILDER_IMPLEMENTATION
+#endif // STRING_BUILDER_IMPLEMENTATION
