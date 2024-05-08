@@ -1,10 +1,10 @@
 #ifndef VERSION_H_
 #define VERSION_H_
 
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdio.h> // FILE, fprintf, stderr
+#include <stdbool.h> // bool
+#include <stdlib.h> // exit
+#include <string.h> // memset
 
 /*
 * @brief Representation of a semantic-versioning object.
@@ -22,7 +22,7 @@ typedef struct
 * @brief Initialize a new version object. Each of the version properties are set to zero and the name is set to NULL.
 * @returns A new version object.
 */
-version_t version_init();
+version_t *version_init();
 
 /*
 * @brief Alternatively initialize a new version object from a given major, minor, and patch numbers.
@@ -31,14 +31,14 @@ version_t version_init();
 * @param patch Patch fix number.
 * @returns A new version object with each of the properties set to the given parametres.
 */
-version_t version_convert(const size_t major, const size_t minor, const size_t patch);
+version_t *version_convert(size_t major, size_t minor, size_t patch);
 
 /*
 * @brief Initialize a new version object with a given name.
 * @param name Constant string to pass to the version object.
 * @returns A new version with the given name and each of its release properties set to zero.
 */
-version_t version_init_with_name(const char *name);
+version_t *version_init_with_name(const char *name);
 
 /*
 * @brief Initialize a version object using only the string properties.
@@ -47,7 +47,28 @@ version_t version_init_with_name(const char *name);
 * @returns A new version with its string realted properties set as the given arguments
 * and its numeric properties set to 0.
 */
-version_t version_strings_init(const char *name, const char *description);
+version_t *version_strings_init(const char *name, const char *description);
+
+/*
+* @brief Set the major value of a version object.
+* @param version Object to update.
+* @param major Value from which to set.
+*/
+void version_set_major(version_t *version, size_t major);
+
+/*
+* @brief Set the minor value of a version object.
+* @param version Object to update.
+* @param minpr Value from which to set.
+*/
+void version_set_minor(version_t *version, size_t minor);
+
+/*
+* @brief Set the patch value of a version object.
+* @param version Object to update.
+* @param patch Value from which to set.
+*/
+void version_set_patch(version_t *version, size_t patch);
 
 /*
 * @brief Publish a new version. Sets the given version's major release number to 1. If the version object's major release number is already greater than 1, an error is raised and the programme exits.
@@ -78,7 +99,7 @@ void version_fix(version_t *version);
 * @param version Version object to check.
 * @returns False if the given version object's major release number is less than 1, else true.
 */
-bool version_is_public(const version_t version);
+bool version_is_public(const version_t *version);
 
 /*
 * @brief Compare the major release of a given version object.
@@ -86,7 +107,7 @@ bool version_is_public(const version_t version);
 * @param major Major release number to compare.
 * @returns False if the given version object's major version is not equal to the given major parametre, else true.
 */
-bool version_compare_major(const version_t version, const size_t major);
+bool version_compare_major(const version_t *version, size_t major);
 
 /*
 * @brief Compare the minor release of a given version object.
@@ -94,7 +115,7 @@ bool version_compare_major(const version_t version, const size_t major);
 * @param minor Minor release number to compare.
 * @returns False if the given version object's minor version is not equal to the given minor parametre, else true.
 */
-bool version_compare_minor(const version_t version, const size_t minor);
+bool version_compare_minor(const version_t *version, size_t minor);
 
 /*
 * @brief Compare the patch release of a given version object.
@@ -102,7 +123,7 @@ bool version_compare_minor(const version_t version, const size_t minor);
 * @param patch Patch release number to compare.
 * @returns False if the given version object's patch version is not equal to the given patch parametre, else true.
 */
-bool version_compare_patch(const version_t version, const size_t patch);
+bool version_compare_patch(const version_t *version, size_t patch);
 
 /*
 * @brief Compare one given version object to another.
@@ -110,14 +131,20 @@ bool version_compare_patch(const version_t version, const size_t patch);
 * @param other Version object to compare.
 * @returns False if all of one given version object's properties are not equal to each other, else true.
 */
-bool version_comapre(const version_t version, const version_t other);
+bool version_comapre(const version_t *version, const version_t *other);
 
 /*
 * @brief Print a given version in a given output stream. If the version's name is not given or NULL, then the name is not printed.
 * @param stream Output stream to print the given version.
 * @param version Version object to print. 
 */
-void version_print(FILE *stream, const version_t version);
+void version_print(FILE *stream, const version_t *version);
+
+/*
+* @brief Deallocate a version object.
+* @param version Object to deallocate.
+*/
+void version_delete(version_t *version);
 
 #endif // VERSION_H_
 
@@ -127,9 +154,15 @@ void version_print(FILE *stream, const version_t version);
 * @brief Initialize a new version object. Each of the version properties are set to zero and the name is set to NULL.
 * @returns A new version object.
 */
-version_t version_init()
+version_t *version_init()
 {
-    version_t version = {0};
+    version_t *version = (version_t *)malloc(sizeof(version_t));
+    if (NULL == version)
+    {
+        fprintf(stderr, "AllocationError: Can not allocate enough memory to initialize version object.\n");
+        exit(1);
+    }
+    memset(version, 0, sizeof(version_t));
     return version;
 }
 
@@ -138,10 +171,10 @@ version_t version_init()
 * @param name Constant string to pass to the version object.
 * @returns A new version with the given name and each of its release properties set to zero.
 */
-version_t version_init_with_name(const char *name)
+version_t *version_init_with_name(const char *name)
 {
-    version_t version = {0};
-    version.name = name;
+    version_t *version = version_init();
+    version->name = name;
     return version;
 }
 
@@ -152,12 +185,11 @@ version_t version_init_with_name(const char *name)
 * @returns A new version with its string realted properties set as the given arguments
 * and its numeric properties set to 0.
 */
-version_t version_strings_init(const char *name, const char *description)
+version_t *version_strings_init(const char *name, const char *description)
 {
-    version_t version = {
-        .name = name,
-        .description = description
-    };
+    version_t *version = version_init();
+    version->name = name;
+    version->description = description;
     return version;
 }
 
@@ -168,27 +200,57 @@ version_t version_strings_init(const char *name, const char *description)
 * @param patch Patch fix number.
 * @returns A new version object with each of the properties set to the given parametres.
 */
-version_t version_convert(const size_t major, const size_t minor, const size_t patch)
+version_t *version_convert(size_t major, size_t minor, size_t patch)
 {
-    version_t version = version_init();
-    version.major = major;
-    version.minor = minor;
-    version.patch = patch;
+    version_t *version = version_init();
+    version->major = major;
+    version->minor = minor;
+    version->patch = patch;
     return version;
+}
+
+/*
+* @brief Set the major value of a version object.
+* @param version Object to update.
+* @param major Value from which to set.
+*/
+void version_set_major(version_t *version, size_t major)
+{
+    version->major = major;
+}
+
+/*
+* @brief Set the minor value of a version object.
+* @param version Object to update.
+* @param minpr Value from which to set.
+*/
+void version_set_minor(version_t *version, size_t minor)
+{
+    version->minor = minor;
+}
+
+/*
+* @brief Set the patch value of a version object.
+* @param version Object to update.
+* @param patch Value from which to set.
+*/
+void version_set_patch(version_t *version, size_t patch)
+{
+    version->patch;
 }
 
 /*
 * @brief Internal way of printing a given version object for error reporting.
 * @param version Version object to print.
 */
-void _version_error_print(FILE *stream, version_t version)
+void _version_error_print(FILE *stream, const version_t *version)
 {
-    if (NULL == version.name)
+    if (NULL == version->name)
     {
-        fprintf(stream, "%d.%d.%d", (int)version.major, (int)version.minor, (int)version.patch);
+        fprintf(stream, "%d.%d.%d", (int)version->major, (int)version->minor, (int)version->patch);
         return;
     }
-    fprintf(stream, "%s: %d.%d.%d", version.name, (int)version.major, (int)version.minor, (int)version.patch);
+    fprintf(stream, "%s: %d.%d.%d", version->name, (int)version->major, (int)version->minor, (int)version->patch);
 }
 
 /*
@@ -197,14 +259,16 @@ void _version_error_print(FILE *stream, version_t version)
 */
 void version_publish(version_t *version)
 {
-    if (version_is_public(*version))
+    if (version_is_public(version))
     {
         fprintf(stderr, "VersionError: Version - ");
-        _version_error_print(stderr, *version);
+        _version_error_print(stderr, version);
         fprintf(stderr, " is already public.");
         exit(1);
     }
-    version_release(version);
+    version_set_major(version, 1);
+    version_set_minor(version, 0);
+    version_set_patch(version, 0);
 }
 
 /*
@@ -214,8 +278,8 @@ void version_publish(version_t *version)
 void version_release(version_t *version)
 {
     version->major++;
-    version->minor = 0;
-    version->patch = 0;
+    version_set_minor(version, 0);
+    version_set_patch(version, 0);
 }
 
 /*
@@ -225,7 +289,7 @@ void version_release(version_t *version)
 void version_update(version_t *version)
 {
     version->minor++;
-    version->patch = 0;
+    version_set_patch(version, 0);
 }
 
 /*
@@ -243,9 +307,9 @@ void version_fix(version_t *version)
 * @param major Major release number to compare.
 * @returns False if the given version object's major version is not equal to the given major parametre, else true.
 */
-bool version_compare_major(const version_t version, const size_t major)
+bool version_compare_major(const version_t *version, size_t major)
 {
-    return version.major == major;
+    return version->major == major;
 }
 
 /*
@@ -254,9 +318,9 @@ bool version_compare_major(const version_t version, const size_t major)
 * @param minor Minor release number to compare.
 * @returns False if the given version object's minor version is not equal to the given minor parametre, else true.
 */
-bool version_compare_minor(const version_t version, const size_t minor)
+bool version_compare_minor(const version_t *version, size_t minor)
 {
-    return version.minor == minor;
+    return version->minor == minor;
 }
 
 /*
@@ -265,9 +329,9 @@ bool version_compare_minor(const version_t version, const size_t minor)
 * @param patch Patch release number to compare.
 * @returns False if the given version object's patch version is not equal to the given patch parametre, else true.
 */
-bool version_compare_patch(const version_t version, const size_t patch)
+bool version_compare_patch(const version_t *version, size_t patch)
 {
-    return version.patch == patch;
+    return version->patch == patch;
 }
 
 /*
@@ -275,9 +339,9 @@ bool version_compare_patch(const version_t version, const size_t patch)
 * @param version Version object to check.
 * @returns False if the given version object's major release number is less than 1, else true.
 */
-bool version_is_public(const version_t version)
+bool version_is_public(const version_t *version)
 {
-    if (version.major < 1)
+    if (version->major < 1)
     {
         return false;
     }
@@ -290,9 +354,9 @@ bool version_is_public(const version_t version)
 * @param other Version object to compare.
 * @returns False if all of one given version object's properties are not equal to each other, else true.
 */
-bool version_comapre(const version_t version, const version_t other)
+bool version_comapre(const version_t *version, const version_t *other)
 {
-    return (version_compare_major(version, other.major)) && (version_compare_minor(version, other.minor)) && (version_compare_patch(version, other.patch));
+    return (version_compare_major(version, other->major)) && (version_compare_minor(version, other->minor)) && (version_compare_patch(version, other->patch));
 }
 
 /*
@@ -300,23 +364,36 @@ bool version_comapre(const version_t version, const version_t other)
 * @param stream Output stream to print the given version.
 * @param version Version object to print. 
 */
-void version_print(FILE *stream, const version_t version)
+void version_print(FILE *stream, const version_t *version)
 {
-    if ((NULL == version.name) && (NULL == version.description))
+    if ((NULL == version->name) && (NULL == version->description))
     {
-        fprintf(stream, "%d.%d.%d\n", (int)version.major, (int)version.minor, (int)version.patch);
+        fprintf(stream, "%d.%d.%d\n", (int)version->major, (int)version->minor, (int)version->patch);
         return;
     }
-    else if ((NULL == version.name) && (!(NULL == version.description)))
+    else if ((NULL == version->name) && (!(NULL == version->description)))
     {
-        fprintf(stream, "%d.%d.%d - %s\n", (int)version.major, (int)version.minor, (int)version.patch, version.description);
+        fprintf(stream, "%d.%d.%d - %s\n", (int)version->major, (int)version->minor, (int)version->patch, version->description);
     }
-    else if ((!(NULL == version.name)) && (NULL == version.description))
+    else if ((!(NULL == version->name)) && (NULL == version->description))
     {
-        fprintf(stream, "%s: %d.%d.%d\n", version.name, (int)version.major, (int)version.minor, (int)version.patch);
+        fprintf(stream, "%s: %d.%d.%d\n", version->name, (int)version->major, (int)version->minor, (int)version->patch);
 
     }
-    fprintf(stream, "%s: %d.%d.%d - %s\n", version.name, (int)version.major, (int)version.minor, (int)version.patch, version.description);
+    fprintf(stream, "%s: %d.%d.%d - %s\n", version->name, (int)version->major, (int)version->minor, (int)version->patch, version->description);
+}
+
+/*
+* @brief Deallocate a version object.
+* @param version Object to deallocate.
+*/
+void version_delete(version_t *version)
+{
+    if (!version)
+    {
+        return;
+    }
+    free(version);
 }
 
 #endif // VERSION_IMPLEMENTATION
