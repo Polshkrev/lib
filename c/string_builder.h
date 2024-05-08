@@ -209,6 +209,7 @@ void string_builder_resize_by(string_builder_t *builder, size_t scaler)
     if (NULL == builder->items)
     {
         fprintf(stderr, "AllocationErorr: Can not resize array.\n");
+        string_builder_delete(builder);
         exit(1);
     }
 }
@@ -231,6 +232,7 @@ void string_builder_delete(string_builder_t *builder)
     }
     free(builder->items);
     builder->items = NULL;
+    free(builder);
     builder = NULL;
 }
 
