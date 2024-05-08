@@ -49,6 +49,13 @@ char *string_builder_at(const string_builder_t *builder, size_t index);
 const char *string_builder_data(string_builder_t *builder);
 
 /*
+* @brief Append a c-string to the string builder.
+* @param builder Builder to which to append.
+* @param items C-string from which to append.
+*/
+void string_builder_extend(string_builder_t *builder, const char *items);
+
+/*
 * @brief Append the underlying data of one string builder with that of another. Because the implementation is using the `string_builder_append` function, it has the same error signature as that function.
 * @param destination Destination string builder to which the source will be concatenated.
 * @param source Source string builder from which to concatenate to the destination.
