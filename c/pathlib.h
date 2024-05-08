@@ -11,7 +11,7 @@
 #include <sys/types.h>
 #endif // _WIN32
 
-#include <stdbool.h>
+#include <stdbool.h> // bool
 #include <errno.h>
 
 #include <stdio.h>
@@ -122,6 +122,14 @@ void path_touch_file(const path_t *path);
 * @param path Path to a directory to create.
 */
 void path_mkdir(const path_t *path);
+
+/*
+* @brief Copy a given file path to a given destination path.
+* @param source Source file to copy.
+* @param destination Destination path to which to copy the source path.
+* @returns A boolean flag determining the sucess of the copy operation.
+*/
+bool path_copy_file(const path_t *source, const path_t *destination);
 
 // #endif // PATH_H_
 
@@ -378,6 +386,19 @@ void path_mkdir(const path_t *path)
         fprintf(stderr, "IOError: Cannot create directory: %s\n", strerror(errno));
         exit(1);
     }
+#endif // _WIN32
+}
+
+/*
+* @brief Copy a given file path to a given destination path.
+* @param source Source file to copy.
+* @param destination Destination path to which to copy the source path.
+* @returns A boolean flag determining the sucess of the copy operation.
+*/
+bool path_copy_file(const path_t *source, const path_t *destination)
+{
+#ifdef _WIN32
+    return CopyFile(passtr(source), passtr(destination), FALSE);
 #endif // _WIN32
 }
 
