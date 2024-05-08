@@ -1,12 +1,12 @@
 #ifndef LOGGER_H_
 #define LOGGER_H_
 
-#include <time.h>
-#include <locale.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
+#include <time.h> // time_t, struct tm, strftime
+#include <locale.h> // setlocale, LC_TIME
+#include <stdio.h> // FILE, size_t, fprintf, stderr, fopen, fclose
+#include <stdlib.h> // malloc, exit, free
+#include <string.h> // memset
+#include <stdbool.h> // bool
 
 #ifndef LOCALE
 #define LOCALE "en_US.UTF-8"
@@ -44,16 +44,16 @@ typedef struct
     FILE *outputs[AVAILABLE_OUTPUTS];
 } Logger;
 
-const char *lltostr(const LoggingLevel level);
+const char *lltostr(LoggingLevel level);
 void logger_set_level(Logger *logger, LoggingLevel level);
-Logger logger_new(const char *name, LoggingLevel level);
+Logger *logger_new(const char *name, LoggingLevel level);
 void logger_add_console(Logger *logger);
 void logger_add_file(Logger *logger, const char *filename);
 void logger_full_setup(Logger *logger, const char *filename);
 void logger_console_only(Logger *logger);
 void logger_file_only(Logger *logger, const char *filename);
 void logger_log(const Logger *logger, const char *message, LoggingLevel level);
-void close_logger(const Logger *logger);
+void close_logger(Logger *logger);
 #endif // LOGGER_H_
 
 #ifdef LOGGER_IMPLEMENTATION
@@ -144,11 +144,17 @@ void logger_set_level(Logger *logger, LoggingLevel level)
 * @param level LoggingLevel that indicates the minimal logging level that will be logged.
 * @returns A new logger.
 */
-Logger logger_new(const char *name, LoggingLevel level)
+Logger *logger_new(const char *name, LoggingLevel level)
 {
-    Logger logger = {0};
-    logger.name = name;
-    logger_set_level(&logger, level);
+    Logger *logger = (Logger *)malloc(sizeof(Logger));
+    if (NULL == logger)
+    {
+        fprintf(stderr, "AllocationError: Can not allocate enough memory to initialize logger.\n");
+        exit(1);
+    }
+    memset(logger, 0, sizeof(Logger));
+    logger->name = name;
+    logger_set_level(logger, level);
     return logger;
 }
 
@@ -238,10 +244,23 @@ static void _publish_message(const Logger *logger, const char *message, LoggingL
 }
 
 /*
+* @brief Deallocate a given logger object.
+* @param logger Object to deallocate.
+*/
+static void _logger_delete(Logger *logger)
+{
+    if (!logger)
+    {
+        return;
+    }
+    free(logger);
+}
+
+/*
 * @brief Close any file outputs linked to the logger.
 * @param logger A logger object to close.
 */
-void close_logger(const Logger *logger)
+void close_logger(Logger *logger)
 {
     for (size_t output_num = 0; output_num < output_count; ++output_num)
     {
@@ -260,6 +279,7 @@ void close_logger(const Logger *logger)
         }
         fclose(current_output);
     }
+    _logger_delete(logger);
 }
 
 /*
