@@ -1,5 +1,5 @@
-// #ifndef LOGGER_H_
-// #define LOGGER_H_
+#ifndef LOGGER_H_
+#define LOGGER_H_
 
 #include <time.h> // time_t, struct tm, strftime
 #include <locale.h> // setlocale, LC_TIME
@@ -53,10 +53,10 @@ void logger_full_setup(Logger *logger, const char *filename);
 void logger_console_only(Logger *logger);
 void logger_file_only(Logger *logger, const char *filename);
 void logger_log(const Logger *logger, const char *message, LoggingLevel level);
-void close_logger(const Logger *logger);
-// #endif // LOGGER_H_
+void close_logger(Logger *logger);
+#endif // LOGGER_H_
 
-// #ifdef LOGGER_IMPLEMENTATION
+#ifdef LOGGER_IMPLEMENTATION
 
 /*
 * @brief Determine wheather a specific output stream is a file.
@@ -152,6 +152,7 @@ Logger *logger_new(const char *name, LoggingLevel level)
         fprintf(stderr, "AllocationError: Can not allocate enough memory to initialize logger.\n");
         exit(1);
     }
+    memset(logger, 0, sizeof(Logger));
     logger->name = name;
     logger_set_level(logger, level);
     return logger;
@@ -243,10 +244,23 @@ static void _publish_message(const Logger *logger, const char *message, LoggingL
 }
 
 /*
+* @brief Deallocate a given logger object.
+* @param logger Object to deallocate.
+*/
+static void _logger_delete(Logger *logger)
+{
+    if (!logger)
+    {
+        return;
+    }
+    free(logger);
+}
+
+/*
 * @brief Close any file outputs linked to the logger.
 * @param logger A logger object to close.
 */
-void close_logger(const Logger *logger)
+void close_logger(Logger *logger)
 {
     for (size_t output_num = 0; output_num < output_count; ++output_num)
     {
@@ -265,6 +279,7 @@ void close_logger(const Logger *logger)
         }
         fclose(current_output);
     }
+    _logger_delete(logger);
 }
 
 /*
@@ -283,4 +298,4 @@ void logger_log(const Logger *logger, const char *message, LoggingLevel level)
     _publish_message(logger, message, level);
 }
 
-// #endif // LOGGER_IMPLEMENTATION
+#endif // LOGGER_IMPLEMENTATION
