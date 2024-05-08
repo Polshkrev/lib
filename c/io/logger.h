@@ -44,7 +44,7 @@ typedef struct
     FILE *outputs[AVAILABLE_OUTPUTS];
 } Logger;
 
-const char *lltostr(const LoggingLevel level);
+const char *lltostr(LoggingLevel level);
 void logger_set_level(Logger *logger, LoggingLevel level);
 Logger logger_new(const char *name, LoggingLevel level);
 void logger_add_console(Logger *logger);
