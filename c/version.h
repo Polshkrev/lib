@@ -50,6 +50,27 @@ version_t *version_init_with_name(const char *name);
 version_t *version_strings_init(const char *name, const char *description);
 
 /*
+* @brief Set the major value of a version object.
+* @param version Object to update.
+* @param major Value from which to set.
+*/
+void version_set_major(version_t *version, size_t major);
+
+/*
+* @brief Set the minor value of a version object.
+* @param version Object to update.
+* @param minpr Value from which to set.
+*/
+void version_set_minor(version_t *version, size_t minor);
+
+/*
+* @brief Set the patch value of a version object.
+* @param version Object to update.
+* @param patch Value from which to set.
+*/
+void version_set_patch(version_t *version, size_t patch);
+
+/*
 * @brief Publish a new version. Sets the given version's major release number to 1. If the version object's major release number is already greater than 1, an error is raised and the programme exits.
 * @param version Version to publish.
 */
@@ -183,6 +204,36 @@ version_t *version_convert(size_t major, size_t minor, size_t patch)
 }
 
 /*
+* @brief Set the major value of a version object.
+* @param version Object to update.
+* @param major Value from which to set.
+*/
+void version_set_major(version_t *version, size_t major)
+{
+    version->major = major;
+}
+
+/*
+* @brief Set the minor value of a version object.
+* @param version Object to update.
+* @param minpr Value from which to set.
+*/
+void version_set_minor(version_t *version, size_t minor)
+{
+    version->minor = minor;
+}
+
+/*
+* @brief Set the patch value of a version object.
+* @param version Object to update.
+* @param patch Value from which to set.
+*/
+void version_set_patch(version_t *version, size_t patch)
+{
+    version->patch;
+}
+
+/*
 * @brief Internal way of printing a given version object for error reporting.
 * @param version Version object to print.
 */
@@ -209,7 +260,9 @@ void version_publish(version_t *version)
         fprintf(stderr, " is already public.");
         exit(1);
     }
-    version_release(version);
+    version_set_major(version, 1);
+    version_set_minor(version, 0);
+    version_set_patch(version, 0);
 }
 
 /*
@@ -219,8 +272,8 @@ void version_publish(version_t *version)
 void version_release(version_t *version)
 {
     version->major++;
-    version->minor = 0;
-    version->patch = 0;
+    version_set_minor(version, 0);
+    version_set_patch(version, 0);
 }
 
 /*
@@ -230,7 +283,7 @@ void version_release(version_t *version)
 void version_update(version_t *version)
 {
     version->minor++;
-    version->patch = 0;
+    version_set_patch(version, 0);
 }
 
 /*
