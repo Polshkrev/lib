@@ -2,6 +2,7 @@
 #define STRING_BUILDER_H_
 
 #include <stddef.h> // size_t
+#include <string.h> // strlen
 #include <stdio.h> // fprintf
 #include <stdlib.h> // malloc, realloc, NULL, exit
 
@@ -86,7 +87,7 @@ void string_builder_delete(string_builder_t *builder);
 
 #endif // STRING_BUILDER_H_
 
-#ifdef STRING_BUILDER_IMPLEMENTATION
+// #ifdef STRING_BUILDER_IMPLEMENTATION
 
 /*
 * @brief Initialize a dynamic array of characters.
@@ -158,6 +159,20 @@ const char *string_builder_data(string_builder_t *builder)
 }
 
 /*
+* @brief Append a c-string to the string builder.
+* @param builder Builder to which to append.
+* @param items C-string from which to append.
+*/
+void string_builder_extend(string_builder_t *builder, const char *items)
+{
+    size_t length = strlen(items);
+    for (size_t i = 0; i < length; ++i)
+    {
+        string_builder_append(builder, items[i]);
+    }
+}
+
+/*
 * @brief Append the underlying data of one string builder with that of another. Because the implementation is using the `string_builder_append` function, it has the same error signature as that function.
 * @param destination Destination string builder to which the source will be concatenated.
 * @param source Source string builder from which to concatenate to the destination.
@@ -219,4 +234,4 @@ void string_builder_delete(string_builder_t *builder)
     builder = NULL;
 }
 
-#endif // STRING_BUILDER_IMPLEMENTATION
+// #endif // STRING_BUILDER_IMPLEMENTATION
