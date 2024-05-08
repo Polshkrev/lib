@@ -22,6 +22,12 @@
 
 char __path_buffer[MAX_PATH_SIZE];
 
+typedef enum
+{
+    FILE_TYPE,
+    DIR_TYPE
+} FileType;
+
 /*
 * @brief Representation of a system path.
 * @property raw A string, marked with const, that holds the pointer to raw path data.
@@ -131,9 +137,16 @@ void path_mkdir(const path_t *path);
 */
 bool path_copy_file(const path_t *source, const path_t *destination);
 
-// #endif // PATH_H_
+/*
+* @brief Determine the file type of a given path.
+* @param path Path whose type is undetermined.
+* @returns The file type of the given path.
+*/
+FileType path_get_type(const path_t *path);
 
-// #ifdef PATHLIB_IMPLEMENTATION
+#endif // PATH_H_
+
+#ifdef PATHLIB_IMPLEMENTATION
 
 /*
 * @brief Initialize a new path. The underlying path data is initialized to NULL after using this function.
@@ -402,4 +415,26 @@ bool path_copy_file(const path_t *source, const path_t *destination)
 #endif // _WIN32
 }
 
-// #endif // PATHLIB_IMPLEMENTATION
+/*
+* @brief Determine the file type of a given path.
+* @param path Path whose type is undetermined.
+* @returns The file type of the given path.
+*/
+FileType path_get_type(const path_t *path)
+{
+#ifdef _WIN32
+    DWORD attr = GetFileAttributes(passtr(path));
+    if (INVALID_FILE_ATTRIBUTES == attr)
+    {
+        fprintf(stderr, "IOError: Path '%s' has an undeterminate file type.\n", passtr(path));
+        exit(1);
+    }
+    if (attr & FILE_ATTRIBUTE_DIRECTORY)
+    {
+        return DIR_TYPE;
+    }
+    return FILE_TYPE;
+#endif // _WIN32
+}
+
+#endif // PATHLIB_IMPLEMENTATION
