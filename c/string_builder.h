@@ -2,6 +2,7 @@
 #define STRING_BUILDER_H_
 
 #include <stddef.h> // size_t
+#include <string.h> // strlen
 #include <stdio.h> // fprintf
 #include <stdlib.h> // malloc, realloc, NULL, exit
 
@@ -47,6 +48,13 @@ char *string_builder_at(const string_builder_t *builder, size_t index);
 * @returns A null-terminated pointer to a character array.
 */
 const char *string_builder_data(string_builder_t *builder);
+
+/*
+* @brief Append a c-string to the string builder.
+* @param builder Builder to which to append.
+* @param items C-string from which to append.
+*/
+void string_builder_extend(string_builder_t *builder, const char *items);
 
 /*
 * @brief Append the underlying data of one string builder with that of another. Because the implementation is using the `string_builder_append` function, it has the same error signature as that function.
@@ -151,6 +159,20 @@ const char *string_builder_data(string_builder_t *builder)
 }
 
 /*
+* @brief Append a c-string to the string builder.
+* @param builder Builder to which to append.
+* @param items C-string from which to append.
+*/
+void string_builder_extend(string_builder_t *builder, const char *items)
+{
+    size_t length = strlen(items);
+    for (size_t i = 0; i < length; ++i)
+    {
+        string_builder_append(builder, items[i]);
+    }
+}
+
+/*
 * @brief Append the underlying data of one string builder with that of another. Because the implementation is using the `string_builder_append` function, it has the same error signature as that function.
 * @param destination Destination string builder to which the source will be concatenated.
 * @param source Source string builder from which to concatenate to the destination.
@@ -187,6 +209,7 @@ void string_builder_resize_by(string_builder_t *builder, size_t scaler)
     if (NULL == builder->items)
     {
         fprintf(stderr, "AllocationErorr: Can not resize array.\n");
+        string_builder_delete(builder);
         exit(1);
     }
 }
@@ -209,6 +232,7 @@ void string_builder_delete(string_builder_t *builder)
     }
     free(builder->items);
     builder->items = NULL;
+    free(builder);
     builder = NULL;
 }
 
