@@ -1,5 +1,5 @@
-// #ifndef VERSION_H_
-// #define VERSION_H_
+#ifndef VERSION_H_
+#define VERSION_H_
 
 #include <stdio.h> // FILE, fprintf, stderr
 #include <stdbool.h> // bool
@@ -140,9 +140,15 @@ bool version_comapre(const version_t *version, const version_t *other);
 */
 void version_print(FILE *stream, const version_t *version);
 
-// #endif // VERSION_H_
+/*
+* @brief Deallocate a version object.
+* @param version Object to deallocate.
+*/
+void version_delete(version_t *version);
 
-// #ifdef VERSION_IMPLEMENTATION
+#endif // VERSION_H_
+
+#ifdef VERSION_IMPLEMENTATION
 
 /*
 * @brief Initialize a new version object. Each of the version properties are set to zero and the name is set to NULL.
@@ -377,4 +383,17 @@ void version_print(FILE *stream, const version_t *version)
     fprintf(stream, "%s: %d.%d.%d - %s\n", version->name, (int)version->major, (int)version->minor, (int)version->patch, version->description);
 }
 
-// #endif // VERSION_IMPLEMENTATION
+/*
+* @brief Deallocate a version object.
+* @param version Object to deallocate.
+*/
+void version_delete(version_t *version)
+{
+    if (!version)
+    {
+        return;
+    }
+    free(version);
+}
+
+#endif // VERSION_IMPLEMENTATION
