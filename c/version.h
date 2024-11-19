@@ -236,7 +236,7 @@ void version_set_minor(version_t *version, size_t minor)
 */
 void version_set_patch(version_t *version, size_t patch)
 {
-    version->patch;
+    version->patch = patch;
 }
 
 /*
