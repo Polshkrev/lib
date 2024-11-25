@@ -1,7 +1,7 @@
 # Logger
 A logger written in c.
 
-### Table Of Contents
+## Table Of Contents
 1. [Usage](#usage)
     1. [Construction](#construction)
     2. [Logging](#logging)
