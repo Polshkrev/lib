@@ -10,4 +10,7 @@
 #define VERSION_IMPLEMENTATION
 #include "./cpp/structures/version.hpp"
 
+#define LOGGER_IMPLEMENTATION
+#include "./cpp/io/logger.hpp"
+
 #endif // LIB_HPP_
