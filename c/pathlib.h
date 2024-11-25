@@ -154,6 +154,7 @@ FileType path_get_type(const path_t *path);
 */
 path_t path_new()
 {
+    // TODO: This should be heap allocated. Its size is variable.
     path_t path = {0};
     return path;
 }
@@ -165,6 +166,7 @@ path_t path_new()
 */
 path_t path_from(const char *path)
 {
+    // TODO: This should be heap allocated. Its size is variable.
     path_t return_path = {0};
     return_path.raw = path;
     return return_path;
