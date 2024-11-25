@@ -44,16 +44,81 @@ typedef struct
     FILE *outputs[AVAILABLE_OUTPUTS];
 } Logger;
 
+/*
+* @brief Represent a LoggingLevel enum as a string.
+* To handle the impossible case of providing an unsupported enum, a message is printed to stderr.
+* @param level LoggingLevel enum to return as a string.
+* @returns String representation of LoggingLevel enum.
+*/
 const char *lltostr(LoggingLevel level);
+
+/*
+* @brief Set the minimum allowable LoggingLevel of the logger. This is inforced in the `logger_log` function.
+* @param logger A pointer to the logger whose level will be set.
+* @param level LoggingLevel to set for the provided logger.
+*/
 void logger_set_level(Logger *logger, LoggingLevel level);
+
+/*
+* @brief Create a new logger given a name and a LoggingLevel. This is the API entry point.
+* @param name Name of the logger.
+* @param level LoggingLevel that indicates the minimal logging level that will be logged.
+* @returns A new logger.
+*/
 Logger *logger_new(const char *name, LoggingLevel level);
+
+/*
+* @brief Add `stdout` to the list of ouputs of the logger. If there's too many outputs that have been "allocated" to the struct, an error will be printed to `stderr` and the programme will exit with and exit code of 1.
+* @param logger A pointer to the Logger whose list of outputs will be updated.
+* @exception If the number of outputs that have been "allocated" to the logger has exceeded the number of constant available outputs, an `AllocationError` will be printed to stderr.
+*/
 void logger_add_console(Logger *logger);
+
+/*
+* @brief Add a file to the list of outputs of the logger. The file is opened in append mode and is not closed.
+* @param logger A pointer to the Logger whose list of outputs will be updated.
+* @param filename A string – marked with const – that will be passed to `fopen`.
+* @exception If the file doesn't exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit with an exit code of 1.
+* @exception If the number of outputs that have been "allocated" to the logger has exceeded the number of constant available outputs, an `AllocationError` will be printed to `stderr` and the file will be closed.
+*/
 void logger_add_file(Logger *logger, const char *filename);
+
+/*
+* @brief Setup the logger with both `stdout` and a file with a given filename.
+* @param logger A pointer to a Logger.
+* @param filename A string – marked with const – that will be passed to `logger_add_file` that was previously defined.
+* @exception As defined in the `logger_add...` functions, if the file doesn't exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit with an exit code of 1.
+* @exception As defined in the `logger_add...` functions, if the number of outputs that have been "allocated" to the logger has exceeded the number of constant available outputs, an `AllocationError` will be printed to `stderr` and the file will be closed.
+*/
 void logger_full_setup(Logger *logger, const char *filename);
+
+/*
+* @brief A prerequisite setup function that setups the logger with only `stdout`.
+* @param logger A pointer to a Logger.
+*/
 void logger_console_only(Logger *logger);
+
+/*
+* @brief A prerequisite setup function that setups the logger with only a file.
+* @param logger A pointer to the Logger as a side effect of an OOP style of thinking and programming.
+* @param filename A string – marked with const – that will be passed to `logger_add_file` that was previously defined.
+*/
 void logger_file_only(Logger *logger, const char *filename);
+
+/*
+* @brief Log a message.
+* @param logger A logger object to use.
+* @param message A string – marked with const – to publish to each of the elements in the array of outputs added to the logger.
+* @param level The level of the message.
+*/
 void logger_log(const Logger *logger, const char *message, LoggingLevel level);
+
+/*
+* @brief Close any file outputs linked to the logger.
+* @param logger A logger object to close.
+*/
 void close_logger(Logger *logger);
+
 #endif // LOGGER_H_
 
 #ifdef LOGGER_IMPLEMENTATION
@@ -254,6 +319,7 @@ static void _logger_delete(Logger *logger)
         return;
     }
     free(logger);
+    logger = NULL;
 }
 
 /*
