@@ -1,5 +1,5 @@
-#ifndef PATHLIB_H_
-#define PATHLIB_H_
+#ifndef PATH_H_
+#define PATH_H_
 
 #ifdef _WIN32
 #include <direct.h>
