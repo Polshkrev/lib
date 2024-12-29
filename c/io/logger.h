@@ -13,21 +13,20 @@
 #endif // LOCALE
 
 #define FORMAT_BUFFER_SIZE 200
-char timestamp[FORMAT_BUFFER_SIZE];
 
 #define AVAILABLE_OUTPUTS 2
 
-#ifndef FILE_BUFFER_SIZE
-#define FILE_BUFFER_SIZE 200
-#endif // FILE_BUFFER
-
-char file_buffer[FILE_BUFFER_SIZE] = {0};
-size_t output_count = 0;
+// #ifndef FILE_BUFFER_SIZE
+// #define FILE_BUFFER_SIZE 200
+// #endif // FILE_BUFFER
 
 #ifndef TIMESTAMP_FORMAT
 #define TIMESTAMP_FORMAT "%Y-%m-%d %X"
 #endif // TIMESTAMP_FORMAT
 
+/*
+* @brief Severity of a logging message.
+*/
 typedef enum
 {
     LOG_DEBUG,
@@ -37,6 +36,9 @@ typedef enum
     LOG_CRITICAL
 } LoggingLevel;
 
+/*
+* @brief A logger.
+*/
 typedef struct
 {
     const char *name;
@@ -123,6 +125,10 @@ void close_logger(Logger *logger);
 
 #ifdef LOGGER_IMPLEMENTATION
 
+char timestamp[FORMAT_BUFFER_SIZE];
+// char file_buffer[FILE_BUFFER_SIZE] = {0};
+size_t output_count = 0;
+
 /*
 * @brief Determine wheather a specific output stream is a file.
 * @param stream Output file stream to check against i/o output.
@@ -196,10 +202,14 @@ const char *lltostr(LoggingLevel level)
 /*
 * @brief Set the minimum allowable LoggingLevel of the logger. This is inforced in the `logger_log` function.
 * @param logger A pointer to the logger whose level will be set.
-* @param level LoggingLevel to set for the provided logger.
+* @param level LoggingLevel to set for the provided logger. If the provided level is less than or equal to the level already set in the logger, the function returns without modifying the logger.
 */
 void logger_set_level(Logger *logger, LoggingLevel level)
 {
+    if (logger->level <= level)
+    {
+        return;
+    }
     logger->level = level;
 }
 
@@ -230,12 +240,13 @@ Logger *logger_new(const char *name, LoggingLevel level)
 */
 void logger_add_console(Logger *logger)
 {
-    if (output_count > AVAILABLE_OUTPUTS)
+    if (output_count >= AVAILABLE_OUTPUTS)
     {
         fprintf(stderr, "AllocationError: %s\n", "Too many outputs assigned.");
         exit(1);
     }
-    logger->outputs[output_count++] = stdout;
+    logger->outputs[output_count] = stdout;
+    output_count++;
 }
 
 /*
@@ -253,12 +264,14 @@ void logger_add_file(Logger *logger, const char *filename)
         fprintf(stderr, "FileNotFoundError: %s\n", "Unable to open the file.");
         exit(1);
     }
-    if (output_count > AVAILABLE_OUTPUTS)
+    if (output_count >= AVAILABLE_OUTPUTS)
     {
         fprintf(stderr, "AllocationError: %s\n", "Too many outputs assigned.");
         fclose(file);
+        exit(1);
     }
-    logger->outputs[output_count++] = file;
+    logger->outputs[output_count] = file;
+    output_count++;
     // fclose(file);
 }
 
@@ -282,6 +295,7 @@ void logger_full_setup(Logger *logger, const char *filename)
 void logger_console_only(Logger *logger)
 {
     logger_add_console(logger);
+    output_count = 2;
 }
 
 /*
@@ -292,6 +306,7 @@ void logger_console_only(Logger *logger)
 void logger_file_only(Logger *logger, const char *filename)
 {
     logger_add_file(logger, filename);
+    output_count = 2;
 }
 
 /*
