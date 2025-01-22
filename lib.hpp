@@ -5,7 +5,7 @@
 #include "./cpp/exception.hpp"
 
 #define PATHLIB_IMPLEMENTATION
-#include "./cpp/pathlib.hpp"
+#include "./cpp/path.hpp"
 
 #define VERSION_IMPLEMENTATION
 #include "./cpp/structures/version.hpp"
