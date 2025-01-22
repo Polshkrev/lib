@@ -1,5 +1,5 @@
-#ifndef PATHLIB_HPP_
-#define PATHLIB_HPP_
+#ifndef PATH_HPP_
+#define PATH_HPP_
 
 #ifdef _WIN32
 #include <direct.h>
@@ -20,11 +20,6 @@
 #ifndef MAX_PATH_SIZE
 #define MAX_PATH_SIZE _MAX_PATH
 #endif // MAX_PATH_SIZE
-
-namespace
-{
-    std::string __path_buffer;
-}
 
 class Path
 {
@@ -129,6 +124,11 @@ std::string _path_append(const std::string &parent, const std::string &child);
 #endif // PATH_HPP_
 
 #ifdef PATHLIB_IMPLEMENTATION
+
+namespace
+{
+    std::string __path_buffer;
+}
 
 /*
 * @brief Protected helper function to split responsibilities when creating a directory on the filesystem.

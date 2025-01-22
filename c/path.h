@@ -1,5 +1,5 @@
-#ifndef PATHLIB_H_
-#define PATHLIB_H_
+#ifndef PATH_H_
+#define PATH_H_
 
 #ifdef _WIN32
 #include <direct.h>
@@ -20,8 +20,9 @@
 #define MAX_PATH_SIZE 256
 #endif // MAX_PATH_SIZE
 
-char __path_buffer[MAX_PATH_SIZE];
-
+/*
+* @brief Type of a file.
+*/
 typedef enum
 {
     FILE_TYPE,
@@ -147,6 +148,8 @@ FileType path_get_type(const path_t *path);
 #endif // PATH_H_
 
 #ifdef PATHLIB_IMPLEMENTATION
+
+char __path_buffer[MAX_PATH_SIZE] = {0};
 
 /*
 * @brief Initialize a new path. The underlying path data is initialized to NULL after using this function.
