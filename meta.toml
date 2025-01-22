@@ -1,0 +1,13 @@
+[project]
+name = "lib"
+author = "Polshkrev"
+description = "Library of single-file stb-like header files."
+
+[project.version]
+major = 1
+
+[urls]
+repository = "https://github.com/Polshkev/lib"
+
+[paths]
+readme = "README.md"
