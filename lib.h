@@ -14,7 +14,7 @@
 #include "./c/runtime/flag.h"
 
 #define PATHLIB_IMPLEMENTATION
-#include "./c/pathlib.h"
+#include "./c/path.h"
 
 #define VERSION_IMPLEMENTATION
 #include "./c/version.h"
