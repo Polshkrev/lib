@@ -294,25 +294,6 @@ namespace logging
     }
 
     /*
-    * @brief Setup the logger with only `stdout`.
-    */
-    void Logger::console_only()
-    {
-        add_console();
-        output_count = 2;
-    }
-
-    /*
-    * @brief Setup the logger with only file.
-    * @param filename Name of the file to setup.
-    */
-    void Logger::file_only(const std::string &filename = "./log.log")
-    {
-        add_file(filename);
-        output_count = 2;
-    }
-
-    /*
     * @brief Log a message.
     * @param message Message to log.
     * @param level level_t to set for the message. If the level is less than the level property of the logger, then the message is not logged. By default, this parametre is set to DEBUG.

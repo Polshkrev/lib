@@ -95,19 +95,6 @@ void logger_add_file(Logger *logger, const char *filename);
 void logger_full_setup(Logger *logger, const char *filename);
 
 /*
-* @brief A prerequisite setup function that setups the logger with only `stdout`.
-* @param logger A pointer to a Logger.
-*/
-void logger_console_only(Logger *logger);
-
-/*
-* @brief A prerequisite setup function that setups the logger with only a file.
-* @param logger A pointer to the Logger as a side effect of an OOP style of thinking and programming.
-* @param filename A string – marked with const – that will be passed to `logger_add_file` that was previously defined.
-*/
-void logger_file_only(Logger *logger, const char *filename);
-
-/*
 * @brief Log a message.
 * @param logger A logger object to use.
 * @param message A string – marked with const – to publish to each of the elements in the array of outputs added to the logger.
@@ -286,27 +273,6 @@ void logger_full_setup(Logger *logger, const char *filename)
 {
     logger_add_console(logger);
     logger_add_file(logger, filename);
-}
-
-/*
-* @brief A prerequisite setup function that setups the logger with only `stdout`.
-* @param logger A pointer to a Logger.
-*/
-void logger_console_only(Logger *logger)
-{
-    logger_add_console(logger);
-    output_count = 2;
-}
-
-/*
-* @brief A prerequisite setup function that setups the logger with only a file.
-* @param logger A pointer to the Logger as a side effect of an OOP style of thinking and programming.
-* @param filename A string – marked with const – that will be passed to `logger_add_file` that was previously defined.
-*/
-void logger_file_only(Logger *logger, const char *filename)
-{
-    logger_add_file(logger, filename);
-    output_count = 2;
 }
 
 /*
