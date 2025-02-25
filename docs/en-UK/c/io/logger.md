@@ -14,4 +14,4 @@ To setup the logger correctly, you will need to either add `stdout` or a file. T
 ### Logging
 To log a message, you need to call the `logger_log` function. This function takes a view into the logger object, a null-terminated log message without a newline, and a level with which the message will be logged. If you want to change the default logging level, call the `logger_set_level` function.
 ### Destruction
-To deallocate the logger object, call the `close_logger` function.
+To deallocate the logger object, call the `logger_close` function.
