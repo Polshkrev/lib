@@ -307,7 +307,7 @@ static void _logger_delete(Logger *logger)
 * @brief Close any file outputs linked to the logger.
 * @param logger A logger object to close.
 */
-void close_logger(Logger *logger)
+void logger_close(Logger *logger)
 {
     for (size_t output_num = 0; output_num < output_count; ++output_num)
     {
