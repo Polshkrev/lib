@@ -1,14 +1,14 @@
 #ifndef FLAG_H_
 #define FLAG_H_
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <inttypes.h>
-#include <assert.h>
-#include <errno.h>
-#include <limits.h>
+#include <stdio.h> // fprintf, snprintf, stdout, stderr, FILE
+#include <stdlib.h> // exit, NULL
+#include <stdbool.h> // bool
+#include <string.h> // strcmp, size_t
+#include <inttypes.h> // uintptr_t, uint64_t
+#include <assert.h> // assert, static_assert
+#include <errno.h> // errno, ERANGE
+#include <limits.h> // ? I don't have any traces of this include. 
 
 #define FLAG_CAPACITY 256
 
