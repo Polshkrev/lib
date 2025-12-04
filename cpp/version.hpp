@@ -132,11 +132,6 @@ namespace polutils
         const char *to_string() const noexcept;
     };
 
-    struct ValueError : public Exception
-    {
-        explicit ValueError(const std::string &message);
-    };
-
     void operator<<(std::ostream &stream, const version_t &version) noexcept;
 }
 
@@ -343,11 +338,6 @@ namespace polutils
         full << to_string();
         full << "\n";
         stream << full.str();
-    }
-
-    ValueError::ValueError(const std::string &message) : Exception(message.data())
-    {
-        _assign_name("ValueError");
     }
 
     void operator<<(std::ostream &stream, const version_t &version) noexcept
