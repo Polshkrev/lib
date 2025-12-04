@@ -2,7 +2,7 @@
 #define VERSION_H
 
 #if defined(__cplusplus)
-extern "C"{
+extern "C" {
 #endif
 
 #include <stddef.h> // size_t
@@ -174,7 +174,7 @@ void version_delete(version_t *version);
 #ifdef VERSION_IMPLEMENTATION
 
 #if defined(__cplusplus)
-extern "C"{
+extern "C" {
 #endif
 
 #include <stdlib.h> // malloc, NULL, exit
