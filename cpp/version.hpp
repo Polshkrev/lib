@@ -1,14 +1,11 @@
-#ifndef VERSION_HPP_
-#define VERSION_HPP_
-
-// #include <string_view>
-// #include <string>
-// #include <ostream>
-// #include <sstream>
+#ifndef VERSION_HPP
+#define VERSION_HPP
 
 #include <cstddef> // size_t
 #include <string> // string
 #include <ostream> // ostream
+
+#include "exception.hpp"
 
 namespace polutils
 {
@@ -89,6 +86,12 @@ namespace polutils
         void fix() noexcept;
 
         /*
+        * @brief Publish a new version. Sets the given version's major release number to 1.
+        * @throws ValueError If the given version object is evaluated to already be published, a `ValueError` is printed to `stderr` and the programme exits.
+        */
+        void publish();
+
+        /*
         * @brief Compare the major release of a given version object.
         * @param major Major release number to compare.
         * @returns False if the given version object's major version is not equal to the given major parametre, else true.
@@ -129,14 +132,22 @@ namespace polutils
         const char *to_string() const noexcept;
     };
 
+    struct ValueError : public Exception
+    {
+        explicit ValueError(const std::string &message);
+    };
+
     void operator<<(std::ostream &stream, const version_t &version) noexcept;
 }
 
-#endif // VERSION_HPP_
+#endif // VERSION_HPP
 
 #ifdef VERSION_IMPLEMENTATION
 
 #include <sstream> // stringstream
+
+#define EXCEPTION_IMPLEMENTATION
+#include "exception.hpp"
 
 namespace polutils
 {
@@ -210,6 +221,21 @@ namespace polutils
     void version_t::fix() noexcept
     {
         patch++;
+    }
+
+    /*
+    * @brief Publish a new version. Sets the given version's major release number to 1.
+    * @throws ValueError If the given version object is evaluated to already be published, a `ValueError` is printed to `stderr` and the programme exits.
+    */
+    void version_t::publish()
+    {
+        if (is_public())
+        {
+            throw ValueError("Version is already public.");
+        }
+        major = 1;
+        minor = 0;
+        patch = 0;
     }
 
     /*
@@ -319,6 +345,11 @@ namespace polutils
         stream << full.str();
     }
 
+    ValueError::ValueError(const std::string &message) : Exception(message.data())
+    {
+        _assign_name("ValueError");
+    }
+
     void operator<<(std::ostream &stream, const version_t &version) noexcept
     {
         std::stringstream full = std::stringstream();
@@ -327,4 +358,5 @@ namespace polutils
         stream << full.str();
     }
 }
+
 #endif // VERSION_IMPLEMENTATION
