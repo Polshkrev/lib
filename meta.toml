@@ -1,0 +1,15 @@
+[project]
+name = "lib"
+description = "Library of single-file stb-like header files for c and c++."
+author = "Polshkrev"
+
+[project.vesion]
+name = "Initial Version"
+minor = 1
+
+[license]
+type = "MIT"
+path = "LICENSE"
+
+[paths]
+readme = "README.md"
