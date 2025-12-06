@@ -1,2 +1,3 @@
 # lib
-Library of single-file stb-like header files for c and c++.
+- [en-UK](/docs/en-UK/README.md)
+- [ru-RU](/docs/ru-RU/README.md)
