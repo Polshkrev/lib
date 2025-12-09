@@ -6,15 +6,15 @@
 
 namespace polutils
 {
-    /* @brief Base Exception class to wrap the cpp `std::exception`.*/
+    /*@brief Base Exception class to wrap the cpp `std::exception`.*/
     class Exception : public std::exception
     {
         private:
-            /* @brief Name (de facto python-like type) of the exception.*/
+            /*@brief Name (de facto python-like type) of the exception.*/
             std::string __name;
-            /* @brief Full string representation of the exception. Composed of the name, a colon, and the message.*/
+            /*@brief Full string representation of the exception. Composed of the name, a colon, and the message.*/
             std::string __repr;
-            /* @brief Message to occompany the exception.*/
+            /*@brief Message to occompany the exception.*/
             std::string  __message;
         protected:
             /*
@@ -53,6 +53,30 @@ namespace polutils
         * @param message Message to accompany the exception.
         */
         explicit ValueError(const std::string &message);
+    };
+
+    /*
+    * @brief Exception for any miscellaneous value exceptions.
+    */
+    struct UnreachableError : public Exception
+    {
+        /*
+        * @brief Construct a `ValueError` with a message.
+        * @param message Message to accompany the exception.
+        */
+        explicit UnreachableError(const std::string &message);
+    };
+
+    /*
+    * @brief Exception for any miscellaneous value exceptions.
+    */
+    struct FileNotFoundError : public Exception
+    {
+        /*
+        * @brief Construct a `ValueError` with a message.
+        * @param message Message to accompany the exception.
+        */
+        explicit FileNotFoundError(const std::string &message);
     };
 
     /*
@@ -119,6 +143,24 @@ namespace polutils
     ValueError::ValueError(const std::string &message) : Exception(message.data())
     {
         _assign_name("ValueError");
+    }
+
+    /*
+    * @brief Construct a `ValueError` with a message.
+    * @param message Message to accompany the exception.
+    */
+    UnreachableError::UnreachableError(const std::string &message) : Exception(message.data())
+    {
+        _assign_name("UnreachableError");
+    }
+
+    /*
+    * @brief Construct a `ValueError` with a message.
+    * @param message Message to accompany the exception.
+    */
+    FileNotFoundError::FileNotFoundError(const std::string &message) : Exception(message.data())
+    {
+        _assign_name("FileNotFoundError");
     }
 
     /*

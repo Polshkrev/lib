@@ -26,7 +26,7 @@ typedef struct
 * @returns A new version object.
 * @throws AllocationError If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
 */
-version_t *version_init(void);
+version_t *version_new(void);
 
 /*
 * @brief Alternatively initialize a new version object from a given major, minor, and patch numbers.
