@@ -7,9 +7,11 @@ If you would like to revise on how to use a single-file header-only library, the
 1. [Usage](#usage)
 2. C
     1. [Version](/docs/en-UK/c/version.md)
+    2. [Logger](/docs/en-UK/c/logger.md)
 3. CPP
     1. [Version](/docs/en-UK/cpp/version.md)
     2. [Exception](/docs/en-UK/cpp/exception.md)
+    3. [Logger](/docs/en-UK/cpp/logger.md)
 
 ## Usage
 A simple &mdash; non-specific &mdash; usage of this library is to, first, copy each of the header files into your project. Then, you can include `lib.h` or `lib.hpp` anywhere in your c or c++ project respectively.
