@@ -1,4 +1,15 @@
 # Changelog
+## 0.3.0 - 2025-12-14
+`Added`
+- C
+    - Added the flag module.
+
+`Changed`
+- CPP
+    - `ValueError`, `FileNotFoundError`, and `UnreachableError` have been moved to a seperate file: `exceptions.hpp`.
+    - `Version`
+        - `to_string` now returns a `std::string`.
+
 ## 0.2.0 - 2025-12-09
 `Added`
 - C
