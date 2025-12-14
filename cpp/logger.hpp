@@ -107,8 +107,8 @@ namespace polutils
 
 #ifdef LOGGER_IMPLEMENTATION
 
-#define EXCEPTION_IMPLEMENTATION
-#include "exception.hpp"
+#define EXCEPTIONS_IMPLMENTATION
+#include "exceptions.hpp"
 
 #include <cstddef> // std::size_t
 #include <cstdio> // stdout
@@ -215,7 +215,7 @@ namespace polutils
         * @param name Name to give the logger.
         * @param level Minimum logging level that will be logged.
         */
-        logger_t::logger_t(const std::string &name, level_t level) noexcept : name(name), level(level) {};
+        logger_t::logger_t(const std::string &name, level_t level) noexcept : name(name), level(level) {}
 
         /*
         * @brief Add `stdout` to the logger.
@@ -277,7 +277,7 @@ namespace polutils
             set_timestamp();
             for (std::size_t output_num = 0; output_num < output_count; ++output_num)
             {
-                fprintf(outputs[output_num], "%s:%s[%s] - %s\n", timestamp, name.c_str(), lltostr(level), message);
+                fprintf(outputs[output_num], "%s:%s[%s] - %s\n", timestamp, name.c_str(), lltostr(level), message.c_str());
             }
         }
 
