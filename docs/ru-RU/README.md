@@ -8,6 +8,7 @@
 2. C
     1. [Версия](/docs/ru-RU/c/version.md)
     2. [Логгер](/docs/ru-RU/c/logger.md)
+    3. [Флаг](/docs/ru-RU/c/flag.md)
 3. CPP
     1. [Версия](/docs/ru-RU/cpp/version.md)
     2. [Ошибка](/docs/ru-RU/cpp/exception.md)
