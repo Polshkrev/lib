@@ -5,8 +5,6 @@
 #include <string> // string
 #include <ostream> // ostream
 
-#include "exception.hpp"
-
 namespace polutils
 {
     /*
@@ -129,7 +127,7 @@ namespace polutils
         * @brief Obtain a string representation of the version object.
         * @returns A string representing a symantic version.
         */
-        const char *to_string() const noexcept;
+        std::string to_string() const noexcept;
     };
 
     void operator<<(std::ostream &stream, const version_t &version) noexcept;
@@ -141,28 +139,30 @@ namespace polutils
 
 #include <sstream> // stringstream
 
-#define EXCEPTION_IMPLEMENTATION
-#include "exception.hpp"
+#include <iostream>
+
+#define EXCEPTIONS_IMPLEMENTATION
+#include "exceptions.hpp"
 
 namespace polutils
 {
     /*
     * @brief Initialize a new version object.
     */
-    version_t::version_t() noexcept : name(std::string()), description(std::string()), major(0), minor(0), patch(0) {}
+    version_t::version_t() noexcept : major(0), minor(0), patch(0), name(std::string()), description(std::string())  {}
 
     /*
     * @brief Initialize a new version object with a given name.
     * @param description Description, or changelog, of the version.
     * @param name Name to give to the object.
     */
-    version_t::version_t(const std::string &name, const std::string &description) noexcept : name(name.data()), description(description.data()), major(0), minor(0), patch(0) {}
+    version_t::version_t(const std::string &name, const std::string &description) noexcept : major(0), minor(0), patch(0), name(name.data()), description(description.data()) {}
 
     /*
     * @brief Initialize a new version object with a given name.
     * @param name Name to give to the object.
     */
-    version_t::version_t(const std::string &name) noexcept : name(name.data()), description(description.data()), major(0), minor(0), patch(0) {}
+    version_t::version_t(const std::string &name) noexcept : major(0), minor(0), patch(0), name(name.data()), description(description.data()) {}
 
     /*
     * @brief Initialize a new version with given major, minor, and patch version numbers.
@@ -170,7 +170,7 @@ namespace polutils
     * @param minor Minor version number.
     * @param patch Patch version number.
     */
-    version_t::version_t(std::size_t major, std::size_t minor, std::size_t patch) noexcept : name(std::string()), major(major), minor(minor), patch(patch) {}
+    version_t::version_t(std::size_t major, std::size_t minor, std::size_t patch) noexcept : major(major), minor(minor), patch(patch), name(std::string()) {}
 
     /*
     * @brief Initialize a new version object with a given name, major, minor, and patch version numbers.
@@ -179,7 +179,7 @@ namespace polutils
     * @param minor Minor version number.
     * @param patch Patch version number.
     */
-    version_t::version_t(const std::string &name, std::size_t major, std::size_t minor, std::size_t patch) noexcept : name(name.data()), major(major), minor(minor), patch(patch) {}
+    version_t::version_t(const std::string &name, std::size_t major, std::size_t minor, std::size_t patch) noexcept : major(major), minor(minor), patch(patch), name(name.data()) {}
 
     /*
     * @brief Initialize a new version object with a given name, major, minor, and patch version numbers.
@@ -189,7 +189,7 @@ namespace polutils
     * @param minor Minor version number.
     * @param patch Patch version number.
     */
-    version_t::version_t(const std::string &name, const std::string &description, std::size_t major, std::size_t minor, std::size_t patch) noexcept : name(name.data()), description(description.data()), major(major), minor(minor), patch(patch) {}
+    version_t::version_t(const std::string &name, const std::string &description, std::size_t major, std::size_t minor, std::size_t patch) noexcept : major(major), minor(minor), patch(patch), name(name.data()), description(description.data()) {}
 
     /*
     * @brief Release the version object.
@@ -282,7 +282,7 @@ namespace polutils
     * @brief Obtain a string representation of the version object.
     * @returns A string representing a symantic version.
     */
-    const char *version_t::to_string() const noexcept
+    std::string version_t::to_string() const noexcept
     {
         std::stringstream result = std::stringstream();
         if (name.empty() && description.empty())
@@ -292,7 +292,8 @@ namespace polutils
             result << minor;
             result << ".";
             result << patch;
-            return result.str().c_str();
+            // std::cout << result.str() << std::endl;
+            return result.str();
         }
         else if ((name.empty()) && (!(description.empty())))
         {
@@ -303,7 +304,8 @@ namespace polutils
             result << patch;
             result << " - ";
             result << description;
-            return result.str().c_str();
+            // std::cout << result.str() << std::endl;
+            return result.str();
         }
         else if ((!(name.empty())) && (description.empty()))
         {
@@ -314,7 +316,8 @@ namespace polutils
             result << minor;
             result << ".";
             result << patch;
-            return result.str().c_str();
+            // std::cout << result.str() << std::endl;
+            return result.str();
         }
         result << name;
         result << ": ";
@@ -325,7 +328,8 @@ namespace polutils
         result << patch;
         result << " - ";
         result << description;
-        return result.str().c_str();
+        // std::cout << result.str() << "hello" << std::endl;
+        return result.str();
     }
 
     /*
