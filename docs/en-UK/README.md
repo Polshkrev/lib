@@ -9,6 +9,7 @@ If you would like to revise on how to use a single-file header-only library, the
     1. [Version](/docs/en-UK/c/version.md)
     2. [Logger](/docs/en-UK/c/logger.md)
     3. [Flag](/docs/en-UK/c/flag.md)
+    4. [String](/docs/en-UK/c/string.md)
 3. CPP
     1. [Version](/docs/en-UK/cpp/version.md)
     2. [Exception](/docs/en-UK/cpp/exception.md)
