@@ -1,8 +1,17 @@
 # Changelog
+## 0.4.0 - 2025-12-23
+`Added`
+- C
+    - Added the string view module.
+    - `Docs`
+        - Added the string view module documentation.
+
 ## 0.3.0 - 2025-12-14
 `Added`
 - C
     - Added the flag module.
+    - `Docs`
+        - Added flag module documentation.
 
 `Changed`
 - CPP
@@ -14,11 +23,15 @@
 `Added`
 - C
     - Added the logger module.
+    - `Docs`
+        - Added the logger module documentation.
 - CPP
     - Added the logger module.
     - `Exception`
         - `UnreachableError` has been added.
         - `FileNotFoundError` has been added.
+    - `Docs`
+        - Added the logger module documentation.
 
 `Changed`
 - C
