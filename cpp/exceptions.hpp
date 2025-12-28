@@ -7,6 +7,18 @@
 namespace polutils
 {
     /*
+    * @brief Exception for an exception when allocating memory.
+    */
+    struct AllocationError : public Exception
+    {
+        /*
+        * @brief Construct an `AllocationError` with a message.
+        * @param message Message to accompany the exception.
+        */
+        explicit AllocationError(const std::string &message);
+    };
+
+    /*
     * @brief Exception for any miscellaneous value exceptions.
     */
     struct ValueError : public Exception
@@ -52,6 +64,15 @@ namespace polutils
 
 namespace polutils
 {
+    /*
+    * @brief Construct an `AllocationError` with a message.
+    * @param message Message to accompany the exception.
+    */
+    AllocationError::AllocationError(const std::string &message) : Exception(message.data())
+    {
+        _assign_name("AllocationError");
+    }
+
     /*
     * @brief Construct a `ValueError` with a message.
     * @param message Message to accompany the exception.
