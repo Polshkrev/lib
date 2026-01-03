@@ -1,4 +1,10 @@
 # Changelog
+## 0.6.0 - 2026-01-03
+`Added`
+- C
+    - Added the string builder module.
+    - `Docs`
+        - Added string builder documentation.
 ## 0.5.0 - 2026-01-02
 `Added`
 - CPP
