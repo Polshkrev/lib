@@ -3,8 +3,8 @@ name = "lib"
 description = "Library of single-file stb-like header files for c and c++."
 author = "Polshkrev"
 
-[project.vesion]
-minor = 4
+[project.version]
+minor = 5
 
 [license]
 type = "MIT"

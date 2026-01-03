@@ -1,4 +1,15 @@
 # Changelog
+## 0.5.0 - 2026-01-02
+`Added`
+- CPP
+    - Added the array module.
+    - Added the collection module.
+    - An `AllocationError` has been added.
+    - An `IndexError` has been added.
+    - An `OutOfRangeError` has been added.
+    - `Docs`
+        - Added the array module documentation.
+        - Added the collection module documentation.
 ## 0.4.0 - 2025-12-23
 `Added`
 - C
