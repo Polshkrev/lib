@@ -3,13 +3,15 @@
 
 Если вы хотите проверять, как использовать утилиты, содержащую только один заголовок, то, пожалуйста, прочтите [гид по stb](https://github.com/nothings/stb/blob/master/docs/stb_howto.txt).
 
-## Table of Contents
+## Оглавление
 1. [Использование](#использование)
 2. C
     1. [Версия](/docs/ru-RU/c/version.md)
     2. [Логгер](/docs/ru-RU/c/logger.md)
     3. [Флаг](/docs/ru-RU/c/flag.md)
     4. [Строка](/docs/ru-RU/c/string.md)
+    5. Скопления
+        1. [Список букв](/docs/ru-RU/c/collections/string_builder.md)
 3. CPP
     1. [Версия](/docs/ru-RU/cpp/version.md)
     2. [Ошибка](/docs/ru-RU/cpp/exception.md)
