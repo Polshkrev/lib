@@ -14,6 +14,11 @@ If you would like to revise on how to use a single-file header-only library, the
     1. [Version](/docs/en-UK/cpp/version.md)
     2. [Exception](/docs/en-UK/cpp/exception.md)
     3. [Logger](/docs/en-UK/cpp/logger.md)
+    4. [Collections](/docs/en-UK/cpp/collections/collections.md)
+        1. Interfaces
+            1. [Collection](/docs/en-UK/cpp/collections/collection.md)
+        2. Structures
+            1. [Array](/docs/en-UK/cpp/collections/array.md)
 
 ## Usage
 A simple &mdash; non-specific &mdash; usage of this library is to, first, copy each of the header files into your project. Then, you can include `lib.h` or `lib.hpp` anywhere in your c or c++ project respectively.

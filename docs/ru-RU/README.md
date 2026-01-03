@@ -14,6 +14,11 @@
     1. [Версия](/docs/ru-RU/cpp/version.md)
     2. [Ошибка](/docs/ru-RU/cpp/exception.md)
     3. [Логгер](/docs/ru-RU/cpp/logger.md)
+    4. [Скопления](/docs/ru-RU/cpp/collections/collections.md)
+        1. Интерфейсы
+            1. [Скопление](/docs/ru-RU/cpp/collections/collection.md)
+        2. Структуры
+            1. [Список](/docs/ru-RU/cpp/collections/array.md)
 
 ## Использование
 Простой способ использования этой утилиты, Во-первых скопировать каждый заголовочный файл в свой проект. Затем вы можете включить `lib.h` или `lib.hpp` в любое место вашего проекта на C или C++ соответственно.
