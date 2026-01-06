@@ -9,7 +9,7 @@ namespace polutils
     namespace collections
     {
         /*
-        * @brief Representation of a sized collection
+        * @brief Representation of a sized collection.
         */
         struct sized_t
         {
