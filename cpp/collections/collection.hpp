@@ -3,6 +3,8 @@
 
 #include <cstddef> // std::size_t
 
+#include "./sized.hpp" // polutils::collections::sized_t
+
 namespace polutils
 {
     namespace collections
@@ -11,7 +13,7 @@ namespace polutils
         * @brief Interface to standardize a linear collection.
         */
         template <typename Type>
-        struct collection_t
+        struct collection_t : public sized_t
         {
             /*
             * @brief Append a given item to a collection.
