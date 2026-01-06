@@ -48,6 +48,19 @@ namespace polutils
                 virtual void remove(std::size_t index) override;
 
                 /*
+                * @brief Determine the size of the collection.
+                * @returns The size of the collection.
+                */
+                std::size_t length() const noexcept;
+
+
+                /*
+                * @brief Determine if the collection is empty.
+                * @returns True if the collection is determined to be empty, else false.
+                */
+                bool is_empty() const noexcept;
+
+                /*
                 * @brief Virtual destructor override to cleanup resources.
                 */
                 virtual ~array_t();
@@ -71,7 +84,7 @@ namespace polutils
                 */
                 virtual void _delete(void);
 
-            private:
+            protected:
                 Type *items;
                 std::size_t size;
                 std::size_t capacity;
@@ -190,45 +203,27 @@ namespace polutils
                 throw AllocationError("Can not resize array.");
             }
             items = temp;
-            // if (!__check_bounds(index, 0, size))
-            // {
-            //     throw ValueError("Can not access element outside of array capacity.");
-            // }
-            // for (std::size_t i = 0; i < index; ++i)
-            // {
-            //     items[index + i] = items[index + i + 1];
-            // }
-            // size--;
-            // Type *temp = static_cast<Type *>(std::calloc(capacity, sizeof(Type)));
-            // for (std::size_t i = 0; i < size; ++i)
-            // {
-            //     if (i == 0)
-            //     {
-            //         temp[i] = items[i+1];
-            //     }
-            //     if (i == index)
-            //     {
-            //         continue;
-            //         // temp[i] = items[i+1];
-            //         // std::printf("hit %d\n", i);
-            //     }
-            //     temp[i] = items[i];
-            // }
-            // capacity--;
-            // size--;
-            // std::free(items);
-            // items = nullptr;
-            // items = temp;
         }
 
-        // template <typename Type>
-        // void array_t<Type>::print() const noexcept
-        // {
-        //     for (std::size_t i = 0; i < size; ++i)
-        //     {
-        //         std::printf("%s\n", std::to_string(*at(i)).c_str());
-        //     }
-        // }
+        /*
+        * @brief Determine the size of the collection.
+        * @returns The size of the collection.
+        */
+        template <typename Type>
+        std::size_t array_t<Type>::length() const noexcept
+        {
+            return size;
+        }
+
+        /*
+        * @brief Determine if the collection is empty.
+        * @returns True if the collection is determined to be empty, else false.
+        */
+        template <typename Type>
+        bool array_t<Type>::is_empty() const noexcept
+        {
+            return size == 0 || nullptr == items;
+        }
 
         /*
         * @brief Resize the array by a factor of 2.
@@ -249,7 +244,7 @@ namespace polutils
         void array_t<Type>::_resize(std::size_t scaler)
         {
             capacity *= scaler;
-            items = std::realloc(items, sizeof(Type) * capacity);
+            items = static_cast<Type *>(std::realloc(items, sizeof(Type) * capacity));
             if (nullptr == items)
             {
                 throw AllocationError("Can not resize array.");
