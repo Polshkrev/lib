@@ -22,6 +22,7 @@ If you would like to revise on how to use a single-file header-only library, the
             2. [Sized](/docs/en-UK/cpp/collections/sized.md)
         2. Structures
             1. [Array](/docs/en-UK/cpp/collections/array.md)
+            2. [Dynamic Array](/docs/en-UK/cpp/collections/dynamic_array.md)
 
 ## Usage
 A simple &mdash; non-specific &mdash; usage of this library is to, first, copy each of the header files into your project. Then, you can include `lib.h` or `lib.hpp` anywhere in your c or c++ project respectively.
