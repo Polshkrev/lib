@@ -1,4 +1,17 @@
 # Changelog
+## 0.8.0 - 2026-01-06
+`Added`
+- CPP
+    - Added the `dynamic array` module.
+    - `Array`
+        - Added the `length` method.
+        - Added the `is_empty` method.
+    - `Docs`
+        - Added the `dynamic array` documentation.
+`Changed`
+- CPP
+    - `Array`
+        - All the private member variables are now protected due to implementation changes.
 ## 0.7.0 - 2026-01-06
 `Added`
 - CPP
