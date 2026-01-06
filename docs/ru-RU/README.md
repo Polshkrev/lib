@@ -19,6 +19,7 @@
     4. [Скопления](/docs/ru-RU/cpp/collections/collections.md)
         1. Интерфейсы
             1. [Скопление](/docs/ru-RU/cpp/collections/collection.md)
+            2. [Размерный](/docs/ru-RU/cpp/collections/sized.md)
         2. Структуры
             1. [Список](/docs/ru-RU/cpp/collections/array.md)
 
