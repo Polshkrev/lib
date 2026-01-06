@@ -1,5 +1,5 @@
-# Array
-Implementation of a classical linear array.
+# Dynamic Array
+Implementation of a classical dynamic array.
 
 ## Table Of Contents
 1. [Append](#append)
@@ -10,7 +10,7 @@ Implementation of a classical linear array.
 ### Append
 To append to an array there is &mdash; of course &mdash; the `append` method. This method appends a singular item to the array. Since this is a fixed-size array, if the array is full, a `ValueError` is thrown.
 ### Remove
-To remove from an array, there is a simple `remove` method. This method takes in an index where the value to be removed is located. If the array is empty, or if the given index is greater than the size of the array, then an `OutOfRangeError` is returned.
+To remove from an array, there is a simple `remove` method. This method takes in an index where the value to be removed is located.
 ### Access
 To access an item in the array, the `at` method is available. This method will take a given index. This method will either return a pointer to the item stored at the given index, or an `IndexError` is thrown.
 ### Implements
