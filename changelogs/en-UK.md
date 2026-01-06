@@ -1,34 +1,40 @@
 # Changelog
+## 0.7.0 - 2026-01-06
+`Added`
+- CPP
+    - Added the `sized` interface.
+    - `Docs`
+        - Added the `sized` documentation.
 ## 0.6.0 - 2026-01-03
 `Added`
 - C
-    - Added the string builder module.
+    - Added the `string builder` module.
     - `Docs`
-        - Added string builder documentation.
+        - Added `string builder` documentation.
 ## 0.5.0 - 2026-01-02
 `Added`
 - CPP
-    - Added the array module.
-    - Added the collection module.
+    - Added the `array` module.
+    - Added the `collection` module.
     - An `AllocationError` has been added.
     - An `IndexError` has been added.
     - An `OutOfRangeError` has been added.
     - `Docs`
-        - Added the array module documentation.
-        - Added the collection module documentation.
+        - Added the `array` module documentation.
+        - Added the `collection` module documentation.
 ## 0.4.0 - 2025-12-23
 `Added`
 - C
-    - Added the string view module.
+    - Added the `string view` module.
     - `Docs`
-        - Added the string view module documentation.
+        - Added the `string view` module documentation.
 
 ## 0.3.0 - 2025-12-14
 `Added`
 - C
-    - Added the flag module.
+    - Added the `flag` module.
     - `Docs`
-        - Added flag module documentation.
+        - Added `flag` module documentation.
 
 `Changed`
 - CPP
@@ -39,16 +45,16 @@
 ## 0.2.0 - 2025-12-09
 `Added`
 - C
-    - Added the logger module.
+    - Added the `logger` module.
     - `Docs`
-        - Added the logger module documentation.
+        - Added the `logger` module documentation.
 - CPP
-    - Added the logger module.
+    - Added the `logger` module.
     - `Exception`
         - `UnreachableError` has been added.
         - `FileNotFoundError` has been added.
     - `Docs`
-        - Added the logger module documentation.
+        - Added the `logger` module documentation.
 
 `Changed`
 - C
