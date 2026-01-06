@@ -19,6 +19,7 @@ If you would like to revise on how to use a single-file header-only library, the
     4. [Collections](/docs/en-UK/cpp/collections/collections.md)
         1. Interfaces
             1. [Collection](/docs/en-UK/cpp/collections/collection.md)
+            2. [Sized](/docs/en-UK/cpp/collections/sized.md)
         2. Structures
             1. [Array](/docs/en-UK/cpp/collections/array.md)
 
