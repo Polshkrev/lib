@@ -1,4 +1,10 @@
 # Changelog
+## 0.9.0 - 2026-01-08
+`Added`
+- C
+    - Added `buffer` module.
+    - `Docs`
+        - Added `buffer` documentation.
 ## 0.8.0 - 2026-01-06
 `Added`
 - CPP
