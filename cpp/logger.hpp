@@ -1,6 +1,7 @@
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
+#include <cstdio> // FILE, fprintf
 #include <string> // std::string
 #include <array> // std::array
 
@@ -16,7 +17,7 @@ namespace polutils
         /*
         * @brief Severity of a logging message.
         */
-        enum level_t
+        enum class level_t
         {
             DEBUG,
             INFO,
@@ -36,7 +37,7 @@ namespace polutils
         /*
         * @brief Close any file opened from the logger. If no file has been added to the logger, there is no need to call this function; although this is internally checked.
         */
-        void close(const std::array<FILE *, AVAILABLE_OUTPUTS> &outputs);
+        void close(const std::array<std::FILE *, AVAILABLE_OUTPUTS> &outputs);
 
         /*
         * @brief A logger.
@@ -58,7 +59,7 @@ namespace polutils
                 * @param name Name to give the logger.
                 * @param level Minimum logging level that will be logged.
                 */
-                explicit logger_t(const std::string &name = "main", level_t level = DEBUG) noexcept;
+                explicit logger_t(const std::string &name = "main", level_t level = level_t::DEBUG) noexcept;
 
                 /*
                 * @brief Add `stdout` to the logger.
@@ -98,7 +99,7 @@ namespace polutils
                 /*
                 * @brief List of available outputs.
                 */
-                std::array<FILE *, AVAILABLE_OUTPUTS> outputs;
+                std::array<std::FILE *, AVAILABLE_OUTPUTS> outputs;
         };
     }
 }
@@ -156,10 +157,10 @@ namespace
     * @param stream Output file stream to check against i/o output.
     * @returns A boolean of whether a given file is composed of an i/o stream (e.g.) stdout, stdin, and stderr.
     */
-    bool is_file(const FILE *stream)
+    bool is_file(const std::FILE *stream)
     {
         bool found = false;
-        FILE *streams[3] = {stdout, stdin, stderr};
+        std::FILE *streams[3] = {stdout, stdin, stderr};
         for (int output = 0; output < 3; ++output)
         {
             if (streams[output] != stream)
@@ -186,23 +187,23 @@ namespace polutils
         {
             switch (level)
             {
-                case DEBUG:
+                case level_t::DEBUG:
                 {
                     return "DEBUG";
                 } break;
-                case INFO:
+                case level_t::INFO:
                 {
                     return "INFO";
                 } break;
-                case WARNING:
+                case level_t::WARNING:
                 {
                     return "WARNING";
                 } break;
-                case ERROR:
+                case level_t::ERROR:
                 {
                     return "ERROR";
                 } break;
-                case CRITICAL:
+                case level_t::CRITICAL:
                 {
                     return "CRITICAL";
                 } break;
@@ -239,7 +240,7 @@ namespace polutils
         */
         void logger_t::add_file(const std::string &filename)
         {
-            FILE *file = fopen(filename.c_str(), "a");
+            std::FILE *file = std::fopen(filename.c_str(), "a");
             if (nullptr == file)
             {
                 throw FileNotFoundError("Unable to open file.");
@@ -277,7 +278,7 @@ namespace polutils
             set_timestamp();
             for (std::size_t output_num = 0; output_num < output_count; ++output_num)
             {
-                fprintf(outputs[output_num], "%s:%s[%s] - %s\n", timestamp, name.c_str(), lltostr(level), message.c_str());
+                std::fprintf(outputs[output_num], "%s:%s[%s] - %s\n", timestamp, name.c_str(), lltostr(level), message.c_str());
             }
         }
 
@@ -292,11 +293,11 @@ namespace polutils
         /*
         * @brief Close any file opened from the logger. If no file has been added to the logger, there is no need to call this function; although this is internally checked.
         */
-        void close(const std::array<FILE *, AVAILABLE_OUTPUTS> &outputs)
+        void close(const std::array<std::FILE *, AVAILABLE_OUTPUTS> &outputs)
         {
             for (size_t output_num = 0; output_num > output_count; ++output_num)
             {
-                FILE *current_output = outputs[output_num];
+                std::FILE *current_output = outputs[output_num];
                 if (!is_file(current_output))
                 {
                     continue;
