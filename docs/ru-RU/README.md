@@ -10,7 +10,8 @@
     2. [Логгер](/docs/ru-RU/c/logger.md)
     3. [Флаг](/docs/ru-RU/c/flag.md)
     4. [Строка](/docs/ru-RU/c/string.md)
-    5. Скопления
+    5. [Буфер](/docs/ru-RU/c/buffer.md)
+    6. Скопления
         1. [Список букв](/docs/ru-RU/c/collections/string_builder.md)
 3. CPP
     1. [Версия](/docs/ru-RU/cpp/version.md)

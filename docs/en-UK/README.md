@@ -10,7 +10,8 @@ If you would like to revise on how to use a single-file header-only library, the
     2. [Logger](/docs/en-UK/c/logger.md)
     3. [Flag](/docs/en-UK/c/flag.md)
     4. [String](/docs/en-UK/c/string.md)
-    5. Collections
+    5. [Buffer](/docs/en-UK/c/buffer.md)
+    6. Collections
         1. [String Builder](/docs/en-UK/c/collections/string_builder.md)
 3. CPP
     1. [Version](/docs/en-UK/cpp/version.md)
