@@ -77,6 +77,18 @@ namespace polutils
         */
         explicit FileNotFoundError(const std::string &message);
     };
+
+    /*
+    * @brief Exception for any miscellaneous operating system exceptions.
+    */
+    struct IOError : public Exception
+    {
+        /*
+        * @brief Construct a `ValueError` with a message.
+        * @param message Message to accompany the exception.
+        */
+        explicit IOError(const std::string &message);
+    };
 }
 
 #endif // EXCEPTIONS_HPP
@@ -134,7 +146,7 @@ namespace polutils
     }
 
     /*
-    * @brief Construct a `ValueError` with a message.
+    * @brief Construct a `FileNotFoundError` with a message.
     * @param message Message to accompany the exception.
     */
     FileNotFoundError::FileNotFoundError(const std::string &message) : Exception(message.data())
@@ -142,6 +154,14 @@ namespace polutils
         _assign_name("FileNotFoundError");
     }
 
+    /*
+    * @brief Construct a `IOError` with a message.
+    * @param message Message to accompany the exception.
+    */
+    IOError::IOError(const std::string &message) : Exception(message.data())
+    {
+        _assign_name("IOError");
+    }
 }
 
 #endif // EXCEPTIONS_IMPLMENTATION
