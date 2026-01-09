@@ -1,4 +1,12 @@
 # Changelog
+## 0.10.0 - 2026-01-08
+`Added`
+- C
+    - Added `path` module.
+- CPP
+    - Added `path` module.
+    - `Exceptions`
+        - `IOError` has been added.
 ## 0.9.0 - 2026-01-08
 `Added`
 - C
