@@ -1,6 +1,5 @@
 # String Builder
 A classical dynamic array of charactors inspired by both [Tsoding's String Builder](https://github.com/tsoding/nob.h/blob/main/nob.h#L295) and [Golang's String Builder](https://pkg.go.dev/strings#Builder).
-
 ## Table Of Contents
 1. [Usage](#usage)
     1. [Construction](#construction)

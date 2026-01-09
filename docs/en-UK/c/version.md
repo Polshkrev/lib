@@ -1,6 +1,5 @@
 # Version
 This is a semantic versioning library. This library can be used to store versioning objects for feature flags. Or it can used with the flag module to easily create a professional looking version flag.
-
 ## Table Of Contents
 1. [Usage](#usage)
     1. [Construction](#construction)

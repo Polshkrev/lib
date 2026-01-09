@@ -1,12 +1,10 @@
 # Array
 Implementation of a classical linear array.
-
 ## Table Of Contents
 1. [Append](#append)
 2. [Remove](#remove)
 3. [Access](#access)
 4. [Implements](#implements)
-
 ### Append
 To append to an array there is &mdash; of course &mdash; the `append` method. This method appends a singular item to the array. Since this is a fixed-size array, if the array is full, a `ValueError` is thrown.
 ### Remove

@@ -1,12 +1,10 @@
 # Logger
 A logger written in c++.
-
 ## Table Of Contents
 1. [Usage](#usage)
     1. [Construction](#construction)
     2. [Logging](#logging)
     3. [Destruction](#destruction)
-
 ## Usage
 Everything is defined behind the `logging` namespace.
 ### Construction
