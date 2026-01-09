@@ -1,16 +1,12 @@
 # Version
 This is a semantic versioning library. This library can be used to store versioning objects for feature flags. Or it can used with the flag module to easily create a professional looking version flag.
-
 ## Table Of Contents
 1. [Usage](#usage)
     1. [Construction](#construction)
     2. [Modify](#modify)
-
 ## Usage
-
 ### Construction
 There are many ways to construct a version object as there are many constructor overloads. An `operator<<` overload is available for printing.
-
 ### Modify
 To set any of the properties in the version object, each property has a specific setter accociated with it.
 To change any of the properties within the object the following functions are available:
