@@ -1,4 +1,10 @@
 # Changelog
+## 0.11.0 - 2026-01-30
+`Added`
+- C
+    - Added `library_load` function.
+    - Added `library_function` function.
+    - Added `library_delete` function.
 ## 0.10.0 - 2026-01-08
 `Added`
 - C
