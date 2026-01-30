@@ -11,6 +11,7 @@
     4. [Строка](/docs/ru-RU/c/string.md)
     5. [Буфер](/docs/ru-RU/c/buffer.md)
     6. [Адрес](/docs/ru-RU/c/path.md)
+    7. [Загрузчик](/docs/ru-RU/c/loader.md)
     7. Скопления
         1. [Список букв](/docs/ru-RU/c/collections/string_builder.md)
 3. CPP

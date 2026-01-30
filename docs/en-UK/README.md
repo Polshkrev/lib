@@ -11,6 +11,7 @@ If you would like to revise on how to use a single-file header-only library, the
     4. [String](/docs/en-UK/c/string.md)
     5. [Buffer](/docs/en-UK/c/buffer.md)
     6. [Path](/docs/en-UK/c/path.md)
+    7. [Loader](/docs/en-UK/c/loader.md)
     7. Collections
         1. [String Builder](/docs/en-UK/c/collections/string_builder.md)
 3. CPP
