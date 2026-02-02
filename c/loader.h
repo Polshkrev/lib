@@ -5,8 +5,12 @@
 extern "C" {
 #endif
 
-#define PATH_IMPLEMENTATION
-#include "path.h" // path_t, path_exists, path_delete
+#include <stdio.h> // fprintf, stderr
+#include <stdlib.h> // NULL, exit
+#include <stdbool.h> // bool
+
+// #define PATH_IMPLEMENTATION
+// #include "path.h" // path_t, path_exists, path_delete
 
 /*
 * @brief Load a dynamically linked library.
@@ -15,7 +19,7 @@ extern "C" {
 * @exception If the given path does not exist on the file system, a `FileNotFoundError` is printed and the programme exists. When the programme exists, the given path is deallocated.
 * @exception If the library can not be loaded, a `FileNotFoundError` is printed and the programme exists. When the programme exists, the given path is deallocated.
 */
-void *library_load(path_t *path);
+void *library_load(const char *path);
 
 /*
 * @brief Load a function from a given library handle with a given name.
@@ -59,20 +63,20 @@ extern "C" {
 * @exception If the given path does not exist on the file system, a `FileNotFoundError` is printed and the programme exists. When the programme exists, the given path is deallocated.
 * @exception If the library can not be loaded, a `FileNotFoundError` is printed and the programme exists. When the programme exists, the given path is deallocated.
 */
-void *library_load(path_t *path)
+void *library_load(const char *path)
 {
-    if (!path_exists(path))
-    {
-        fprintf(stderr, "FileNotFoundError: Can not load library from path '%s'.", passtr(path));
-        path_delete(path);
-        exit(1);
-    }
+    // if (!path_exists(path))
+    // {
+    //     fprintf(stderr, "FileNotFoundError: Can not load library from path '%s'.", passtr(path));
+    //     path_delete(path);
+    //     exit(1);
+    // }
 #ifdef _WIN32
-    HANDLE lib = LoadLibrary(passtr(path));
+    HANDLE lib = LoadLibrary(path);
     if (NULL == lib)
     {
-        fprintf(stderr, "FileNotFoundError: Can not load library from path '%s'.", passtr(path));
-        path_delete(path);
+        fprintf(stderr, "FileNotFoundError: Can not load library from path '%s'.", path);
+        // path_delete(path);
         exit(1);
     }
 #else
@@ -80,7 +84,7 @@ void *library_load(path_t *path)
     if (NULL == lib)
     {
         fprintf(stderr, "FileNotFoundError: Can not load library from path '%s': %s.", passtr(path), dlerror())
-        path_delete(path);
+        // path_delete(path);
         exit(1);
     }
 #endif // _WIN32
@@ -100,9 +104,9 @@ void *library_function(void *library, const char *name)
     void *function = (void*)GetProcAddress(library, name);
     if (NULL == function)
     {
-        library_delete(library);
         fprintf(stderr, "ValueError: Can not load funtion '%s'.", name);
-        exit(1); // ! This does not free the path value.
+        library_delete(library);
+        exit(1);
     }
 #else
     void *function = (void*)dlsym(library, name);
