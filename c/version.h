@@ -293,7 +293,7 @@ void version_set_patch(version_t *version, size_t patch)
 * @brief Internal way of printing a given version object for error reporting.
 * @param version Version object to print.
 */
-void _version_error_print(FILE *stream, const version_t *version)
+static void _version_error_print(FILE *stream, const version_t *version)
 {
     if (NULL == version->name)
     {
