@@ -211,7 +211,7 @@ path_t *pasb(const path_t *path)
         fprintf(stderr, "FileNotFoundError: File '%s' can not be found.\n", passtr(path));
         exit(1);
     }
-    // size_t checkpoint = buffer_save();
+    size_t checkpoint = buffer_save();
     char *buffer = buffer_allocate(MAX_PATH);
 #ifdef _WIN32
     if (GetFullPathName(passtr(path), MAX_PATH, buffer, NULL) == 0)
@@ -226,7 +226,7 @@ path_t *pasb(const path_t *path)
         exit(1);
     }
 #endif // _WIN32
-    // buffer_rewind(checkpoint);
+    buffer_rewind(checkpoint);
     return path_from(buffer);
 }
 
