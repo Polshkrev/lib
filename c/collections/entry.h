@@ -180,6 +180,7 @@ static bool _safe_long_to_size(long value, size_t *result)
 {
     if (value < 0) return false;
     *result = (size_t)value;
+    return true;
 }
 
 /**
@@ -190,10 +191,10 @@ static bool _safe_long_to_size(long value, size_t *result)
  */
 static bool _get_file_size(FILE *file, size_t *result) {
     long current_pos = ftell(file);
-    if (fseek(fp, 0L, SEEK_END) != 0) return false;
-    long size = ftell(fp);
+    if (fseek(file, 0L, SEEK_END) != 0) return false;
+    long size = ftell(file);
     if (size == -1) return false;
-    else if (fseek(fp, current_pos, SEEK_SET) != 0) return false;
+    else if (fseek(file, current_pos, SEEK_SET) != 0) return false;
     return _safe_long_to_size(size, result);
 }
 
@@ -320,8 +321,8 @@ bool entry_touch(entry_t *entry)
     FILE *file = fopen(passtr(entry->path), "w");
     if (NULL == file)
     {
-        fprintf(stderr, "IOError: Can not open file: %s.\n", passtr(path));
-        path_delete(entry);
+        fprintf(stderr, "IOError: Can not open file: %s.\n", passtr(entry->path));
+        entry_delete(entry);
         exit(1);
     }
     fclose(file);
