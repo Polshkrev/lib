@@ -1,5 +1,23 @@
 # Changelog
-## 0.12.0 - 2026-02-24
+## v0.13.0 - 2026-02-25
+`Added`
+- C
+    - `collections`
+        - Added `files` module.
+        - `entry`
+            - Added `entry_size` function.
+        - `string_builder`
+            - Added `string_builder_fit` function.
+
+`Changed`
+- C
+    - The `entry` module has been moved to `collections`.
+    - The `buffer` module has been moved to `collections`
+    - `collections`
+        - Each creation function for `entry_t` have been marked as non-const.
+        - Each removal function for `entry_t` have been marked as non-const.
+        - Each function for `entry_t` has been properly error handled, i.e. crash states have been added where applicable.
+## v0.12.0 - 2026-02-24
 `Added`
 - C
     - Added `entry_t` type.
@@ -10,13 +28,13 @@
 `Changed`
 - C
     - `loader_load` no longer depends on a `path_t` to ne passed as an argument. Instead a regular c-string will suffice.The previous behaviour is the same.
-## 0.11.0 - 2026-01-30
+## v0.11.0 - 2026-01-30
 `Added`
 - C
     - Added `library_load` function.
     - Added `library_function` function.
     - Added `library_delete` function.
-## 0.10.0 - 2026-01-08
+## v0.10.0 - 2026-01-08
 `Added`
 - C
     - Added `path` module.
@@ -24,13 +42,13 @@
     - Added `path` module.
     - `Exceptions`
         - `IOError` has been added.
-## 0.9.0 - 2026-01-08
+## v0.9.0 - 2026-01-08
 `Added`
 - C
     - Added `buffer` module.
     - `Docs`
         - Added `buffer` documentation.
-## 0.8.0 - 2026-01-06
+## v0.8.0 - 2026-01-06
 `Added`
 - CPP
     - Added the `dynamic array` module.
@@ -44,19 +62,19 @@
 - CPP
     - `Array`
         - All the private member variables are now protected due to implementation changes.
-## 0.7.0 - 2026-01-06
+## v0.7.0 - 2026-01-06
 `Added`
 - CPP
     - Added the `sized` interface.
     - `Docs`
         - Added the `sized` documentation.
-## 0.6.0 - 2026-01-03
+## v0.6.0 - 2026-01-03
 `Added`
 - C
     - Added the `string builder` module.
     - `Docs`
         - Added `string builder` documentation.
-## 0.5.0 - 2026-01-02
+## v0.5.0 - 2026-01-02
 `Added`
 - CPP
     - Added the `array` module.
@@ -67,14 +85,14 @@
     - `Docs`
         - Added the `array` module documentation.
         - Added the `collection` module documentation.
-## 0.4.0 - 2025-12-23
+## v0.4.0 - 2025-12-23
 `Added`
 - C
     - Added the `string view` module.
     - `Docs`
         - Added the `string view` module documentation.
 
-## 0.3.0 - 2025-12-14
+## v0.3.0 - 2025-12-14
 `Added`
 - C
     - Added the `flag` module.
@@ -87,7 +105,7 @@
     - `Version`
         - `to_string` now returns a `std::string`.
 
-## 0.2.0 - 2025-12-09
+## v0.2.0 - 2025-12-09
 `Added`
 - C
     - Added the `logger` module.
@@ -105,7 +123,7 @@
 - C
     - `version_init` has been renamed to `version_new` to more closely fit with this package's nomenclature.
 
-## 0.1.0 - 2025-12-06
+## v0.1.0 - 2025-12-06
 `Added`
 - C
     - Added the `version` module.
