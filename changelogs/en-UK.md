@@ -1,4 +1,15 @@
 # Changelog
+## 0.12.0 - 2026-02-24
+`Added`
+- C
+    - Added `entry_t` type.
+    - Added `file_type_t` enum.
+    - `Docs`
+        - Added documentation for `entry_t`.
+
+`Changed`
+- C
+    - `loader_load` no longer depends on a `path_t` to ne passed as an argument. Instead a regular c-string will suffice.The previous behaviour is the same.
 ## 0.11.0 - 2026-01-30
 `Added`
 - C
@@ -28,6 +39,7 @@
         - Added the `is_empty` method.
     - `Docs`
         - Added the `dynamic array` documentation.
+
 `Changed`
 - CPP
     - `Array`
