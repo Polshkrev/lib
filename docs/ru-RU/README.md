@@ -9,11 +9,13 @@
     2. [Логгер](/docs/ru-RU/c/logger.md)
     3. [Флаг](/docs/ru-RU/c/flag.md)
     4. [Строка](/docs/ru-RU/c/string.md)
-    5. [Буфер](/docs/ru-RU/c/buffer.md)
-    6. [Адрес](/docs/ru-RU/c/path.md)
-    7. [Загрузчик](/docs/ru-RU/c/loader.md)
+    5. [Адрес](/docs/ru-RU/c/path.md)
+    6. [Загрузчик](/docs/ru-RU/c/loader.md)
     7. Скопления
         1. [Список букв](/docs/ru-RU/c/collections/string_builder.md)
+        2. [Строка](/docs/ru-RU/c/collections/string.md)
+        3. [Буфер](/docs/ru-RU/c/collections/buffer.md)
+        4. [Запись](/docs/ru-RU/c/collections/entry.md)
 3. CPP
     1. [Версия](/docs/ru-RU/cpp/version.md)
     2. [Ошибка](/docs/ru-RU/cpp/exception.md)

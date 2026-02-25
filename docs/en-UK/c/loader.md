@@ -8,8 +8,7 @@ A platform agnostic dynamically linked library loader.
     3. [Destruction](#destruction)
 ## Usage
 ### Load
-To load a library, first a [path](/docs/en-UK/c/path.md) needs to be constructed.
-The created path will then be passed to the function `library_load`. This function will return a handle to the dynamically linked library.
+To load a library, the `library_load` function should be used. This function will return a handle to the dynamically linked library.
 ### Access
 To acccess a function within the dynamically linked library, the function `library_function` will need to be called.
 This function takes in the handle to the library obtained through the `library_load` function and the name of the function to be loaded. This function will return a handle to the loaded function.
