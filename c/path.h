@@ -86,16 +86,6 @@ path_t *path_append_to(const char *destination, const path_t *source);
 */
 path_t *path_get_parent(const path_t *path);
 
-// /*
-// * @brief Copy a file from a given source to a given destination.
-// * @param source Source path from which to copy.
-// * @param destination Destination path to which to copy.
-// * @returns True if the source path has been copied to the destination successfully, else false.
-// * @exception If the source path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits.
-// * @exception If the destination path already exists, a `FileExistsError` is printed to `stderr` and the programme exits.
-// */
-// bool path_copy_file(const path_t *source, const path_t *destination);
-
 /*
 * @brief Deallocate the given path parametre.
 * @param path Path to deallocate.
@@ -132,7 +122,7 @@ extern "C" {
 #endif // _WIN32
 
 #define BUFFER_IMPLEMENTATION
-#include "./buffer.h"
+#include "collections/buffer.h"
 
 #ifdef _WIN32
 /*

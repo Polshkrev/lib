@@ -257,6 +257,7 @@ bool entry_touch(const entry_t *entry)
     FILE *file = fopen(passtr(entry->path), "w");
     if (NULL == file) return false;
     fclose(file);
+    return true;
 }
 
 /**
