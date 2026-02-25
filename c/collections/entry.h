@@ -93,21 +93,21 @@ bool entry_create(entry_t *entry);
  * @param entry Entry to remove.
  * @returns True if the entry's path can be removed, else false.
  */
-bool entry_remove(const entry_t *entry);
+bool entry_remove(entry_t *entry);
 
 /**
  * @brief Remove directory on the filesystem.
  * @param entry Entry to remove.
  * @returns True if the entry's path can be removed, else false.
  */
-bool entry_remove_directory(const entry_t *entry);
+bool entry_remove_directory(entry_t *entry);
 
 /**
  * @brief Remove a file on the filesystem.
  * @param entry Entry to remove.
  * @returns True if the entry's path can be removed, else false.
  */
-bool entry_remove_file(const entry_t *entry);
+bool entry_remove_file(entry_t *entry);
 
 /**
  * @brief Copy a file entry from a given source to a given destination.
@@ -376,9 +376,14 @@ bool entry_create(entry_t *entry)
  * @param entry Entry to remove.
  * @returns True if the entry's path can be removed, else false.
  */
-bool entry_remove_directory(const entry_t *entry)
+bool entry_remove_directory(entry_t *entry)
 {
-    if (!path_exists(entry->path)) return false;
+    if (!path_exists(entry->path))
+    {
+        fprintf(stderr, "FileNotFoundError: Can not find file %s.\n", passtr(entry->path));
+        entry_delete(entry);
+        exit(1);
+    }
     else if (entry->type != DIRECTORY_TYPE) return false;
 #ifdef _WIN32
     int result = remove(passtr(entry->path));
@@ -393,9 +398,14 @@ bool entry_remove_directory(const entry_t *entry)
  * @param entry Entry to remove.
  * @returns True if the entry's path can be removed, else false.
  */
-bool entry_remove_file(const entry_t *entry)
+bool entry_remove_file(entry_t *entry)
 {
-    if (!path_exists(entry->path)) return false;
+    if (!path_exists(entry->path))
+    {
+        fprintf(stderr, "FileNotFoundError: Can not find file %s.\n", passtr(entry->path));
+        entry_delete(entry);
+        exit(1);
+    }
     else if (entry->type != FILE_TYPE) return false;
     return remove(passtr(entry->path)) == 0;
 }
@@ -405,7 +415,7 @@ bool entry_remove_file(const entry_t *entry)
  * @param entry Entry to remove.
  * @returns True if the entry's path can be removed, else false.
  */
-bool entry_remove(const entry_t *entry)
+bool entry_remove(entry_t *entry)
 {
     switch (entry->type)
     {
