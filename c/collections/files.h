@@ -94,7 +94,7 @@ extern "C" {
 #endif
 
 #define BUFFER_IMPLEMENTATION
-#include "collections/buffer.h"
+#include "buffer.h"
 
 #ifndef FILES_CAPACITY
 #define FILES_CAPACITY 256
