@@ -14,9 +14,9 @@ extern "C" {
 typedef struct
 {
     const char *root;
+    char **files;
     size_t size;
     size_t capacity;
-    char **files;
 } files_t;
 
 /**
@@ -41,7 +41,7 @@ files_t *files_init_with_capacity(const char *root, size_t capacity);
  * @param files Array of files to which to append.
  * @param entry Path from which to append.
  */
-void files_append(files_t *files, char *entry);
+void files_append(files_t *files, const char *entry);
 
 /**
  * @brief Obtain a path at a given index within the array of files.
@@ -93,8 +93,15 @@ void files_delete(files_t *files);
 extern "C" {
 #endif
 
-#define BUFFER_IMPLEMENTATION
-#include "buffer.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <tchar.h>
+#include <strsafe.h>
+#endif // _WIN32
 
 #ifndef FILES_CAPACITY
 #define FILES_CAPACITY 256
@@ -145,13 +152,25 @@ files_t *files_init_with_capacity(const char *root, size_t capacity)
  * @param entry Path from which to append.
  * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-void files_append(files_t *files, char *entry)
+void files_append(files_t *files, const char *entry)
 {
     if (files->size >= files->capacity)
     {
         files_resize(files);
     }
-    files->files[files->size++] = entry;
+    files->files[files->size] = (char*)malloc((strlen(entry) + 1) * sizeof(char));
+    if (files->files[files->size] == NULL)
+    {
+        fprintf(stderr, "ValueError: Can not allocate enough memory for entry: '%s'.\n", entry);
+        files_delete(files);
+        exit(1);
+    }
+#ifdef _WIN32
+    StringCbCopy(files->files[files->size], (strlen(entry) + 1) * sizeof(char), entry);
+#else
+#error "NotImplementedError: The linux version of `files_append()` has not been defined yet."
+#endif
+    files->size++;
 }
 
 /**
@@ -210,22 +229,18 @@ void files_fit(files_t *files)
 void files_delete(files_t *files)
 {
     if (!files->files) return;
-    // else if (!files->files) return;
+    for (size_t i = 0; i < files->size; i++) {
+        free(files->files[i]);
+    }
     free(files->files);
+    files->files = NULL;
+    files->size = 0;
+    files->capacity = 0;
     if (!files) return;
     free(files);
 }
 
 #ifdef _WIN32
-
-/**
- * @brief OS-dependant path seperator.
- */
-#define PATH_SEPERATOR '\\'
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
 #ifndef WIN32_ERR_MSG_SIZE
 /**
  * @brief Size of the error message format buffer within the windows implementation.
@@ -234,123 +249,42 @@ void files_delete(files_t *files)
 #endif // WIN32_ERR_MSG_SIZE
 
 /**
- * @brief Format a given error code.
- * @param error Error code to format.
- * @returns A formatted string obtained from the given error code.
- */
-static char *_win32_error_message(DWORD error) {
-    static char win32ErrMsg[WIN32_ERR_MSG_SIZE] = {0};
-    DWORD errMsgSize = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error, LANG_USER_DEFAULT, win32ErrMsg, WIN32_ERR_MSG_SIZE, NULL);
-    if (errMsgSize == 0)
-    {
-        if (GetLastError() != ERROR_MR_MID_NOT_FOUND)
-        {
-            if (sprintf(win32ErrMsg, "Could not get error message for 0x%lX", error) > 0)
-            {
-                return (char *)&win32ErrMsg;
-            }
-            else
-            {
-                return NULL;
-            }
-        }
-        else
-        {
-            if (sprintf(win32ErrMsg, "Invalid Windows Error code (0x%lX)", error) > 0)
-            {
-                return (char *)&win32ErrMsg;
-            }
-            else
-            {
-                return NULL;
-            }
-        }
-    }
-    while (errMsgSize > 1 && isspace(win32ErrMsg[errMsgSize - 1]))
-    {
-        win32ErrMsg[--errMsgSize] = '\0';
-    }
-    return win32ErrMsg;
-}
-
-/**
- * @brief Open a directory of a given root.
- * @param root Root of the directory to open.
- * @param handle Handle to the directory to open.
- * @param data Pointer to the data within the directory.
- * @returns True if the directory can be opened, else false.
- */
-static bool _open_windows(const char *root, HANDLE *handle, WIN32_FIND_DATA *data)
-{
-    size_t temp_mark = buffer_save();
-    char *buffer = buffer_sprintf("%s\\*", root);
-    HANDLE find = FindFirstFile(buffer, data);
-    buffer_rewind(temp_mark);
-    if (find == INVALID_HANDLE_VALUE) return false;
-    *handle = find;
-    return true;
-}
-
-/**
- * @brief Append a given root path to a given child path.
- * @param root Root to which to append.
- * @param child Child from which to append.
- * @return A formatted string containing the given root path and child path seperated by an operating system dependent seperator.
- */
-static char *_append_path(const char *root, const char *child)
-{
-    size_t checkpoint = buffer_save();
-    char *result = buffer_sprintf("%s%c%s", root, PATH_SEPERATOR, child);
-    buffer_rewind(checkpoint);
-    return result;
-}
-
-/**
  * @brief Obtain the entries at the given array root.
  * @param files Array of files to which to append.
  * @param handle Handle to the directory to open.
  * @param data Pointer to the data within the directory.
  * @returns True if the entries contained at the directory root can be obtained, else false.
  */
-static bool _get_entries_windows(files_t *files, HANDLE handle, WIN32_FIND_DATA *data)
+static bool _get_entries_windows(files_t *files, const char *path)
 {
-    if (!FindNextFile(handle, data)) return false;
-    if (strcmp(data->cFileName, ".") == 0) return true;
-    else if (strcmp(data->cFileName, "..") == 0) return true;
-    files_append(files, buffer_duplicate(_append_path(files->root, data->cFileName)));
-    return true;
-}
-
-/**
- * @brief Walk the directory of the given files' root.
- * @param files Array from which to walk.
- * @returns True if the directory can be walked, else false.
- */
-static bool _walk_directory_windows(files_t *files)
-{
-    bool result = true;
-    HANDLE handle;
+    char buffer[MAX_PATH];
     WIN32_FIND_DATA data;
-    if (!_open_windows(files->root, &handle, &data)) return false;
-    for (;;)
-    {
-        if (!_get_entries_windows(files, handle, &data))
+    HANDLE find = INVALID_HANDLE_VALUE;
+    StringCchCopy(buffer, MAX_PATH, path);
+    StringCchCat(buffer, MAX_PATH, "\\*");
+    find = FindFirstFile(buffer, &data);
+    if (INVALID_HANDLE_VALUE == find) return false;
+    bool result = true;
+    do {
+        if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0) continue;
+        char full_path[MAX_PATH];
+        StringCchCopy(full_path, MAX_PATH, path);
+        StringCchCat(full_path, MAX_PATH, "\\");
+        StringCchCat(full_path, MAX_PATH, data.cFileName);
+        // printf("Full Path: %s\n", full_path);
+        files_append(files, full_path);
+        if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
         {
-            if (GetLastError() == ERROR_NO_MORE_FILES) break;
-            result = false;
-            break;
+            if (!_get_entries_windows(files, full_path))
+            {
+                result = false;
+            }
         }
-    }
+    } while (FindNextFile(find, &data) != 0);
+    FindClose(find);
     return result;
 }
-
 #else
-
-/*
-* @brief OS-dependant path seperator.
-*/
-#define PATH_SEPERATOR "/"
-
 #endif // _WIN32
 
 /**
@@ -361,8 +295,7 @@ static bool _walk_directory_windows(files_t *files)
 bool files_fill(files_t *files)
 {
 #ifdef _WIN32
-    bool result = _walk_directory_windows(files);
-    buffer_reset();
+    bool result = _get_entries_windows(files, files->root);
 #else
 #error "NotImplementedError: The linux version of `files_fill()` has not been defined yet."
 #endif // _WIN32

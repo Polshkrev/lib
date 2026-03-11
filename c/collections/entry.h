@@ -12,6 +12,8 @@ extern "C" {
 #include "string_builder.h" // string_builder_t, sring_builder_init, string_builder_append, string_builder_empty, string_builder_data, string_builder_delete
 
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #include <direct.h> // _mkdir, remove
 #else
 #include <unistd.h> // mkdir, rmdir
@@ -22,6 +24,7 @@ extern "C" {
  */
 typedef enum
 {
+    NONE_TYPE,
     DIRECTORY_TYPE,
     FILE_TYPE,
 } file_type_t;
@@ -35,6 +38,13 @@ typedef struct
     path_t *path;
     string_builder_t *content;
 } entry_t;
+
+/**
+ * @brief Represent a `file_type_t` as a string.
+ * @param file_type File type to represent as a string.
+ * @return The given file type as a c-string.
+ */
+const char *file_type_to_string(file_type_t file_type);
 
 /**
  * @brief Construct a new entry of a given path.
@@ -151,6 +161,51 @@ extern "C" {
 #endif
 
 /**
+ * @brief Represent a `file_type_t` as a string.
+ * @param file_type File type to represent as a string.
+ * @return The given file type as a c-string.
+ */
+const char *file_type_to_string(file_type_t file_type)
+{
+    switch (file_type)
+    {
+        case DIRECTORY_TYPE:
+        {
+            return "DIRECTORY";
+        } break;
+        case FILE_TYPE:
+        {
+            return "FILE";
+        } break;
+        default:
+        {
+            return "NONE";
+        } break;
+    }
+}
+
+/**
+ * @brief Obtain the file type of the given path. If the path does not exist, it can not be analysed.
+ * @param path Path to analyse.
+ * @returns The file type of the given path.
+ */
+static file_type_t _get_file_type(const char *path)
+{
+#ifdef _WIN32
+    DWORD attr = GetFileAttributesA(path);
+    if (attr == INVALID_FILE_ATTRIBUTES) return NONE_TYPE;
+    else if (attr & FILE_ATTRIBUTE_DIRECTORY) return DIRECTORY_TYPE;
+    return FILE_TYPE;
+#else // _WIN32
+    struct stat statbuf;
+    if (lstat(path, &statbuf) < 0) return NONE_TYPE;
+    else if (S_ISREG(statbuf.st_mode)) return FILE_TYPE;
+    else if (S_ISDIR(statbuf.st_mode)) return DIRECTORY_TYPE;
+    return NONE_TYPE;
+#endif // _WIN32
+}
+
+/**
  * @brief Construct a new entry of a given path.
  * @param path Path of the entry.
  * @returns A new entry of the given path with its type set to `FILE_TYPE` and its content an empty `string_builder_t`.
@@ -166,7 +221,15 @@ entry_t *entry_init(path_t *path)
     }
     entry->path = path;
     entry->content = string_builder_init();
-    entry->type = FILE_TYPE;
+    if (path_exists(path))
+    {
+        entry->type = _get_file_type(passtr(path));
+    }
+    else
+    {
+        printf("else\n");
+        entry->type = FILE_TYPE;
+    }
     return entry;
 }
 
