@@ -1,14 +1,17 @@
 [project]
 name = "lib"
+author = {name = "Polshkrev"}
 description = "Library of single-file stb-like header files for c and c++."
-author = "Polshkrev"
 
 [project.version]
-minor = 13
+minor = 14
 
 [license]
 type = "MIT"
 path = "LICENSE"
+
+[urls]
+repository = "https://github.com/Polshkrev/lib"
 
 [paths]
 readme = "README.md"

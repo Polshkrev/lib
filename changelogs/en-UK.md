@@ -1,4 +1,11 @@
 # Changelog
+## v0.14.0 -2026-03-11
+`Added`
+- C
+    - `collections`
+        - Added `directory` module.
+        - Added `NONE_TYPE` for `file_type_t` enum.
+        - Added `file_type_to_string` function.
 ## v0.13.0 - 2026-02-25
 `Added`
 - C
