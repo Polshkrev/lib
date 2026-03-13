@@ -1,5 +1,20 @@
 # Changelog
-## v0.14.0 -2026-03-11
+## v1.15.0 - 2026-03-13
+`Added`
+- C
+    - `collections`
+        - Added `directory_to_string`.
+        - Added `entry_to_string`.
+- CPP
+    - `collections`
+        - Added the `is_full` methos for `sized_t`.
+        - Added the `is_full` method for `array_t`.
+
+`Changed`
+- CPP
+    - `collections`
+        - `length` has been renamed to `size` for `sized_t`.
+## v0.14.0 - 2026-03-11
 `Added`
 - C
     - `collections`
