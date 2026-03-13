@@ -8,13 +8,14 @@ If you would like to revise on how to use a single-file header-only library, the
     1. [Version](/docs/en-UK/c/version.md)
     2. [Logger](/docs/en-UK/c/logger.md)
     3. [Flag](/docs/en-UK/c/flag.md)
-    4. [String](/docs/en-UK/c/string.md)
-    5. [Path](/docs/en-UK/c/path.md)
-    6. [Loader](/docs/en-UK/c/loader.md)
-    7. Collections
+    4. [Path](/docs/en-UK/c/path.md)
+    5. [Loader](/docs/en-UK/c/loader.md)
+    6. Collections
         1. [String Builder](/docs/en-UK/c/collections/string_builder.md)
         2. [String](/docs/en-UK/c/collections/string.md)
         3. [Buffer](/docs/en-UK/c/collections/buffer.md)
+        4. [Entry](/docs/en-UK/c/entry.md)
+        5. [Files](/c/collections/files.h)
 3. CPP
     1. [Version](/docs/en-UK/cpp/version.md)
     2. [Exception](/docs/en-UK/cpp/exception.md)
