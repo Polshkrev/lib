@@ -136,6 +136,13 @@ bool entry_copy(entry_t *source, entry_t *destination);
 bool entry_move(entry_t *source, entry_t *destination);
 
 /**
+ * @brief Represent an entry as a string.
+ * @param entry Entry to represent as a string.
+ * @returns A string representation of the entry.
+ */
+const char *entry_to_string(entry_t *entry);
+
+/**
  * @brief Obtain the size of the entry in bytes.
  * @param entry Entry from which to obtain the size.
  * @returns The size of the entry.
@@ -491,6 +498,16 @@ bool entry_remove(entry_t *entry)
             return entry_remove_file(entry);
         } break;
     }
+}
+
+/**
+ * @brief Represent an entry as a string.
+ * @param entry Entry to represent as a string.
+ * @returns A string representation of the entry.
+ */
+const char *entry_to_string(entry_t *entry)
+{
+    return buffer_sprintf("%s - %s", passtr(entry->path), file_type_to_string(entry->type));
 }
 
 /**

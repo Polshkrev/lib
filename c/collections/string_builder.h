@@ -24,6 +24,8 @@ typedef struct
 /**
  * @brief Construct a new dynamic buffer of characters.
  * @returns A new dynamic buffer of characters.
+ * @exception If the builder can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
+ * @exception If the underlying array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 string_builder_t *string_builder_init(void);
 
@@ -31,6 +33,8 @@ string_builder_t *string_builder_init(void);
  * @brief Construct a new dynamic buffer of characters with a given capacity.
  * @param capacity capacity to set for the buffer.
  * @returns A new dynamic buffer of characters with a given initial capacity.
+ * @exception If the builder can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
+ * @exception If the underlying array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 string_builder_t *string_builder_with_capacity(size_t capacity);
 
@@ -38,6 +42,7 @@ string_builder_t *string_builder_with_capacity(size_t capacity);
  * @brief Append a character to the buffer of characters. If the buffer is full, the buffer is resized by an exponential factor of two.
  * @param builder Buffer of characters to which to append.
  * @param item Item to append to the buffer.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 void string_builder_append(string_builder_t *builder, char item);
 
@@ -45,6 +50,8 @@ void string_builder_append(string_builder_t *builder, char item);
  * @brief Append a null-terminated string to the buffer of characters not including the aforementioned null byte.
  * @param builder Buffer of characters to which to append.
  * @param items Null-terminated string from which to append to the buffer.
+ * @exception If the given items are null, an `IllegalParametreError` is printed to standard error and the programme exits.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 void string_builder_extend(string_builder_t *builder, const char *items);
 
@@ -53,7 +60,7 @@ void string_builder_extend(string_builder_t *builder, const char *items);
  * @param builder Buffer from which to access.
  * @param index Index within the buffer where the data is located.
  * @returns A pointer to the data within the given buffer at the given index.
- * @exception If the given index is greater than the size of the buffer, an `IndexError` to `stderr` is printed and the programme exits.
+ * @exception If the given index is greater than the size of the buffer, an `IndexError` is printed to `stderr` and the programme exits.
  */
 char *string_builder_at(const string_builder_t *builder, size_t index);
 
@@ -61,6 +68,7 @@ char *string_builder_at(const string_builder_t *builder, size_t index);
  * @brief Obtain a null-terminated c-string consisting of the items within the buffer.
  * @param builder Buffer from which to obtain the data.
  * @returns A null-terminated c-string consisting of the data within the array.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 const char *string_builder_data(string_builder_t *builder);
 
@@ -71,9 +79,10 @@ const char *string_builder_data(string_builder_t *builder);
 void string_builder_fit(string_builder_t *builder);
 
 /**
- * @brief Append the contents of a given buffer into another.
- * @param destination Buffer to which to append.
- * @param source Buffer from which to append.
+ * @brief Fit the capacity of the builder to its size.
+ * @param builder Builder to fit.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
+ * @exception If the given index is greater than the size of the builder, an `IndexError` is printed to `stderr` and the programme exits.
  */
 void string_builder_combine(string_builder_t *destination, const string_builder_t *source);
 
@@ -97,6 +106,7 @@ void string_builder_remove(string_builder_t *builder, size_t index);
 /**
  * @brief Resize the buffer by an exponentional factor of two.
  * @param builder Buffer to resize.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 void string_builder_resize(string_builder_t *builder);
 
@@ -104,6 +114,7 @@ void string_builder_resize(string_builder_t *builder);
  * @brief Resize the buffer by a given exponentional factor.
  * @param builder Buffer to resize.
  * @param scaler Exponential scaler by which to resize the buffer.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 void string_builder_resize_by(string_builder_t *builder, size_t scaler);
 
@@ -152,6 +163,8 @@ string_builder_t *string_builder_init(void)
  * @brief Construct a new dynamic buffer of characters with a given capacity.
  * @param capacity capacity to set for the buffer.
  * @returns A new dynamic buffer of characters with a given initial capacity.
+ * @exception If the builder can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
+ * @exception If the underlying array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 string_builder_t *string_builder_with_capacity(size_t capacity)
 {
@@ -167,6 +180,11 @@ string_builder_t *string_builder_with_capacity(size_t capacity)
     if (NULL == builder->items)
     {
         fprintf(stderr, "AllocationError: Can not allocate buffer.\n");
+        if (builder)
+        {
+            free(builder);
+            builder = NULL;
+        }
         exit(1);
     }
     return builder;
@@ -176,6 +194,7 @@ string_builder_t *string_builder_with_capacity(size_t capacity)
  * @brief Append a character to the buffer of characters. If the buffer is full, the buffer is resized by an exponential factor of two.
  * @param builder Buffer of characters to which to append.
  * @param item Item to append to the buffer.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 void string_builder_append(string_builder_t *builder, char item)
 {
@@ -190,6 +209,8 @@ void string_builder_append(string_builder_t *builder, char item)
  * @brief Append a null-terminated string to the buffer of characters not including the aforementioned null byte.
  * @param builder Buffer of characters to which to append.
  * @param items Null-terminated string from which to append to the buffer.
+ * @exception If the given items are null, an `IllegalParametreError` is printed to standard error and the programme exits.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 void string_builder_extend(string_builder_t *builder, const char *items)
 {
@@ -210,7 +231,7 @@ void string_builder_extend(string_builder_t *builder, const char *items)
  * @param builder Buffer from which to access.
  * @param index Index within the buffer where the data is located.
  * @returns A pointer to the data within the given buffer at the given index.
- * @exception If the given index is greater than the size of the buffer, an `IndexError` to `stderr` is printed and the programme exits.
+ * @exception If the given index is greater than the size of the buffer, an `IndexError` is printed to `stderr` and the programme exits.
  */
 char *string_builder_at(const string_builder_t *builder, size_t index)
 {
@@ -226,6 +247,7 @@ char *string_builder_at(const string_builder_t *builder, size_t index)
  * @brief Obtain a null-terminated c-string consisting of the items within the buffer.
  * @param builder Buffer from which to obtain the data.
  * @returns A null-terminated c-string consisting of the data within the array.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 const char *string_builder_data(string_builder_t *builder)
 {
@@ -245,6 +267,8 @@ void string_builder_fit(string_builder_t *builder)
 /**
  * @brief Fit the capacity of the builder to its size.
  * @param builder Builder to fit.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
+ * @exception If the given index is greater than the size of the builder, an `IndexError` is printed to `stderr` and the programme exits.
  */
 void string_builder_combine(string_builder_t *destination, const string_builder_t *source)
 {
@@ -277,11 +301,13 @@ void string_builder_remove(string_builder_t *builder, size_t index)
     if (index >= builder->size)
     {
         fprintf(stderr, "IndexError: Can not remove from buffer of size %zu at index %zu.\n", builder->size, index);
+        string_builder_delete(builder);
         exit(1);
     }
     else if (string_builder_empty(builder))
     {
         fprintf(stderr, "ValueError: Can not remove from an empty buffer.\n");
+        string_builder_delete(builder);
         exit(1);
     }
     for (size_t i = index; i < builder->size - 1; i++)
@@ -293,6 +319,7 @@ void string_builder_remove(string_builder_t *builder, size_t index)
     if (NULL == temp)
     {
         fprintf(stderr, "AllocationError: Can not reallocate the buffer.\n");
+        string_builder_delete(builder);
         exit(1);
     }
     builder->items = temp;
@@ -301,6 +328,7 @@ void string_builder_remove(string_builder_t *builder, size_t index)
 /**
  * @brief Resize the buffer by an exponentional factor of two.
  * @param builder Buffer to resize.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 void string_builder_resize(string_builder_t *builder)
 {
@@ -311,6 +339,7 @@ void string_builder_resize(string_builder_t *builder)
  * @brief Resize the buffer by a given exponentional factor.
  * @param builder Buffer to resize.
  * @param scaler Exponential scaler by which to resize the buffer.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 void string_builder_resize_by(string_builder_t *builder, size_t scaler)
 {
@@ -319,6 +348,7 @@ void string_builder_resize_by(string_builder_t *builder, size_t scaler)
     if (NULL == builder->items)
     {
         fprintf(stderr, "AllocationError: Can not reallocate the buffer.\n");
+        string_builder_delete(builder);
         exit(1);
     }
 }
@@ -339,10 +369,10 @@ bool string_builder_empty(const string_builder_t *builder)
  */
 void string_builder_delete(string_builder_t *builder)
 {
-    if (!builder->items) return;
+    if (!builder) return;
+    else if (!builder->items) return;
     free(builder->items);
     builder->items = NULL;
-    if (!builder) return;
     free(builder);
     builder = NULL;
 }

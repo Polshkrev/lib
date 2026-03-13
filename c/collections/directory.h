@@ -6,7 +6,7 @@
 #endif // DIRECTORY_CAPACITY
 
 #define ENTRY_IMPLEMENTATION
-#include "./entry.h"
+#include "entry.h"
 
 /**
  * @brief Representation of a directory on the filesystem.
@@ -61,6 +61,15 @@ entry_t **directory_at(directory_t *directory, size_t index);
 bool directory_read(directory_t *directory);
 
 /**
+ * @brief Represent a directory to as a string.
+ * @param directory Directory to represent.
+ * @param buffer Buffer to which to render the resulting string.
+ * @exception If the given items are null, an `IllegalParametreError` is printed to standard error and the programme exits.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
+ */
+void directory_to_string(directory_t *directory, string_builder_t *buffer);
+
+/**
  * @brief Resize a given directory by a factor of two.
  * @param directory Directory to resize.
  * @exception If the directory can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
@@ -96,7 +105,7 @@ void directory_delete(directory_t *directory);
 #ifdef DIRECTORY_IMPLEMENTATION
 
 #define FILES_IMPLEMENTATION
-#include "./files.h"
+#include "files.h"
 
 /**
  * @brief Construct a new directory at a given root.
@@ -213,6 +222,22 @@ bool directory_read(directory_t *directory)
         }
     }
     return result;
+}
+
+/**
+ * @brief Represent a given directory as a string.
+ * @param directory Directory to represent as a string.
+ * @param result Buffer to which to formulate the string.
+ * @exception If the given items are null, an `IllegalParametreError` is printed to standard error and the programme exits.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
+ */
+void directory_to_string(directory_t *directory, string_builder_t *result)
+{
+    for (size_t i = 0; i < directory->size; ++i)
+    {
+        string_builder_extend(result, entry_to_string(directory->entries[i]));
+        string_builder_append(result, '\n');
+    }
 }
 
 /**
