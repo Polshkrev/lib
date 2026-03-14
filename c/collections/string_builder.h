@@ -65,6 +65,19 @@ void string_builder_extend(string_builder_t *builder, const char *items);
 char *string_builder_at(const string_builder_t *builder, size_t index);
 
 /**
+ * @brief Find a specified character within the builder.
+ * @returns The index within the builder where the given character is stored. If the character can not be found, negative one is returned.
+ */
+ssize_t string_builder_find(const string_builder_t *builder, char chararctor);
+
+/**
+ * @brief Obtain the items within the builder.
+ * @param builder Builder from which to obtain the items.
+ * @returns The underlying items within the builder without appending a null byte.
+ */
+char *string_builder_items(const string_builder_t *builder);
+
+/**
  * @brief Obtain a null-terminated c-string consisting of the items within the buffer.
  * @param builder Buffer from which to obtain the data.
  * @returns A null-terminated c-string consisting of the data within the array.
@@ -241,6 +254,33 @@ char *string_builder_at(const string_builder_t *builder, size_t index)
         exit(1);
     }
     return &builder->items[index];
+}
+
+/**
+ * @brief Find a specified character within the builder.
+ * @returns The index within the builder where the given character is stored. If the character can not be found, negative one is returned.
+ */
+ssize_t string_builder_find(const string_builder_t *builder, char chararcter)
+{
+    for (size_t i = 0; i < builder->size; ++i)
+    {
+        if (builder->items[i] != chararcter)
+        {
+            continue;
+        }
+        return i;
+    }
+    return -1;
+}
+
+/**
+ * @brief Obtain the items within the builder.
+ * @param builder Builder from which to obtain the items.
+ * @returns The underlying items within the builder without appending a null byte.
+ */
+char *string_builder_items(const string_builder_t *builder)
+{
+    return builder->items;
 }
 
 /**
