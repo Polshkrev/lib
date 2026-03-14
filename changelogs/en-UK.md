@@ -1,5 +1,12 @@
 # Changelog
-## v1.15.0 - 2026-03-13
+## v0.16.0 - 2026-03-14
+`Added`
+- C
+    - `collections`
+        - Added `string_builder_find`.
+        - Added `string_builder_items`.
+    - Added `path_get_root`.
+## v0.15.0 - 2026-03-13
 `Added`
 - C
     - `collections`

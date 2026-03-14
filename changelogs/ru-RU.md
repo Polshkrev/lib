@@ -1,5 +1,27 @@
 # Журнал изменений
-## v0.14.0 -2026-03-11
+## v0.16.0 - 2026-03-14
+`Добавлено`
+- C
+    - `collections`
+        - Добавлен `string_builder_find`.
+        - Добавлен `string_builder_items`.
+    - Добавлен `path_get_root`.
+## v0.15.0 - 2026-03-13
+`Добавлено`
+- C
+    - `collections`
+        - Добавлен `directory_to_string`.
+        - Добавлен `entry_to_string`.
+- CPP
+    - `collections`
+        - Добавлен метод `is_full` для `size_t`.
+        - Добавлен метод `is_full` для `array_t`.
+
+`Изменено`
+- CPP
+    - `collections`
+        - Параметр `length` был переименован в `size` для `sized_t`.
+## v0.14.0 - 2026-03-11
 `Добавлено`
 - C
     - `collections`
