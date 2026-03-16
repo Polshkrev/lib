@@ -1,4 +1,9 @@
 # Changelog
+## v0.20.0 - 2026-03-16
+`Added`
+- C
+    - Added `path_filename` function.
+    - Added `path_extension` function.
 ## v0.19.0 - 2026-03-16
 `Added`
 - CPP
