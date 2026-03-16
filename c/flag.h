@@ -9,9 +9,9 @@ extern "C" {
 #include <stdbool.h> // bool
 #include <inttypes.h> // uintptr_t, uint64_t, size_t, PRIu64
 
-/*
-* @brief Type representation of the "psuedo-union" type defined in the Flag struct.
-*/
+/**
+ * @brief Type representation of the "psuedo-union" type defined in the Flag struct.
+ */
 typedef enum
 {
     FLAG_BOOL,
@@ -19,9 +19,9 @@ typedef enum
     FLAG_STR
 } Flag_Type;
 
-/*
-* @brief Enum to represent the index in a "psuedo-union" array.
-*/
+/**
+ * @brief Enum to represent the index in a "psuedo-union" array.
+ */
 typedef enum
 {
     DATA_VAL,
@@ -30,9 +30,9 @@ typedef enum
     DATA_MAX
 } Flag_Data;
 
-/*
-* @brief Struct to represent a runtime flag given to a programme.
-*/
+/**
+ * @brief Struct to represent a runtime flag given to a programme.
+ */
 typedef struct
 {
     Flag_Type type;
@@ -41,71 +41,71 @@ typedef struct
     uintptr_t data[sizeof(Flag_Data)];
 } Flag;
 
-/*
-* @brief Internal way to create a new flag.
-* @param type An enum representation of a type of flag.
-* @param name Name of the flag to be printed in a help message.
-* @param desc Description of the flag to be printed in the help message.
-* @returns A pointer to the address of the allocated flag.
-* @exception If the amount of allocated flags have exceeded the capacity, a `ValueError` is printed to `stderr` and the programme exits.
-*/
+/**
+ * @brief Internal way to create a new flag.
+ * @param type An enum representation of a type of flag.
+ * @param name Name of the flag to be printed in a help message.
+ * @param desc Description of the flag to be printed in the help message.
+ * @returns A pointer to the address of the allocated flag.
+ * @exception If the amount of allocated flags have exceeded the capacity, a `ValueError` is printed to `stderr` and the programme exits.
+ */
 Flag *flag_new(Flag_Type type, char *name, char *desc);
 
-/*
-* @brief Allocate a boolean flag.
-* @param name Name of the flag to be printed in a help message.
-* @param def Default boolean value of the flag.
-* @param desc Description of the flag to be printed in the help message.
-* @returns A pointer to the boolean value of the provided flag.
-*/
+/**
+ * @brief Construct a boolean flag.
+ * @param name Name of the flag to be printed in a help message.
+ * @param def Default boolean value of the flag.
+ * @param desc Description of the flag to be printed in the help message.
+ * @returns A pointer to the boolean value of the provided flag.
+ */
 bool *flag_bool(char *name, bool def, char *desc);
 
-/*
-* @brief Allocate an unsigned 64-bit integer flag.
-* @param name Name of the flag to be printed in a help message.
-* @param def Default unsigned 64-bit integer value of the flag.
-* @param desc Description of the flag to be printed in the help message.
-* @returns A pointer to the unsigned 64-bit integer value of the provided flag.
-*/
+/**
+ * @brief Construct an unsigned 64-bit integer flag.
+ * @param name Name of the flag to be printed in a help message.
+ * @param def Default unsigned 64-bit integer value of the flag.
+ * @param desc Description of the flag to be printed in the help message.
+ * @returns A pointer to the unsigned 64-bit integer value of the provided flag.
+ */
 uint64_t *flag_uint64(char *name, uint64_t def, char *desc);
 
-/*
-* @brief Set a range between a given minimum and maximum for a given integer flag.
-* @param flag A mutable pointer to the unsigned 64-bit flag to set the range.
-* @param min An unsinged 64-bit integer minimum to set.
-* @param max An unsinged 64-bit integer maximum to set.
-* @exception If the supplied value is greater than or equal to the maximum allowed by the type, a `ValueError` is printed and the programme exits.
-* @exception If the supplied value is less than or equal to the minimum allowed by the type, a `ValueError` is printed and the programme exits.
-*/
+/**
+ * @brief Set a range between a given minimum and maximum for a given integer flag.
+ * @param flag A mutable pointer to the unsigned 64-bit flag to set the range.
+ * @param min An unsinged 64-bit integer minimum to set.
+ * @param max An unsinged 64-bit integer maximum to set.
+ * @exception If the supplied value is greater than or equal to the maximum allowed by the type, a `ValueError` is printed and the programme exits.
+ * @exception If the supplied value is less than or equal to the minimum allowed by the type, a `ValueError` is printed and the programme exits.
+ */
 void flag_uint64_range(uint64_t *flag, uint64_t min, uint64_t max);
 
-/*
-* @brief Allocate a string flag.
-* @param name Name of the flag to be printed in a help message.
-* @param def Default string value of the flag.
-* @param desc Description of the flag to be printed in the help message.
-* @returns A pointer to the c-string value of the provided flag.
-*/
+/**
+ * @brief Construct a string flag.
+ * @param name Name of the flag to be printed in a help message.
+ * @param def Default string value of the flag.
+ * @param desc Description of the flag to be printed in the help message.
+ * @returns A pointer to the c-string value of the provided flag.
+ */
 char **flag_string(char *name, char *def, char *desc);
 
-/*
-* @brief Print a help message to a given stream.
-* @param stream A pointer to an ouput stream where the ouptut message will be printed.
-* @param print_default A boolean flag to customize the printing of the default values of each flag. By default the value should be false.
-*/
+/**
+ * @brief Print a help message to a given stream.
+ * @param stream A pointer to an ouput stream where the ouptut message will be printed.
+ * @param print_default A boolean flag to customize the printing of the default values of each flag. By default the value should be false.
+ */
 void flag_print_help(FILE *stream, bool print_default);
 
-/*
-* @brief Set the name of the programme that takes in the flags. The name of the programme will be displayed in the help menu. A global `PROGRAMME_NAME` variable will be set to be used in the `flag_parse` function. If this function is not called, then the first argument supplied to `argv` will be used.
-* @param name String to set as the name of the programme marked with const.
-*/
+/**
+ * @brief Set the name of the programme that takes in the flags. The name of the programme will be displayed in the help menu. A global `PROGRAMME_NAME` variable will be set to be used in the `flag_parse` function. If this function is not called, then the first argument supplied to `argv` will be used.
+ * @param name String to set as the name of the programme marked with const.
+ */
 void flag_set_programme_name(const char *name);
 
-/*
-* @brief Parse the flags provided to the programme at runtime. This function must be called for any of the flags to be parsed.
-* @param argc Argument count provided in `main`.
-* @param argv String array of runtime arguments provided in `main`.
-*/
+/**
+ * @brief Parse the flags provided to the programme at runtime. This function must be called for any of the flags to be parsed.
+ * @param argc Argument count provided in `main`.
+ * @param argv String array of runtime arguments provided in `main`.s
+ */
 void flag_parse(int argc, char **argv);
 
 #if defined(__cplusplus)
@@ -137,14 +137,14 @@ static size_t flag_count = 0;
 static char flag_tmp_str[FLAG_TMP_STR_CAPACITY];
 static size_t flag_tmp_str_size = 0;
 
-/*
-* @brief Internal way to create a new flag.
-* @param type An enum representation of a type of flag.
-* @param name Name of the flag to be printed in a help message.
-* @param desc Description of the flag to be printed in the help message.
-* @returns A pointer to the address of the allocated flag.
-* @exception If the amount of allocated flags have exceeded the capacity, a `ValueError` is printed to `stderr` and the programme exits.
-*/
+/**
+ * @brief Internal way to create a new flag.
+ * @param type An enum representation of a type of flag.
+ * @param name Name of the flag to be printed in a help message.
+ * @param desc Description of the flag to be printed in the help message.
+ * @returns A pointer to the address of the allocated flag.
+ * @exception If the amount of allocated flags have exceeded the capacity, a `ValueError` is printed to `stderr` and the programme exits.
+ */
 Flag *flag_new(Flag_Type type, char *name, char *desc)
 {
     // make sure the count doesn't exceed the capacity
@@ -162,13 +162,13 @@ Flag *flag_new(Flag_Type type, char *name, char *desc)
     return flag;
 }
 
-/*
-* @brief Allocate a boolean flag.
-* @param name Name of the flag to be printed in a help message.
-* @param def Default boolean value of the flag.
-* @param desc Description of the flag to be printed in the help message.
-* @returns A pointer to the boolean value of the provided flag.
-*/
+/**
+ * @brief Construct a boolean flag.
+ * @param name Name of the flag to be printed in a help message.
+ * @param def Default boolean value of the flag.
+ * @param desc Description of the flag to be printed in the help message.
+ * @returns A pointer to the boolean value of the provided flag.
+ */
 bool *flag_bool(char *name, bool def, char *desc)
 {
     Flag *flag = flag_new(FLAG_BOOL, name, desc);
@@ -177,13 +177,13 @@ bool *flag_bool(char *name, bool def, char *desc)
     return (bool*) &flag->data[DATA_VAL]; // return the address as a boolean
 }
 
-/*
-* @brief Allocate an unsigned 64-bit integer flag.
-* @param name Name of the flag to be printed in a help message.
-* @param def Default unsigned 64-bit integer value of the flag.
-* @param desc Description of the flag to be printed in the help message.
-* @returns A pointer to the unsigned 64-bit integer value of the provided flag.
-*/
+/**
+ * @brief Construct an unsigned 64-bit integer flag.
+ * @param name Name of the flag to be printed in a help message.
+ * @param def Default unsigned 64-bit integer value of the flag.
+ * @param desc Description of the flag to be printed in the help message.
+ * @returns A pointer to the unsigned 64-bit integer value of the provided flag.
+ */
 uint64_t *flag_uint64(char *name, uint64_t def, char *desc)
 {
     Flag *flag = flag_new(FLAG_UINT64, name, desc);
@@ -194,14 +194,14 @@ uint64_t *flag_uint64(char *name, uint64_t def, char *desc)
     return (uint64_t*) &flag->data[DATA_VAL];
 }
 
-/*
-* @brief Set a range between a given minimum and maximum for a given integer flag.
-* @param flag A mutable pointer to the unsigned 64-bit flag to set the range.
-* @param min An unsinged 64-bit integer minimum to set.
-* @param max An unsinged 64-bit integer maximum to set.
-* @exception If the supplied value is greater than or equal to the maximum allowed by the type, a `ValueError` is printed and the programme exits.
-* @exception If the supplied value is less than or equal to the minimum allowed by the type, a `ValueError` is printed and the programme exits.
-*/
+/**
+ * @brief Set a range between a given minimum and maximum for a given integer flag.
+ * @param flag A mutable pointer to the unsigned 64-bit flag to set the range.
+ * @param min An unsinged 64-bit integer minimum to set.
+ * @param max An unsinged 64-bit integer maximum to set.
+ * @exception If the supplied value is greater than or equal to the maximum allowed by the type, a `ValueError` is printed and the programme exits.
+ * @exception If the supplied value is less than or equal to the minimum allowed by the type, a `ValueError` is printed and the programme exits.
+ */
 void flag_uint64_range(uint64_t *flag, uint64_t min, uint64_t max)
 {
     static_assert(sizeof(uint64_t) == sizeof(uintptr_t), "This will only work if the size of uint64_t and uintptr_t is the same");
@@ -219,13 +219,13 @@ void flag_uint64_range(uint64_t *flag, uint64_t min, uint64_t max)
     flag[DATA_MAX] = max;
 }
 
-/*
-* @brief Allocate a string flag.
-* @param name Name of the flag to be printed in a help message.
-* @param def Default string value of the flag.
-* @param desc Description of the flag to be printed in the help message.
-* @returns A pointer to the c-string value of the provided flag.
-*/
+/**
+ * @brief Construct a string flag.
+ * @param name Name of the flag to be printed in a help message.
+ * @param def Default string value of the flag.
+ * @param desc Description of the flag to be printed in the help message.
+ * @returns A pointer to the c-string value of the provided flag.
+ */
 char **flag_string(char *name, char *def, char *desc)
 {
     Flag *flag = flag_new(FLAG_STR, name, desc);
@@ -234,13 +234,13 @@ char **flag_string(char *name, char *def, char *desc)
     return (char **) &flag->data[DATA_VAL];
 }
 
-/*
-* @brief Shift each argument provided as parced at runtime.
-* @param argc A pointer to the arguments count provided in `main`. This parametre is decremented, thus its mutability.
-* @param argv A pointer to a dynamic array of strings provided in `main`.
-* @returns A string representation of the parced argument.
-* @exception If there are no arguments provided, a `RuntimeError` is printed and the programme exits.
-*/
+/**
+ * @brief Shift each argument provided as parced at runtime.
+ * @param argc A pointer to the arguments count provided in `main`. This parametre is decremented, thus its mutability.
+ * @param argv A pointer to a dynamic array of strings provided in `main`.
+ * @returns A string representation of the parced argument.
+ * @exception If there are no arguments provided, a `RuntimeError` is printed and the programme exits.
+ */
 static char *_flag_shift_args(int *argc, char ***argv)
 {
     if (*argc <= 0)
@@ -257,11 +257,11 @@ static char *_flag_shift_args(int *argc, char ***argv)
 
 // TODO: I've tried to refactor this to look more clean. After I do my changes, everything breaks. I don't know. Fix this eventually.
 
-/*
-* @brief Internal implementation of the flag parsing.
-* @param argc Argument count provided in `main`.
-* @param argv String array of runtime arguments provided in `main`.
-*/
+/**
+ * @brief Internal implementation of the flag parsing.
+ * @param argc Argument count provided in `main`.
+ * @param argv String array of runtime arguments provided in `main`.
+ */
 static void _flag_scan(int argc, char **argv)
 {
     _flag_shift_args(&argc, &argv);
@@ -335,6 +335,13 @@ static void _flag_scan(int argc, char **argv)
     };
 }
 
+/**
+ * @brief Represent an unsigned 64-bit flag as a string.
+ * @param data Pointer type to the internal data of the flag.
+ * @returns The given data as a string.
+ * @exception If the initial formatting of the data fails, a `ValueError` is printed to standard error and the programme exits.
+ * @exception If the global array of flags is full, an `AllocationError` is printed to standard error and the programme exits.
+ */
 static char *_uint64_to_string(uintptr_t data)
 {
     int n = snprintf(NULL, 0, "%"PRIu64, *(uint64_t*) &data);
@@ -362,6 +369,12 @@ static char *_uint64_to_string(uintptr_t data)
     return result;
 }
 
+/**
+ * @brief Represent a given flag as a string.
+ * @param type Type of the flag to be represented.
+ * @param data Data of the flag to reperesent.
+ * @returns A string representation of the given data based on the given type.
+ */
 static char *_flag_show_data(Flag_Type type, uintptr_t data)
 {
     switch(type)
@@ -378,11 +391,11 @@ static char *_flag_show_data(Flag_Type type, uintptr_t data)
     exit(1);
 }
 
-/*
-* @brief Print a help message to a given stream.
-* @param stream A pointer to an ouput stream where the ouptut message will be printed.
-* @param print_default A boolean flag to customize the printing of the default values of each flag. By default the value should be false.
-*/
+/**
+ * @brief Print a help message to a given stream.
+ * @param stream A pointer to an ouput stream where the ouptut message will be printed.
+ * @param print_default A boolean flag to customize the printing of the default values of each flag. By default the value should be false.
+ */
 void flag_print_help(FILE *stream, bool print_default)
 {
     for (size_t i = 0; i < flag_count; ++i)
@@ -409,20 +422,20 @@ void flag_print_help(FILE *stream, bool print_default)
     }
 }
 
-/*
-* @brief Set the name of the programme that takes in the flags. The name of the programme will be displayed in the help menu. A global `PROGRAMME_NAME` variable will be set to be used in the `flag_parse` function. If this function is not called, then the first argument supplied to `argv` will be used.
-* @param name String to set as the name of the programme marked with const.
-*/
+/**
+ * @brief Set the name of the programme that takes in the flags. The name of the programme will be displayed in the help menu. A global `PROGRAMME_NAME` variable will be set to be used in the `flag_parse` function. If this function is not called, then the first argument supplied to `argv` will be used.
+ * @param name String to set as the name of the programme marked with const.
+ */
 void flag_set_programme_name(const char *name)
 {
     _PROGRAMME_NAME = name;
 }
 
-/*
-* @brief Parse the flags provided to the programme at runtime. This function must be called for any of the flags to be parsed.
-* @param argc Argument count provided in `main`.
-* @param argv String array of runtime arguments provided in `main`.
-*/
+/**
+ * @brief Parse the flags provided to the programme at runtime. This function must be called for any of the flags to be parsed.
+ * @param argc Argument count provided in `main`.
+ * @param argv String array of runtime arguments provided in `main`.s
+ */
 void flag_parse(int argc, char **argv)
 {
     char *programme = argv[0];

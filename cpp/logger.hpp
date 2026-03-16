@@ -1,7 +1,7 @@
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
-#include <cstdio> // FILE, fprintf
+#include <cstdio> // FILE, std::fprintf
 #include <string> // std::string
 #include <array> // std::array
 
@@ -89,7 +89,7 @@ namespace polutils
                 * @param message Message to log.
                 * @param level The level of the message. If the given level is less than the minimum the logger has allowed, the message will not be logged.
                 */
-                void log(const std::string &message, level_t level) const noexcept;
+                void log(const std::string &message, level_t level = level_t::DEBUG) const noexcept;
 
                 /*
                 * @brief Close a logger.
