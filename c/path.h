@@ -93,6 +93,20 @@ path_t *path_get_parent(const path_t *path);
 path_t *path_get_root(const path_t *path);
 
 /**
+ * @brief Obtain the filename of the given path.
+ * @param path Path from which to obtain the filename.
+ * @returns The filename of the given path.
+ */
+path_t *path_filename(const path_t *path);
+
+/**
+ * @brief Obtain the extension of the given path.
+ * @param path Path from which to obtain the file extension.
+ * @returns The extension of the given path.
+ */
+const char *path_extension(const path_t *path);
+
+/**
  * @brief Deallocate the given path parametre.
  * @param path Path to deallocate.
  */
@@ -299,7 +313,7 @@ path_t *path_get_parent(const path_t *path)
     ssize_t last_stroke = _find_last_stroke(passtr(absolute));
     if (last_stroke < 0)
     {
-        return path;
+        return path_from(passtr(path));
     }
     char *buffer = buffer_allocate(last_stroke);
     for (ssize_t i = 0; i < last_stroke; ++i)
@@ -341,7 +355,7 @@ path_t *path_get_root(const path_t *path)
     if (first_stroke < 0)
     {
         path_delete(absolute);
-        return path;
+        return path_from(passtr(path));
     }
     char *buffer = buffer_allocate(first_stroke);
     for (ssize_t i = 0; i < first_stroke; ++i)
@@ -353,6 +367,47 @@ path_t *path_get_root(const path_t *path)
     return path_from(buffer);
 #else
     return path_from("/");
+#endif // _WIN32
+}
+
+/**
+ * @brief Obtain the filename of the given path.
+ * @param path Path from which to obtain the filename.
+ * @returns The filename of the given path.
+ */
+path_t *path_filename(const path_t *path)
+{
+#ifndef _WIN32
+    if (!path->raw || !*path->raw) return path_from(buffer_duplicate("."));
+    char *string = buffer_duplicate(path->raw);
+    size_t i = strlen(string) - 1;
+    for (; i && string[i] == PATH_SEPERATOR; i--) string[i] = 0;
+    for (; i && string[i-1] != PATH_SEPERATOR; i--);
+    return path_from(string + i);
+#else
+    // if (!path->raw) return NULL;
+    char *filename = buffer_allocate(_MAX_FNAME);
+    char *extension = buffer_allocate(_MAX_EXT);
+    errno_t result = _splitpath_s(path->raw, NULL, 0, NULL, 0, filename, _MAX_FNAME, extension, _MAX_EXT);
+    if (result != 0) return path_from(passtr(path));
+    return path_from(filename);
+#endif // _WIN32
+}
+
+/**
+ * @brief Obtain the extension of the given path.
+ * @param path Path from which to obtain the file extension.
+ * @returns The extension of the given path.
+ */
+const char *path_extension(const path_t *path)
+{
+#ifndef _WIN32
+    return strrchr(path_filename(path), ".");
+#else
+    char *extension = buffer_allocate(_MAX_EXT);
+    errno_t result = _splitpath_s(passtr(path), NULL, 0, NULL, 0, NULL, 0, extension, _MAX_EXT);
+    if (result != 0) return passtr(path);
+    return extension + 1;
 #endif // _WIN32
 }
 
