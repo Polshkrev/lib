@@ -1,4 +1,14 @@
 # Changelog
+## v0.17.0 - 2026-03-16
+`Added`
+- CPP
+    - Added `printable_t` interface.
+    - Added both the `parent` and `root` methods for `path_t`.
+    - Added all getters and setters for private properties for `version_t`.
+
+`Changed`
+- CPP
+    - All public properties are now private in `version_t`.
 ## v0.16.0 - 2026-03-14
 `Added`
 - C
