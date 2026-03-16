@@ -1,4 +1,8 @@
 # Changelog
+## v0.19.0 - 2026-03-16
+`Added`
+- CPP
+    - Added `entry` module.
 ## v0.18.0 - 2026-03-16
 `Added`
 - CPP
