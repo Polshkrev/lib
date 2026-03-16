@@ -1,4 +1,9 @@
 # Changelog
+## v0.18.0 - 2026-03-16
+`Added`
+- CPP
+    - Added `loader` module.
+    - Added `FileExistsError` exception.
 ## v0.17.0 - 2026-03-16
 `Added`
 - CPP
