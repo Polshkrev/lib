@@ -141,9 +141,6 @@ extern "C" {
 #include <sys/stat.h> // struct stat, stat, S_ISDIR
 #endif // _WIN32
 
-#define BUFFER_IMPLEMENTATION
-#include "collections/buffer.h"
-
 #ifdef _WIN32
 /**
  * @brief OS-dependant path seperator.
@@ -155,6 +152,8 @@ extern "C" {
  */
 #define PATH_SEPERATOR '/'
 #endif // _WIN32
+
+char __path_buffer[_MAX_PATH] = {0};
 
 /**
  * @brief Initialize a new path.
@@ -221,10 +220,8 @@ path_t *pasb(const path_t *path)
         fprintf(stderr, "FileNotFoundError: File '%s' can not be found.\n", passtr(path));
         exit(1);
     }
-    size_t checkpoint = buffer_save();
-    char *buffer = buffer_allocate(MAX_PATH);
 #ifdef _WIN32
-    if (GetFullPathName(passtr(path), MAX_PATH, buffer, NULL) == 0)
+    if (GetFullPathName(passtr(path), MAX_PATH, __path_buffer, NULL) == 0)
     {
         fprintf(stderr, "IOError: Can not get absolute path: %ld\n", GetLastError());
         exit(1);
@@ -236,8 +233,7 @@ path_t *pasb(const path_t *path)
         exit(1);
     }
 #endif // _WIN32
-    buffer_rewind(checkpoint);
-    return path_from(buffer);
+    return path_from(__path_buffer);
 }
 
 /**
@@ -269,7 +265,8 @@ path_t *path_append(const path_t *destination, const path_t *source)
  */
 path_t *path_append_as(const path_t *destination, const char *source)
 {
-    return path_from(buffer_sprintf("%s%c%s", destination->raw, PATH_SEPERATOR, source));
+    sprintf(__path_buffer, "%s%c%s", destination->raw, PATH_SEPERATOR, source);
+    return path_from(__path_buffer);
 }
 
 /**
@@ -280,7 +277,8 @@ path_t *path_append_as(const path_t *destination, const char *source)
  */
 path_t *path_append_to(const char *destination, const path_t *source)
 {
-    return path_from(buffer_sprintf("%s%c%s", destination, PATH_SEPERATOR, source->raw));
+    sprintf(__path_buffer, "%s%c%s", destination, PATH_SEPERATOR, source->raw);
+    return path_from(__path_buffer);
 }
 
 /**
@@ -315,14 +313,13 @@ path_t *path_get_parent(const path_t *path)
     {
         return path_from(passtr(path));
     }
-    char *buffer = buffer_allocate(last_stroke);
     for (ssize_t i = 0; i < last_stroke; ++i)
     {
-        buffer[i] = absolute->raw[i];
+        __path_buffer[i] = absolute->raw[i];
     }
-    buffer[last_stroke] = '\0';
+    __path_buffer[last_stroke] = '\0';
     path_delete(absolute);
-    return path_from(buffer);
+    return path_from(__path_buffer);
 }
 
 /**
@@ -357,14 +354,13 @@ path_t *path_get_root(const path_t *path)
         path_delete(absolute);
         return path_from(passtr(path));
     }
-    char *buffer = buffer_allocate(first_stroke);
     for (ssize_t i = 0; i < first_stroke; ++i)
     {
-        buffer[i] = absolute->raw[i];
+        __path_buffer[i] = absolute->raw[i];
     }
-    buffer[first_stroke] = '\0';
+    __path_buffer[first_stroke] = '\0';
     path_delete(absolute);
-    return path_from(buffer);
+    return path_from(__path_buffer);
 #else
     return path_from("/");
 #endif // _WIN32
@@ -378,17 +374,16 @@ path_t *path_get_root(const path_t *path)
 path_t *path_filename(const path_t *path)
 {
 #ifndef _WIN32
-    if (!path->raw || !*path->raw) return path_from(buffer_duplicate("."));
-    char *string = buffer_duplicate(path->raw);
+    if (!path->raw || !*path->raw) return path_from(".");
+    char *string = strdup(path->raw);
     size_t i = strlen(string) - 1;
     for (; i && string[i] == PATH_SEPERATOR; i--) string[i] = 0;
     for (; i && string[i-1] != PATH_SEPERATOR; i--);
     return path_from(string + i);
 #else
     // if (!path->raw) return NULL;
-    char *filename = buffer_allocate(_MAX_FNAME);
-    char *extension = buffer_allocate(_MAX_EXT);
-    errno_t result = _splitpath_s(path->raw, NULL, 0, NULL, 0, filename, _MAX_FNAME, extension, _MAX_EXT);
+    char filename[_MAX_FNAME];
+    errno_t result = _splitpath_s(path->raw, NULL, 0, NULL, 0, filename, _MAX_FNAME, NULL, 0);
     if (result != 0) return path_from(passtr(path));
     return path_from(filename);
 #endif // _WIN32
@@ -404,10 +399,10 @@ const char *path_extension(const path_t *path)
 #ifndef _WIN32
     return strrchr(path_filename(path), ".");
 #else
-    char *extension = buffer_allocate(_MAX_EXT);
-    errno_t result = _splitpath_s(passtr(path), NULL, 0, NULL, 0, NULL, 0, extension, _MAX_EXT);
+    errno_t result = _splitpath_s(passtr(path), NULL, 0, NULL, 0, NULL, 0, __path_buffer, _MAX_EXT);
     if (result != 0) return passtr(path);
-    return extension + 1;
+    __path_buffer[_MAX_EXT] = '\0';
+    return __path_buffer + 1;
 #endif // _WIN32
 }
 
