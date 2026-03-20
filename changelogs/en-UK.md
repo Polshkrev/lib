@@ -1,4 +1,7 @@
 # Changelog
+## v0.21.0 - 2026-03-20
+`Changed`
+- Removed buffer implementations.
 ## v0.20.0 - 2026-03-16
 `Added`
 - C
