@@ -381,10 +381,10 @@ path_t *path_filename(const path_t *path)
     for (; i && string[i-1] != PATH_SEPERATOR; i--);
     return path_from(string + i);
 #else
-    // if (!path->raw) return NULL;
-    char filename[_MAX_FNAME];
+    static char filename[_MAX_FNAME] = {0};
     errno_t result = _splitpath_s(path->raw, NULL, 0, NULL, 0, filename, _MAX_FNAME, NULL, 0);
     if (result != 0) return path_from(passtr(path));
+    filename[_MAX_FNAME - 1] = '\0';
     return path_from(filename);
 #endif // _WIN32
 }
