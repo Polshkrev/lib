@@ -44,8 +44,6 @@ namespace polutils
 #define EXCEPTIONS_IMPLEMENTATION
 #include "exceptions.hpp" // FileNotFoundError, ValueError
 
-#define BUFFER_IMPLEMENTATION
-#include "../c/collections/buffer.h" // buffer_sprintf
 namespace polutils
 {
     /**
@@ -61,13 +59,13 @@ namespace polutils
         HANDLE lib = LoadLibrary(path.c_str());
         if (nullptr == lib)
         {
-            throw FileNotFoundError(buffer_sprintf("Can not load library from path '%s'.", path.c_str()));
+            throw FileNotFoundError("Can not load library from path '%s'.", path.c_str());
         }
     #else
         void *lib = dlopen(path.c_str(), RTLD_NOW);
         if (nullptr == lib)
         {
-            throw FileNotFoundError(buffer_sprintf("Can not load library from path '%s': %s.", path.c_str(), dlerror()))
+            throw FileNotFoundError("Can not load library from path '%s': %s.", path.c_str(), dlerror());
         }
     #endif // _WIN32
         return lib;
@@ -87,14 +85,14 @@ namespace polutils
         if (nullptr == function)
         {
             library_delete(library);
-            throw ValueError(buffer_sprintf("Can not load funtion '%s'.", name.c_str()));
+            throw ValueError("Can not load funtion '%s'.", name.c_str());
         }
     #else
         void *function = (void*)dlsym(library, name.c_str());
         if (nullptr == function)
         {
             library_delete(library);
-            throw ValueError(buffer_sprintf("ValueError: Can not load function '%s': %s.", name.c_str(), dlerror()));
+            throw ValueError("Can not load function '%s': %s.", name.c_str(), dlerror());
         }
     #endif // _WIN32
         return function;

@@ -45,7 +45,15 @@ namespace polutils
              * @brief Standard constructor for an exception.
              * @param message A message string (without newline) to be displayed when the exception is thrown. The parametre is marked with const.
              */
-            Exception(const std::string &message);
+            explicit Exception(const std::string &message);
+
+            /**
+             * @brief Standard constructor for an exception.
+             * @param format A message string (without newline) to be displayed when the exception is thrown. The parametre is marked with const.
+             * @param arguemtns Variadic fomatting arguments.
+             */
+            template <typename... Arguments>
+            explicit Exception(const std::string &format, Arguments...arguments);
 
             /**
              * @brief Overload to interface with the parent exception class.
@@ -83,6 +91,21 @@ namespace polutils
     Exception::Exception(const std::string &message) : __message(message)
     {
         _assign_name("Exception");
+        _assign_repr();
+    }
+
+    /**
+     * @brief Standard constructor for an exception.
+     * @param format A message string (without newline) to be displayed when the exception is thrown. The parametre is marked with const.
+     * @param arguemtns Variadic fomatting arguments.
+     */
+    template <typename... Arguments>
+    Exception::Exception(const std::string &format, Arguments... arguments)
+    {
+        char buffer[256] = {0};
+        _assign_name("Exception");
+        std::sprintf(buffer, format.c_str(), arguments...);
+        __message.assign(buffer);
         _assign_repr();
     }
 
