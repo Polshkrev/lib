@@ -6,7 +6,7 @@
 #include <string> // std::string
 
 #define PATH_IMPLEMENTATION
-#include "path.hpp"
+#include "../path.hpp"
 
 #include "printable.hpp"
 
@@ -200,7 +200,7 @@ namespace
         file.open(path.to_string());
         if (!file.is_open())
         {
-            throw polutils::IOError(buffer_sprintf("Can not write to file '%s'.", path.to_string()));
+            throw polutils::IOError("Can not write to file '%s'.", path.to_string());
         }
         file << content;
         file.close();
@@ -256,16 +256,16 @@ namespace polutils
         {
             if (__path.exists())
             {
-                throw FileExistsError(buffer_sprintf("File '%s' already exists.", __path.to_string()));
+                throw FileExistsError("File '%s' already exists.", __path.to_string());
             }
             else if (__type != type_t::FILE)
             {
-                throw IOError(buffer_sprintf("Can not touch a directory: %s.", __path.to_string()));
+                throw IOError("Can not touch a directory: %s.", __path.to_string());
             }
             FILE *file = fopen(__path.to_string(), "w");
             if (nullptr == file)
             {
-                throw IOError(buffer_sprintf("Can not open file: %s.", __path.to_string()));
+                throw IOError("Can not open file: %s.", __path.to_string());
             }
             fclose(file);
         }
@@ -280,11 +280,11 @@ namespace polutils
         {
             if (__path.exists())
             {
-                throw FileExistsError(buffer_sprintf("Directory '%s' already exists.", __path.to_string()));
+                throw FileExistsError("Directory '%s' already exists.", __path.to_string());
             }
             else if (__type != type_t::DIRECTORY)
             {
-                throw IOError(buffer_sprintf("Can not touch a directory: %s.", __path.to_string()));
+                throw IOError("Can not touch a directory: %s.", __path.to_string());
             }
         #ifdef _WIN32
             int result = _mkdir(__path.to_string());
@@ -293,7 +293,7 @@ namespace polutils
         #endif
             if (result != 0)
             {
-                throw IOError(buffer_sprintf("Can not make directory: %s", __path.to_string()));
+                throw IOError("Can not make directory: %s", __path.to_string());
             }
         }
 
@@ -307,13 +307,13 @@ namespace polutils
         {
             if (!__path.exists())
             {
-                throw FileNotFoundError(buffer_sprintf("Path '%s' does not exist.", __path.to_string()));
+                throw FileNotFoundError("Path '%s' does not exist.", __path.to_string());
             }
             std::ifstream file{};
             file.open(__path.to_string());
             if (file.fail())
             {
-                throw IOError(buffer_sprintf("Can not open file: '%s'.", __path.to_string()));
+                throw IOError("Can not open file: '%s'.", __path.to_string());
             }
             std::stringstream buffer;
             buffer << file.rdbuf();
@@ -365,15 +365,15 @@ namespace polutils
         {
             if (!__path.exists())
             {
-                throw FileNotFoundError(buffer_sprintf("Can not find file %s.\n", __path.to_string()));
+                throw FileNotFoundError("Can not find file %s.\n", __path.to_string());
             }
             else if (destination.path().exists())
             {
-                throw FileExistsError(buffer_sprintf("File '%s' already exists.\n", destination.path().to_string()));
+                throw FileExistsError("File '%s' already exists.\n", destination.path().to_string());
             }
             else if ((__type != type_t::FILE) || destination.type() != type_t::FILE)
             {
-                throw IOError(buffer_sprintf("Can not copy a directory: '%s' to '%s'.", __path.to_string(), destination.path().to_string()));
+                throw IOError("Can not copy a directory: '%s' to '%s'.", __path.to_string(), destination.path().to_string());
             }
             write(destination.path());
         }
@@ -387,11 +387,11 @@ namespace polutils
         {
             if (!__path.exists())
             {
-                throw FileNotFoundError(buffer_sprintf("Can not find file '%s'", __path.to_string()));
+                throw FileNotFoundError("Can not find file '%s'", __path.to_string());
             }
             else if (std::remove(__path.to_string()) != 0)
             {
-                throw IOError(buffer_sprintf("Can not remove file '%s'.", __path.to_string()));
+                throw IOError("Can not remove file '%s'.", __path.to_string());
             }
         }
 
