@@ -45,7 +45,7 @@ const char *lltostr(LoggingLevel level);
  * @returns A new logger.
  * @exception If the logger can not be allocated, an `AllocationError` will be printed to `stderr` and the programme will exit.
  */
-logger_t *logger_new(const char *name, LoggingLevel level);
+logger_t *logger_init(const char *name, LoggingLevel level);
 
 /**
  * @brief Set the minimum allowable logging level.

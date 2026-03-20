@@ -116,8 +116,10 @@ namespace
 #define EXCEPTIONS_IMPLEMENTATION
 #include "exceptions.hpp"
 
-#define BUFFER_IMPLEMENTATION
-#include "../c/collections/buffer.h"
+namespace
+{
+    char __path_buffer[_MAX_PATH] = {0};
+}
 
 namespace
 {
@@ -212,13 +214,12 @@ namespace polutils
         {
             if (!exists())
             {
-                throw FileNotFoundError(buffer_sprintf("File `%s` does not exist.", to_string()));
+                throw FileNotFoundError("File `%s` does not exist.", to_string());
             }
-            char *buffer = static_cast<char *>(buffer_allocate(MAX_PATH));
         #ifdef _WIN32
-            if (GetFullPathName(to_string(), MAX_PATH, buffer, NULL) == 0)
+            if (GetFullPathName(to_string(), MAX_PATH, __path_buffer, NULL) == 0)
             {
-                throw IOError(buffer_sprintf("Can not get absolute path: %ld\n", GetLastError()));
+                throw IOError("Can not get absolute path: %ld\n", GetLastError());
             }
         #else
             if (NULL == realpath(to_string(), buffer))
@@ -226,8 +227,7 @@ namespace polutils
                 throw IOError(buffer_sprintf("Can not get absolute path: %s\n", strerror(errno)));
             }
         #endif // _WIN32
-            // buffer_rewind(checkpoint);
-            return path_t(buffer);
+            return path_t(__path_buffer);
         }
         
         /**
@@ -244,13 +244,12 @@ namespace polutils
             {
                 return *this;
             }
-            char *buffer = static_cast<char *>(buffer_allocate(last_stroke));
             for (ssize_t i = 0; i < last_stroke; ++i)
             {
-                buffer[i] = abs.__path[i];
+                __path_buffer[i] = abs.__path[i];
             }
-            buffer[last_stroke] = '\0';
-            return path_t(buffer);
+            __path_buffer[last_stroke] = '\0';
+            return path_t(__path_buffer);
         }
 
         /**
@@ -269,13 +268,12 @@ namespace polutils
             {
                 return *this;
             }
-            char *buffer = static_cast<char *>(buffer_allocate(first_stroke));
             for (ssize_t i = 0; i < first_stroke; ++i)
             {
-                buffer[i] = abs.__path[i];
+                __path_buffer[i] = abs.__path[i];
             }
-            buffer[first_stroke] = '\0';
-            return path_t(buffer);
+            __path_buffer[first_stroke] = '\0';
+            return path_t(__path_buffer);
         #else
             return path_t("/");
         #endif // _WIN32
@@ -297,7 +295,8 @@ namespace polutils
          */
         path_t path_t::operator/(const path_t &child) const noexcept
         {
-            return path_t(buffer_sprintf("%s%c%s", to_string(), PATH_SEPERATOR, child.to_string()));
+            std::sprintf(__path_buffer, "%s%c%s", to_string(), PATH_SEPERATOR, child.to_string());
+            return path_t(__path_buffer);
         }
 
         /**
@@ -307,7 +306,8 @@ namespace polutils
          */
         path_t path_t::operator/(const std::string &child) const noexcept
         {
-            return path_t(buffer_sprintf("%s%c%s", to_string(), PATH_SEPERATOR, child.c_str()));
+            std::sprintf(__path_buffer, "%s%c%s", to_string(), PATH_SEPERATOR, child.c_str());
+            return path_t(__path_buffer);
         }
     }
 }
