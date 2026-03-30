@@ -1,4 +1,7 @@
 # Changelog
+## v0.22.0 - 2026-03-30
+`Changed`
+- Implementations of some methods and functions have changed. Hopefully, all previous behaviours should still be the same.
 ## v0.21.0 - 2026-03-20
 `Changed`
 - Removed buffer implementations.
