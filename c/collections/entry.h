@@ -167,6 +167,11 @@ void entry_delete(entry_t *entry);
 extern "C" {
 #endif
 
+#define BUFFER_IMPLEMENTATION
+#include "buffer.h" // buffer_sprintf
+
+#include <stdint.h> // SIZE_MAX
+
 /**
  * @brief Represent a `file_type_t` as a string.
  * @param file_type File type to represent as a string.
@@ -234,7 +239,6 @@ entry_t *entry_init(path_t *path)
     }
     else
     {
-        printf("else\n");
         entry->type = FILE_TYPE;
     }
     return entry;
@@ -248,7 +252,7 @@ entry_t *entry_init(path_t *path)
  */
 static bool _safe_long_to_size(long value, size_t *result)
 {
-    if (value < 0) return false;
+    if (value > SIZE_MAX || value < 0) return false;
     *result = (size_t)value;
     return true;
 }
@@ -533,13 +537,14 @@ size_t entry_size(entry_t *entry)
         entry_delete(entry);
         exit(1);
     }
-    size_t result = 0; // Size of zero is valid.z
+    size_t result = 0; // Size of zero is valid.
     if (!_get_file_size(file, &result))
     {
         fprintf(stderr, "IOError: Can not get size of file: %s.\n", passtr(entry->path));
         entry_delete(entry);
         exit(1);
     }
+    fclose(file);
     return result;
 }
 

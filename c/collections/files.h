@@ -241,12 +241,6 @@ void files_delete(files_t *files)
 }
 
 #ifdef _WIN32
-#ifndef WIN32_ERR_MSG_SIZE
-/**
- * @brief Size of the error message format buffer within the windows implementation.
- */
-#define WIN32_ERR_MSG_SIZE (4 * 1024)
-#endif // WIN32_ERR_MSG_SIZE
 
 /**
  * @brief Obtain the entries at the given array root.

@@ -168,7 +168,7 @@ namespace polutils
         {
             if (is_full())
             {
-                throw ValueError("Can not add an element to a full array.");
+                throw ValueError("Can not add an element to a full array of size %zu.", __size);
             }
             __items[__size++] = item;
         }
