@@ -133,6 +133,8 @@ extern "C" {
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <tchar.h>
+#include <strsafe.h>
 // #include <minwinbase.h> // DWORD
 // #include <winbase.h> // CopyFile
 // #include <fileapi.h> // GetFullPathName, GetFileAttributes, INVALID_FILE_ATTRIBUTES
@@ -265,7 +267,11 @@ path_t *path_append(const path_t *destination, const path_t *source)
  */
 path_t *path_append_as(const path_t *destination, const char *source)
 {
+#ifdef _WIN32
+    StringCbPrintf(__path_buffer, MAX_PATH, "%s%c%s", destination->raw, PATH_SEPERATOR, source);
+#else
     sprintf(__path_buffer, "%s%c%s", destination->raw, PATH_SEPERATOR, source);
+#endif // _WIN32
     return path_from(__path_buffer);
 }
 
@@ -277,7 +283,11 @@ path_t *path_append_as(const path_t *destination, const char *source)
  */
 path_t *path_append_to(const char *destination, const path_t *source)
 {
+#ifdef _WIN32
+    StringCbPrintf(__path_buffer, _MAX_PATH, "%s%c%s", destination, PATH_SEPERATOR, source->raw);
+#else
     sprintf(__path_buffer, "%s%c%s", destination, PATH_SEPERATOR, source->raw);
+#endif // _WIN32
     return path_from(__path_buffer);
 }
 
