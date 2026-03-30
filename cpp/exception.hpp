@@ -73,6 +73,10 @@ namespace polutils
 #endif // EXCEPTION_HPP_
 
 #ifdef EXCEPTION_IMPLEMENTATION
+
+#define BUFFER_IMPLEMENTATION
+#include "../c/collections/buffer.h"
+
 namespace polutils
 {
     /**
@@ -102,11 +106,11 @@ namespace polutils
     template <typename... Arguments>
     Exception::Exception(const std::string &format, Arguments... arguments)
     {
-        char buffer[256] = {0};
+        std::size_t checkpoint = buffer_save();
         _assign_name("Exception");
-        std::sprintf(buffer, format.c_str(), arguments...);
-        __message.assign(buffer);
+        __message.assign(buffer_sprintf(format.c_str(), arguments...));
         _assign_repr();
+        buffer_rewind(checkpoint);
     }
 
     /**
