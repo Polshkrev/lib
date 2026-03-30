@@ -57,6 +57,7 @@ entry_t **directory_at(directory_t *directory, size_t index);
  * @brief Read a given directory.
  * @param directory Directory to read. Each `entry_t` that is scanned from the filesystem is appended to the directory.
  * @returns True if the directory can be written, else false.
+ * @bug This leaks memory. I don't know how to refactor this without making the whole api obsolete.
  */
 bool directory_read(directory_t *directory);
 
@@ -184,44 +185,20 @@ entry_t **directory_at(directory_t *directory, size_t index)
  * @brief Read a given directory.
  * @param directory Directory to read. Each `entry_t` that is scanned from the filesystem is appended to the directory.
  * @returns True if the directory can be written, else false.
+ * @bug This leaks memory. I don't know how to refactor this without making the whole api obsolete.
  */
 bool directory_read(directory_t *directory)
 {
     files_t *files = files_init(passtr(directory->root));
-    if (!files_fill(files))
-    {
-        files_delete(files);
-        return false;
-    }
-    bool result = true;
+    if (!files_fill(files)) return false;
     for (size_t i = 0; i < files->size; ++i)
     {
-        path_t *main_path = path_from(files->files[i]);
-        entry_t *entry = entry_init(main_path);
-        switch (entry->type)
-        {
-            case NONE_TYPE:
-            {
-                result = false && result;
-            } break;
-            case DIRECTORY_TYPE:
-            {
-                directory_append(directory, entry);
-                files_t *directory_files = files_init(files->files[i]);
-                for (size_t i = 0; i < directory_files->size; ++i)
-                {
-                    path_t *path = path_from(directory_files->files[i]);
-                    entry_t *entry = entry_init(path);
-                    directory_append(directory, entry);
-                }
-            } break;
-            default:
-            {
-                directory_append(directory, entry);
-            } break;
-        }
+        char **file = files_at(files, i);
+        if (NULL == file) return false;
+        directory_append(directory, entry_init(path_from(buffer_duplicate(*file))));
     }
-    return result;
+    files_delete(files);
+    return true;
 }
 
 /**
@@ -313,6 +290,7 @@ void directory_delete(directory_t *directory)
 {
     if (!directory) return;
     else if (!directory->entries) return;
+    path_delete(directory->root);
     for (size_t i = 0; i < directory->size; ++i)
     {
         entry_delete(directory->entries[i]);
@@ -321,6 +299,7 @@ void directory_delete(directory_t *directory)
     directory->entries = NULL;
     free(directory);
     directory = NULL;
+    buffer_reset();
 }
 
 #endif // DIRECTORY_IMPLEMENTATION

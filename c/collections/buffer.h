@@ -9,43 +9,43 @@
 extern "C" {
 #endif
 
-/*
-* @brief Duplicate a string into a static memory buffer.
-* @param string String from which to copy.
-* @returns A duplicate of the original given string.
-*/
-char *buffer_duplicate(const char *string);
-
-/*
-* @brief Allocate a new region of memory.
-* @param size Additional size — in bytes — to allocate.
-* @returns A pointer to the allocated region of memory.
-*/
+/**
+ * @brief Allocate a new region of memory.
+ * @param size Additional size — in bytes — to allocate.
+ * @returns A pointer to the allocated region of memory.
+ */
 void *buffer_allocate(size_t size);
 
-/*
-* @brief Obtain a pointer to a formated string.
-* @param format String format.
-* @returns A pointer to a new formated string.
-*/
+/**
+ * @brief Duplicate a string into a static memory buffer.
+ * @param string String from which to copy.
+ * @returns A duplicate of the original given string.
+ */
+char *buffer_duplicate(const char *string);
+
+/**
+ * @brief Obtain a pointer to a formated string.
+ * @param format String format.
+ * @returns A pointer to a new formated string.
+ */
 char *buffer_sprintf(const char *format, ...);
 
-/*
-* @brief Reset the allocated region of memeory.
-*/
-void buffer_reset(void);
-
-/*
-* @brief Save the current position of the buffers cursor.
-* @returns The cursor.
-*/
+/**
+ * @brief Save the current position of the buffers cursor.
+ * @returns The cursor.
+ */
 size_t buffer_save(void);
 
-/*
-* @brief Set the buffer to a new checkpoint.
-* @param checkpoint Point to wich to rewind the buffer.
-*/
+/**
+ * @brief Set the buffer to a new checkpoint.
+ * @param checkpoint Point to wich to rewind the buffer.
+ */
 void buffer_rewind(size_t checkpoint);
+
+/**
+ * @brief Reset the allocated region of memeory.
+ */
+void buffer_reset(void);
 
 #if defined(__cplusplus)
 }
@@ -71,11 +71,11 @@ extern "C" {
 static size_t temp_size = 0;
 static char temp_buffer[TEMP_CAPACITY] = {0};
 
-/*
-* @brief Allocate a new region of memory.
-* @param size Additional size — in bytes — to allocate.
-* @returns A pointer to the allocated region of memory.
-*/
+/**
+ * @brief Allocate a new region of memory.
+ * @param size Additional size — in bytes — to allocate.
+ * @returns A pointer to the allocated region of memory.
+ */
 void *buffer_allocate(size_t size)
 {
     if (temp_size + size > TEMP_CAPACITY)
@@ -87,11 +87,11 @@ void *buffer_allocate(size_t size)
     return result;
 }
 
-/*
-* @brief Duplicate a string into a static memory buffer.
-* @param string String from which to copy.
-* @returns A duplicate of the original given string.
-*/
+/**
+ * @brief Duplicate a string into a static memory buffer.
+ * @param string String from which to copy.
+ * @returns A duplicate of the original given string.
+ */
 char *buffer_duplicate(const char *string)
 {
     size_t length = strlen(string);
@@ -106,11 +106,11 @@ char *buffer_duplicate(const char *string)
     return result;
 }
 
-/*
-* @brief Obtain a pointer to a formated string.
-* @param format String format.
-* @returns A pointer to a new formated string.
-*/
+/**
+ * @brief Obtain a pointer to a formated string.
+ * @param format String format.
+ * @returns A pointer to a new formated string.
+ */
 char *buffer_sprintf(const char *format, ...)
 {
     va_list args;
@@ -134,30 +134,30 @@ char *buffer_sprintf(const char *format, ...)
     return result;
 }
 
-/*
-* @brief Reset the allocated region of memeory.
-*/
-void buffer_reset(void)
-{
-    temp_size = 0;
-}
-
-/*
-* @brief Save the current position of the buffers cursor.
-* @returns The cursor.
-*/
+/**
+ * @brief Save the current position of the buffers cursor.
+ * @returns The cursor.
+ */
 size_t buffer_save(void)
 {
     return temp_size;
 }
 
-/*
-* @brief Set the buffer to a new checkpoint.
-* @param checkpoint Point to wich to rewind the buffer.
-*/
+/**
+ * @brief Set the buffer to a new checkpoint.
+ * @param checkpoint Point to wich to rewind the buffer.
+ */
 void buffer_rewind(size_t checkpoint)
 {
     temp_size = checkpoint;
+}
+
+/**
+ * @brief Reset the allocated region of memeory.
+ */
+void buffer_reset(void)
+{
+    temp_size = 0;
 }
 
 #if defined(__cplusplus)
