@@ -217,11 +217,6 @@ bool path_exists(const path_t *path)
  */
 path_t *pasb(const path_t *path)
 {
-    if (!path_exists(path))
-    {
-        fprintf(stderr, "FileNotFoundError: File '%s' can not be found.\n", passtr(path));
-        exit(1);
-    }
 #ifdef _WIN32
     if (GetFullPathName(passtr(path), MAX_PATH, __path_buffer, NULL) == 0)
     {
