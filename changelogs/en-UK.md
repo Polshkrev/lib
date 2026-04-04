@@ -1,4 +1,13 @@
 # Changelog
+## v0.23.0 - 2026-04-04
+`Changed`
+- C
+    - Renamed `logger_new` to `logger_init` to better fit within conventions.
+    - `pasb` no longer checks if the given path exists.
+
+`Fixed`
+- C
+    - `logger_new` now allocates the correct amount of memory for the logger.
 ## v0.22.0 - 2026-03-30
 `Changed`
 - Implementations of some methods and functions have changed. Hopefully, all previous behaviours should still be the same.

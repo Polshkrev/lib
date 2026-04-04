@@ -4,7 +4,7 @@ author = {name = "Polshkrev"}
 description = "Library of single-file stb-like header files for c and c++."
 
 [project.version]
-minor = 22
+minor = 23
 
 [license]
 type = "MIT"
