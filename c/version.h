@@ -165,7 +165,7 @@ void version_print(FILE *stream, const version_t *version);
  */
 void version_delete(version_t *version);
 
-#ifdef defined(__cplusplus)
+#if defined(__cplusplus)
 }
 #endif
 
@@ -187,13 +187,13 @@ extern "C" {
  */
 version_t *version_init(void)
 {
-    version_t *version = (version_t *)malloc(sizeof(version));
+    version_t *version = (version_t *)malloc(sizeof(version_t));
     if (NULL == version)
     {
         fprintf(stderr, "AllocationError: Can not allocate enough memory to initialize the version object.");
         exit(1);
     }
-    memset(version, 0, sizeof(*version));
+    memset(version, 0, sizeof(version_t));
     return version;
 }
 
@@ -456,7 +456,7 @@ void version_delete(version_t *version)
     free(version);
 }
 
-#ifdef defined(__cplusplus)
+#if defined(__cplusplus)
 }
 #endif
 

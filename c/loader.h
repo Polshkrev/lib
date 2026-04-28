@@ -89,7 +89,6 @@ void *library_load(const char *path)
     if (!_path_exists(path))
     {
         fprintf(stderr, "FileNotFoundError: Can not load library from path '%s'.", path);
-        path_delete(path);
         exit(1);
     }
 #ifdef _WIN32
