@@ -1,4 +1,8 @@
 # Changelog
+## v0.25.0 - 2026-06-12
+`Removed`
+- C
+    - Removed `directory_read`. The `files_t` interface will be used in its place.
 ## v0.24.0 - 2026-06-12
 `Changed`
 - C
