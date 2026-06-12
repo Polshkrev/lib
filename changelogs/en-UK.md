@@ -1,4 +1,13 @@
 # Changelog
+## v0.24.0 - 2026-06-12
+`Changed`
+- C
+    - All structures have been stack allocated where applicable.
+
+`Removed`
+- C
+    - Removed `entry_delete`. To deallocate the entry content, use `string_builder_delete`.
+    - Removed `directory_to_string`.
 ## v0.23.0 - 2026-04-04
 `Changed`
 - C
