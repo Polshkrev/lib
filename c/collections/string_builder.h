@@ -181,26 +181,22 @@ string_builder_t *string_builder_init(void)
  */
 string_builder_t *string_builder_with_capacity(size_t capacity)
 {
-    string_builder_t *builder = (string_builder_t *)malloc(sizeof(string_builder_t));
-    if (NULL == builder)
+    string_builder_t *result = (string_builder_t *)malloc(sizeof(string_builder_t));
+    if (NULL == result)
     {
-        fprintf(stderr, "AllocationError: Can not allocate buffer.\n");
+        fprintf(stderr, "AllocationError: Can not allocate enough memory for the array of characters structure.\n");
         exit(1);
     }
-    builder->capacity = capacity;
-    builder->size = 0;
-    builder->items = (char *)calloc(builder->capacity, sizeof(char));
-    if (NULL == builder->items)
+    char *items = (char *)malloc(capacity * sizeof(char));
+    if (NULL == items)
     {
-        fprintf(stderr, "AllocationError: Can not allocate buffer.\n");
-        if (builder)
-        {
-            free(builder);
-            builder = NULL;
-        }
+        fprintf(stderr, "AllocationError: Can not allocate enough memory for the array of characters.\n");
         exit(1);
     }
-    return builder;
+    result->capacity = capacity;
+    result->size = 0;
+    result->items = items;
+    return result;
 }
 
 /**
