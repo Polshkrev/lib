@@ -303,7 +303,6 @@ bool entry_write_content_to_path(const path_t *path, string_builder_t *content)
         string_builder_delete(content);
         exit(1);
     }
-    fprintf(file, "%s", string_builder_data(content));
     fclose(file);
     return true;
 }
