@@ -247,7 +247,7 @@ static bool _get_file_size(FILE *file, size_t *result) {
 #define _READ_BUFFER_CAPACITY 156
 char _read_buffer[_READ_BUFFER_CAPACITY] = {0};
 
-void read_file(const path_t *path, string_builder_t **result)
+void _read_file(const path_t *path, string_builder_t **result)
 {
     const char *filepath = passtr(path);
     FILE *file = fopen(filepath, "r");
@@ -283,7 +283,7 @@ bool entry_read(entry_t *entry)
         string_builder_delete(entry->content);
         exit(1);
     }
-    read_file(&entry->path, &entry->content);
+    _read_file(&entry->path, &entry->content);
     return true;
 }
 
