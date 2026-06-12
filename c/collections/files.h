@@ -25,7 +25,7 @@ typedef struct
  * @returns A new dynamic array of files on the filesystem with a given root.
  * @exception If the array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-files_t *files_init(const char *root);
+files_t files_init(const char *root);
 
 /**
  * @brief Construct a new dynamic array of files with a given root and initial capacity.
@@ -34,7 +34,7 @@ files_t *files_init(const char *root);
  * @returns A new dynamic array of files on the filesystem with a given root and capacity.
  * @exception If the array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-files_t *files_init_with_capacity(const char *root, size_t capacity);
+files_t files_init_with_capacity(const char *root, size_t capacity);
 
 /**
  * @brief Append a new filepath to the array of files.
@@ -113,7 +113,7 @@ extern "C" {
  * @returns A new dynamic array of files on the filesystem with a given root.
  * @exception If the array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-files_t *files_init(const char *root)
+files_t files_init(const char *root)
 {
     return files_init_with_capacity(root, FILES_CAPACITY);
 }
@@ -125,25 +125,21 @@ files_t *files_init(const char *root)
  * @returns A new dynamic array of files on the filesystem with a given root and capacity.
  * @exception If the array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-files_t *files_init_with_capacity(const char *root, size_t capacity)
+files_t files_init_with_capacity(const char *root, size_t capacity)
 {
-    files_t *files = malloc(sizeof(files_t));
+    char **files = (char **)malloc(capacity * sizeof(char*));
     if (NULL == files)
     {
-        fprintf(stderr, "AllocationError: Can not allocate files.\n");
+        fprintf(stderr, "AllocationError: Can not allocate enough memory for the array of files.\n");
         exit(1);
     }
-    files->size = 0;
-    files->capacity = capacity;
-    files->files = (char **)malloc(sizeof(char *) * capacity);
-    if (NULL == files->files)
+    return (files_t)
     {
-        fprintf(stderr, "AllocationError: Can not allocate files array.\n");
-        if (files) free(files);
-        exit(1);
-    }
-    files->root = root;
-    return files;
+        .root = root,
+        .capacity = capacity,
+        .size = 0,
+        .files = files
+    };
 }
 
 /**
@@ -236,8 +232,6 @@ void files_delete(files_t *files)
     files->files = NULL;
     files->size = 0;
     files->capacity = 0;
-    if (!files) return;
-    free(files);
 }
 
 #ifdef _WIN32
@@ -251,7 +245,7 @@ void files_delete(files_t *files)
  */
 static bool _get_entries_windows(files_t *files, const char *path)
 {
-    char buffer[MAX_PATH];
+    char buffer[MAX_PATH] = {0};
     WIN32_FIND_DATA data;
     HANDLE find = INVALID_HANDLE_VALUE;
     StringCchCopy(buffer, MAX_PATH, path);
@@ -265,7 +259,6 @@ static bool _get_entries_windows(files_t *files, const char *path)
         StringCchCopy(full_path, MAX_PATH, path);
         StringCchCat(full_path, MAX_PATH, "\\");
         StringCchCat(full_path, MAX_PATH, data.cFileName);
-        // printf("Full Path: %s\n", full_path);
         files_append(files, full_path);
         if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
         {
