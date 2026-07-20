@@ -211,7 +211,7 @@ path_t pasb(const path_t *path)
         exit(1);
     }
 #else
-    if (NULL == realpath(passtr(path), buffer))
+    if (NULL == realpath(passtr(path), __path_buffer))
     {
         fprintf(stderr, "IOError: Can not get absolute path: %s\n", strerror(errno));
         exit(1);
@@ -299,15 +299,14 @@ static ssize_t _find_last_stroke(const char *path)
  */
 path_t path_get_parent(const path_t *path)
 {
-    path_t absolute = pasb(path);
-    ssize_t last_stroke = _find_last_stroke(passtr(&absolute));
+    ssize_t last_stroke = _find_last_stroke(passtr(path));
     if (last_stroke < 0)
     {
         return path_from(passtr(path));
     }
     for (ssize_t i = 0; i < last_stroke; ++i)
     {
-        __path_buffer[i] = absolute.raw[i];
+        __path_buffer[i] = path->raw[i];
     }
     __path_buffer[last_stroke] = '\0';
     return path_from(__path_buffer);
@@ -337,7 +336,9 @@ static ssize_t _find_first_stroke(const char *path)
  */
 path_t path_get_root(const path_t *path)
 {
-#ifdef _WIN32
+#ifndef _WIN32
+    return path_from("/");
+#else
     path_t absolute = pasb(path);
     ssize_t first_stroke = _find_first_stroke(passtr(&absolute));
     if (first_stroke < 0)
@@ -350,8 +351,6 @@ path_t path_get_root(const path_t *path)
     }
     __path_buffer[first_stroke] = '\0';
     return path_from(__path_buffer);
-#else
-    return path_from("/");
 #endif // _WIN32
 }
 
@@ -364,7 +363,7 @@ path_t path_filename(const path_t *path)
 {
 #ifndef _WIN32
     if (!path->raw || !*path->raw) return path_from(".");
-    char *string = strdup(path->raw);
+    char *string = strdupa(path->raw);
     size_t i = strlen(string) - 1;
     for (; i && string[i] == PATH_SEPERATOR; i--) string[i] = 0;
     for (; i && string[i-1] != PATH_SEPERATOR; i--);
@@ -386,12 +385,13 @@ path_t path_filename(const path_t *path)
 const char *path_extension(const path_t *path)
 {
 #ifndef _WIN32
-    return strrchr(path_filename(path), ".");
+    return strrchr(passtr(path), ".");
 #else
-    errno_t result = _splitpath_s(passtr(path), NULL, 0, NULL, 0, NULL, 0, __path_buffer, _MAX_EXT);
+    static char extension[_MAX_EXT + 1] = {0};
+    errno_t result = _splitpath_s(passtr(path), NULL, 0, NULL, 0, NULL, 0, extension, _MAX_EXT);
     if (result != 0) return passtr(path);
-    __path_buffer[_MAX_EXT] = '\0';
-    return __path_buffer + 1;
+    extension[_MAX_EXT] = '\0';
+    return extension + 1;
 #endif // _WIN32
 }
 
