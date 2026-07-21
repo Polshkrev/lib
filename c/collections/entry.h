@@ -36,7 +36,7 @@ typedef struct
 {
     file_type_t type;
     path_t path;
-    string_builder_t *content;
+    string_builder_t content;
 } entry_t;
 
 /**
@@ -244,43 +244,46 @@ static bool _get_file_size(FILE *file, size_t *result) {
     return _safe_long_to_size(size, result);
 }
 
-#define _READ_BUFFER_CAPACITY 156
-char _read_buffer[_READ_BUFFER_CAPACITY] = {0};
-
-void _read_file(const path_t *path, string_builder_t **result)
+/**
+ * @brief Read the contents of a given path into a given result.
+ * @param path Path fromw which to read.
+ * @param result Buffer to which to append.
+ * @exception If the given path can not be read, an `IOError` is returned.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
+ */
+void _read_file(const path_t *path, string_builder_t *result)
 {
     const char *filepath = passtr(path);
     FILE *file = fopen(filepath, "r");
     if (NULL == file)
     {
         fprintf(stderr, "IOError: Can not readfile: %s.\n", filepath);
-        string_builder_delete(*result);
+        string_builder_delete(result);
         exit(1);
     };
-    int i = 0;
     while (!feof(file) && !ferror(file))
     {
         int read = fgetc(file);
         if (EOF == read) break;
-        _read_buffer[i++] = read;
+        string_builder_append(result, read);
     }
-    _read_buffer[i] = '\0';
-    string_builder_extend(*result, _read_buffer);
     fclose(file);
-    string_builder_fit(*result);
+    string_builder_fit(result);
 }
 
 /**
  * @brief Read a file's content into an entry.
  * @param entry Entry to which to set the read content.
  * @returns True if the entry's path can be successfully read, else false.
+ * @exception If the given path can not be read, an `IOError` is returned.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 bool entry_read(entry_t *entry)
 {
     if (!path_exists(&entry->path))
     {
         fprintf(stderr, "FileNotFoundError: Can not find file %s.\n", passtr(&entry->path));
-        string_builder_delete(entry->content);
+        string_builder_delete(&entry->content);
         exit(1);
     }
     _read_file(&entry->path, &entry->content);
@@ -303,6 +306,7 @@ bool entry_write_content_to_path(const path_t *path, string_builder_t *content)
         string_builder_delete(content);
         exit(1);
     }
+    fprintf(file, "%s", string_builder_data(content));
     fclose(file);
     return true;
 }
@@ -314,7 +318,7 @@ bool entry_write_content_to_path(const path_t *path, string_builder_t *content)
  */
 bool entry_write(entry_t *entry)
 {
-    return entry_write_content_to_path(&entry->path, entry->content);
+    return entry_write_content_to_path(&entry->path, &entry->content);
 }
 
 /**
@@ -328,24 +332,24 @@ bool entry_copy(entry_t *source, entry_t *destination)
     if (!path_exists(&source->path))
     {
         fprintf(stderr, "FileNotFoundError: Can not find file %s.\n", passtr(&source->path));
-        string_builder_delete(source->content);
-        string_builder_delete(destination->content);
+        string_builder_delete(&source->content);
+        string_builder_delete(&destination->content);
         exit(1);
     }
     else if (path_exists(&destination->path))
     {
         fprintf(stderr, "FileExistsError: File '%s' already exists.\n", passtr(&destination->path));
-        string_builder_delete(source->content);
-        string_builder_delete(destination->content);
+        string_builder_delete(&source->content);
+        string_builder_delete(&destination->content);
         exit(1);
     }
     else if (source->type != FILE_TYPE) return false;
     else if (destination->type != FILE_TYPE) return false;
-    else if (string_builder_empty(source->content))
+    else if (string_builder_empty(&source->content))
     {
         if (!entry_read(source)) return false;
     }
-    else if (!entry_write_content_to_path(&destination->path, source->content)) return false;
+    if (!entry_write_content_to_path(&destination->path, &source->content)) return false;
     return true;
 }
 
@@ -371,7 +375,7 @@ bool entry_touch(entry_t *entry)
     if (path_exists(&entry->path))
     {
         fprintf(stderr, "FileExistsError: File '%s' already exists.\n", passtr(&entry->path));
-        string_builder_delete(entry->content);
+        string_builder_delete(&entry->content);
         exit(1);
     }
     else if (entry->type != FILE_TYPE) return false;
@@ -379,7 +383,7 @@ bool entry_touch(entry_t *entry)
     if (NULL == file)
     {
         fprintf(stderr, "IOError: Can not open file: %s.\n", passtr(&entry->path));
-        string_builder_delete(entry->content);
+        string_builder_delete(&entry->content);
         exit(1);
     }
     fclose(file);
@@ -396,7 +400,7 @@ bool entry_make_directory(entry_t *entry)
     if (path_exists(&entry->path))
     {
         fprintf(stderr, "FileExistsError: File '%s' already exists.\n", passtr(&entry->path));
-        string_builder_delete(entry->content);
+        string_builder_delete(&entry->content);
         exit(1);
     }
     else if (entry->type != DIRECTORY_TYPE) return false;
@@ -438,7 +442,7 @@ bool entry_remove_directory(entry_t *entry)
     if (!path_exists(&entry->path))
     {
         fprintf(stderr, "FileNotFoundError: Can not find file %s.\n", passtr(&entry->path));
-        string_builder_delete(entry->content);
+        string_builder_delete(&entry->content);
         exit(1);
     }
     else if (entry->type != DIRECTORY_TYPE) return false;
@@ -460,7 +464,7 @@ bool entry_remove_file(entry_t *entry)
     if (!path_exists(&entry->path))
     {
         fprintf(stderr, "FileNotFoundError: Can not find file %s.\n", passtr(&entry->path));
-        string_builder_delete(entry->content);
+        string_builder_delete(&entry->content);
         exit(1);
     }
     else if (entry->type != FILE_TYPE) return false;
@@ -499,7 +503,7 @@ size_t entry_size(entry_t *entry)
         if (!entry_create(entry))
         {
             fprintf(stderr, "IOError: Can not create file %s\n", passtr(&entry->path));
-            string_builder_delete(entry->content);
+            string_builder_delete(&entry->content);
             exit(1);
         }
     }
@@ -507,14 +511,14 @@ size_t entry_size(entry_t *entry)
     if (NULL == file)
     {
         fprintf(stderr, "IOError: Can not open file: %s\n", passtr(&entry->path));
-        string_builder_delete(entry->content);
+        string_builder_delete(&entry->content);
         exit(1);
     }
     size_t result = 0; // Size of zero is valid.
     if (!_get_file_size(file, &result))
     {
         fprintf(stderr, "IOError: Can not get size of file: %s.\n", passtr(&entry->path));
-        string_builder_delete(entry->content);
+        string_builder_delete(&entry->content);
         exit(1);
     }
     fclose(file);
