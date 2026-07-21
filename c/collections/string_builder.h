@@ -24,7 +24,6 @@ typedef struct
 /**
  * @brief Construct a new dynamic buffer of characters.
  * @returns A new dynamic buffer of characters.
- * @exception If the builder can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  * @exception If the underlying array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 string_builder_t string_builder_init(void);
@@ -33,7 +32,6 @@ string_builder_t string_builder_init(void);
  * @brief Construct a new dynamic buffer of characters with a given capacity.
  * @param capacity capacity to set for the buffer.
  * @returns A new dynamic buffer of characters with a given initial capacity.
- * @exception If the builder can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  * @exception If the underlying array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 string_builder_t string_builder_with_capacity(size_t capacity);
@@ -166,6 +164,7 @@ extern "C" {
 /**
  * @brief Construct a new dynamic buffer of characters.
  * @returns A new dynamic buffer of characters.
+ * @exception If the underlying array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 string_builder_t string_builder_init(void)
 {
@@ -176,7 +175,6 @@ string_builder_t string_builder_init(void)
  * @brief Construct a new dynamic buffer of characters with a given capacity.
  * @param capacity capacity to set for the buffer.
  * @returns A new dynamic buffer of characters with a given initial capacity.
- * @exception If the builder can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  * @exception If the underlying array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 string_builder_t string_builder_with_capacity(size_t capacity)
