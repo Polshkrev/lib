@@ -1,4 +1,17 @@
 # Changelog
+## v0.26.0 - 2026-07-20
+`Added`
+- C
+    - `collections`
+        - Added `string_empty` function.
+
+`Changed`
+- C
+    - `path`
+        - The function `path_get_parent` no longer needs the absolute path.
+    - `collections`
+        - The `string_builder` structure is no longer heap allocated. Its underlying array is still heap allocated.
+        - The content of `entry_t` is no longer a pointer. The content still needs to be deallocated.
 ## v0.25.0 - 2026-06-12
 `Removed`
 - C
