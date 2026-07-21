@@ -54,6 +54,14 @@ void directory_append(directory_t *directory, entry_t entry);
 entry_t *directory_at(directory_t *directory, size_t index);
 
 /**
+ * @brief Read a given directory.
+ * @param directory Directory to read. Each `entry_t` that is scanned from the filesystem is appended to the directory.
+ * @returns True if the directory can be written, else false.
+ * @bug This leaks memory. I don't know how to refactor this without making the whole api obsolete.
+ */
+bool directory_read(directory_t *directory);
+
+/**
  * @brief Resize a given directory by a factor of two.
  * @param directory Directory to resize.
  * @exception If the directory can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
@@ -90,9 +98,6 @@ void directory_delete(directory_t *directory);
 
 #define FILES_IMPLEMENTATION
 #include "files.h"
-
-#define BUFFER_IMPLEMENTATION
-#include "buffer.h"
 
 #define _GNU_SOURCE
 #include <string.h>
@@ -163,6 +168,26 @@ entry_t *directory_at(directory_t *directory, size_t index)
         exit(1);
     }
     return &directory->entries[index];
+}
+
+/**
+ * @brief Read a given directory.
+ * @param directory Directory to read. Each `entry_t` that is scanned from the filesystem is appended to the directory.
+ * @returns True if the directory can be written, else false.
+ * @bug This leaks memory. I don't know how to refactor this without making the whole api obsolete.
+ */
+bool directory_read(directory_t *directory)
+{
+    files_t files = files_init(passtr(&directory->root));
+    if (!files_fill(&files)) return false;
+    for (size_t i = 0; i < files.size; ++i)
+    {
+        char **file = files_at(&files, i);
+        if (NULL == file) return false;
+        directory_append(directory, entry_init(path_from(*file)));
+    }
+    files_delete(&files);
+    return true;
 }
 
 /**
@@ -243,7 +268,6 @@ void directory_delete(directory_t *directory)
     }
     free(directory->entries);
     directory->entries = NULL;
-    buffer_reset();
 }
 
 #endif // DIRECTORY_IMPLEMENTATION
