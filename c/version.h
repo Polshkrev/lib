@@ -26,7 +26,7 @@ typedef struct
  * @returns A new version object.
  * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-version_t version_init(void);
+version_t *version_init(void);
 
 /**
  * @brief Construct a new version object from a given major, minor, and patch numbers.
@@ -36,7 +36,7 @@ version_t version_init(void);
  * @returns A new version object with each of the properties set to the given parametres.
  * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-version_t version_convert(size_t major, size_t minor, size_t patch);
+version_t *version_convert(size_t major, size_t minor, size_t patch);
 
 /**
  * @brief Construct a new version object with a given name.
@@ -44,7 +44,7 @@ version_t version_convert(size_t major, size_t minor, size_t patch);
  * @returns A new version with the given name and each of its release properties set to zero.
  * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-version_t version_init_with_name(const char *name);
+version_t *version_init_with_name(const char *name);
 
 /**
  * @brief Construct a version object using only the string properties.
@@ -53,7 +53,7 @@ version_t version_init_with_name(const char *name);
  * @returns A new version with its string realted properties set as the given arguments and its numeric properties set to 0.
  * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-version_t version_init_strings(const char *name, const char *description);
+version_t *version_init_strings(const char *name, const char *description);
 
 /**
  * @brief Full initialize a version object.
@@ -65,7 +65,7 @@ version_t version_init_strings(const char *name, const char *description);
  * @returns A new version initialized with all its properties set to the given parametres.
  * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-version_t version_init_full(const char *name, const char *description, size_t major, size_t minor, size_t patch);
+version_t *version_init_full(const char *name, const char *description, size_t major, size_t minor, size_t patch);
 
 /**
  * @brief Set the major value of a version object.
@@ -159,7 +159,13 @@ bool version_comapre(const version_t *version, const version_t *other);
  */
 void version_print(FILE *stream, const version_t *version);
 
-#if defined(__cplusplus)
+/**
+ * @brief Deallocate a version object.
+ * @param version Object to deallocate.
+ */
+void version_delete(version_t *version);
+
+#ifdef defined(__cplusplus)
 }
 #endif
 
@@ -179,9 +185,16 @@ extern "C" {
  * @returns A new version object.
  * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-version_t version_init(void)
+version_t *version_init(void)
 {
-    return version_init_full(NULL, NULL, 0, 0, 0);
+    version_t *version = (version_t *)malloc(sizeof(version));
+    if (NULL == version)
+    {
+        fprintf(stderr, "AllocationError: Can not allocate enough memory to initialize the version object.");
+        exit(1);
+    }
+    memset(version, 0, sizeof(*version));
+    return version;
 }
 
 /**
@@ -192,9 +205,13 @@ version_t version_init(void)
  * @returns A new version object with each of the properties set to the given parametres.
  * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-version_t version_convert(size_t major, size_t minor, size_t patch)
+version_t *version_convert(size_t major, size_t minor, size_t patch)
 {
-    return version_init_full(NULL, NULL, major, minor, patch);
+    version_t *version = version_init();
+    version_set_major(version, major);
+    version_set_major(version, minor);
+    version_set_major(version, patch);
+    return version;
 }
 
 /**
@@ -203,9 +220,11 @@ version_t version_convert(size_t major, size_t minor, size_t patch)
  * @returns A new version with the given name and each of its release properties set to zero.
  * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-version_t version_init_with_name(const char *name)
+version_t *version_init_with_name(const char *name)
 {
-    return version_init_full(name, NULL, 0, 0, 0);
+    version_t *version = version_init();
+    version->name = name;
+    return version;
 }
 
 /**
@@ -215,9 +234,11 @@ version_t version_init_with_name(const char *name)
  * @returns A new version with its string realted properties set as the given arguments and its numeric properties set to 0.
  * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-version_t version_init_strings(const char *name, const char *description)
+version_t *version_init_strings(const char *name, const char *description)
 {
-    return version_init_full(name, description, 0, 0, 0);
+    version_t *version = version_init_with_name(name);
+    version->description = description;
+    return version;
 }
 
 /**
@@ -230,16 +251,12 @@ version_t version_init_strings(const char *name, const char *description)
  * @returns A new version initialized with all its properties set to the given parametres.
  * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-version_t version_init_full(const char *name, const char *description, size_t major, size_t minor, size_t patch)
+version_t *version_init_full(const char *name, const char *description, size_t major, size_t minor, size_t patch)
 {
-    return (version_t)
-    {
-        .name = name,
-        .description = description,
-        .major = major,
-        .minor = minor,
-        .patch = patch
-    };
+    version_t *version = version_convert(major, minor, patch);
+    version->name = name;
+    version->description = description;
+    return version;
 }
 
 /**
@@ -426,7 +443,20 @@ void version_print(FILE *stream, const version_t *version)
     fprintf(stream, "%s: %d.%d.%d - %s\n", version->name, (int)version->major, (int)version->minor, (int)version->patch, version->description);
 }
 
-#if defined(__cplusplus)
+/**
+ * @brief Deallocate a version object.
+ * @param version Object to deallocate.
+ */
+void version_delete(version_t *version)
+{
+    if (!version)
+    {
+        return;
+    }
+    free(version);
+}
+
+#ifdef defined(__cplusplus)
 }
 #endif
 

@@ -1,39 +1,4 @@
 # Changelog
-## v0.26.0 - 2026-07-20
-`Added`
-- C
-    - `collections`
-        - Added `string_empty` function.
-
-`Changed`
-- C
-    - `path`
-        - The function `path_get_parent` no longer needs the absolute path.
-    - `collections`
-        - The `string_builder` structure is no longer heap allocated. Its underlying array is still heap allocated.
-        - The content of `entry_t` is no longer a pointer. The content still needs to be deallocated.
-## v0.25.0 - 2026-06-12
-`Removed`
-- C
-    - Removed `directory_read`. The `files_t` interface will be used in its place.
-## v0.24.0 - 2026-06-12
-`Changed`
-- C
-    - All structures have been stack allocated where applicable.
-
-`Removed`
-- C
-    - Removed `entry_delete`. To deallocate the entry content, use `string_builder_delete`.
-    - Removed `directory_to_string`.
-## v0.23.0 - 2026-04-04
-`Changed`
-- C
-    - Renamed `logger_new` to `logger_init` to better fit within conventions.
-    - `pasb` no longer checks if the given path exists.
-
-`Fixed`
-- C
-    - `logger_new` now allocates the correct amount of memory for the logger.
 ## v0.22.0 - 2026-03-30
 `Changed`
 - Implementations of some methods and functions have changed. Hopefully, all previous behaviours should still be the same.

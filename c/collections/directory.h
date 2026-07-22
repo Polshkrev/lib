@@ -15,8 +15,8 @@ typedef struct
 {
     size_t size;
     size_t capacity;
-    path_t root;
-    entry_t *entries;
+    path_t *root;
+    entry_t **entries;
 } directory_t;
 
 /**
@@ -26,7 +26,7 @@ typedef struct
  * @exception If the directory can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  * @exception If the underlying entry array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
-directory_t directory_init(path_t root);
+directory_t *directory_init(path_t *root);
 
 /**
  * @brief Construct a new directory at a given root with a given initial capacity.
@@ -35,7 +35,7 @@ directory_t directory_init(path_t root);
  * @exception If the directory can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  * @exception If the underlying entry array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
-directory_t directory_init_with_capacity(path_t root, size_t capacity);
+directory_t *directory_init_with_capacity(path_t *root, size_t capacity);
 
 /**
  * @brief Append an `entry_t` to the directory.
@@ -43,7 +43,7 @@ directory_t directory_init_with_capacity(path_t root, size_t capacity);
  * @param entry Entry from which to append.
  * @exception If the directory can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
-void directory_append(directory_t *directory, entry_t entry);
+void directory_append(directory_t *directory, entry_t *entry);
 
 /**
  * @brief Obtain a pointer to an `entry_t` at a given index.
@@ -51,7 +51,24 @@ void directory_append(directory_t *directory, entry_t entry);
  * @param index Index at which the directory is to be accessed.
  * @exception If the index is outside of the bounds of the directory, an `IndexError` is printed to standard error and the programme exits.
  */
-entry_t *directory_at(directory_t *directory, size_t index);
+entry_t **directory_at(directory_t *directory, size_t index);
+
+/**
+ * @brief Read a given directory.
+ * @param directory Directory to read. Each `entry_t` that is scanned from the filesystem is appended to the directory.
+ * @returns True if the directory can be written, else false.
+ * @bug This leaks memory. I don't know how to refactor this without making the whole api obsolete.
+ */
+bool directory_read(directory_t *directory);
+
+/**
+ * @brief Represent a directory to as a string.
+ * @param directory Directory to represent.
+ * @param buffer Buffer to which to render the resulting string.
+ * @exception If the given items are null, an `IllegalParametreError` is printed to standard error and the programme exits.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
+ */
+void directory_to_string(directory_t *directory, string_builder_t *buffer);
 
 /**
  * @brief Resize a given directory by a factor of two.
@@ -91,9 +108,6 @@ void directory_delete(directory_t *directory);
 #define FILES_IMPLEMENTATION
 #include "files.h"
 
-#define _GNU_SOURCE
-#include <string.h>
-
 /**
  * @brief Construct a new directory at a given root.
  * @param root Root of the directory.
@@ -101,7 +115,7 @@ void directory_delete(directory_t *directory);
  * @exception If the directory can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  * @exception If the underlying entry array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
-directory_t directory_init(path_t root)
+directory_t *directory_init(path_t *root)
 {
     return directory_init_with_capacity(root, DIRECTORY_CAPACITY);
 }
@@ -113,21 +127,26 @@ directory_t directory_init(path_t root)
  * @exception If the directory can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  * @exception If the underlying entry array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
-directory_t directory_init_with_capacity(path_t root, size_t capacity)
+directory_t *directory_init_with_capacity(path_t *root, size_t capacity)
 {
-    entry_t *entries = (entry_t *)malloc(capacity * sizeof(entry_t));
-    if (NULL == entries)
+    directory_t *directory = (directory_t *)calloc(1, sizeof(directory_t));
+    if (NULL == directory)
     {
-        fprintf(stderr, "AllocationError: Can not allocate enough memory for the array of entries.\n");
+        fprintf(stderr, "AllocationError: Can not allocate a new directory.\n");
         exit(1);
     }
-    return (directory_t)
+    directory->size = 0;
+    directory->capacity = capacity;
+    directory->root = root;
+    directory->entries = (entry_t **)malloc(sizeof(entry_t *) * directory->capacity);
+    if (NULL == directory->entries)
     {
-        .root = root,
-        .capacity = capacity,
-        .size = 0,
-        .entries = entries
-    };
+        fprintf(stderr, "AllocationError: Can not allocate a new directory.\n");
+        path_delete(root);
+        if (directory) free(directory);
+        exit(1);
+    }
+    return directory;
 }
 
 /**
@@ -136,7 +155,7 @@ directory_t directory_init_with_capacity(path_t root, size_t capacity)
  * @param entry Entry from which to append.
  * @exception If the directory can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
-void directory_append(directory_t *directory, entry_t entry)
+void directory_append(directory_t *directory, entry_t *entry)
 {
     if (directory->size >= directory->capacity)
     {
@@ -151,7 +170,7 @@ void directory_append(directory_t *directory, entry_t entry)
  * @param index Index at which the directory is to be accessed.
  * @exception If the index is outside of the bounds of the directory, an `IndexError` is printed to standard error and the programme exits.
  */
-entry_t *directory_at(directory_t *directory, size_t index)
+entry_t **directory_at(directory_t *directory, size_t index)
 {
     if (index >= directory->size)
     {
@@ -160,6 +179,42 @@ entry_t *directory_at(directory_t *directory, size_t index)
         exit(1);
     }
     return &directory->entries[index];
+}
+
+/**
+ * @brief Read a given directory.
+ * @param directory Directory to read. Each `entry_t` that is scanned from the filesystem is appended to the directory.
+ * @returns True if the directory can be written, else false.
+ * @bug This leaks memory. I don't know how to refactor this without making the whole api obsolete.
+ */
+bool directory_read(directory_t *directory)
+{
+    files_t *files = files_init(passtr(directory->root));
+    if (!files_fill(files)) return false;
+    for (size_t i = 0; i < files->size; ++i)
+    {
+        char **file = files_at(files, i);
+        if (NULL == file) return false;
+        directory_append(directory, entry_init(path_from(buffer_duplicate(*file))));
+    }
+    files_delete(files);
+    return true;
+}
+
+/**
+ * @brief Represent a given directory as a string.
+ * @param directory Directory to represent as a string.
+ * @param result Buffer to which to formulate the string.
+ * @exception If the given items are null, an `IllegalParametreError` is printed to standard error and the programme exits.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
+ */
+void directory_to_string(directory_t *directory, string_builder_t *result)
+{
+    for (size_t i = 0; i < directory->size; ++i)
+    {
+        string_builder_extend(result, entry_to_string(directory->entries[i]));
+        string_builder_append(result, '\n');
+    }
 }
 
 /**
@@ -181,7 +236,7 @@ void directory_resize(directory_t *directory)
 void directory_resize_by(directory_t *directory, size_t scaler)
 {
     directory->capacity *= scaler;
-    directory->entries = (entry_t *)realloc(directory->entries, directory->capacity);
+    directory->entries = (entry_t **)realloc(directory->entries, directory->capacity);
     if (NULL == directory->entries)
     {
         fprintf(stderr, "AllocationError: Can not reallocate entries.\n");
@@ -208,7 +263,7 @@ void directory_remove(directory_t *directory, size_t index)
     }
     else if (directory->size == 0 || NULL == directory->entries)
     {
-        fprintf(stderr, "ValueError: Can not remove from an empty directory '%s'.\n", passtr(&directory->root));
+        fprintf(stderr, "ValueError: Can not remove from an empty directory '%s'.\n", passtr(directory->root));
         directory_delete(directory);
         exit(1);
     }
@@ -217,7 +272,7 @@ void directory_remove(directory_t *directory, size_t index)
         directory->entries[i] = directory->entries[i + 1];
     }
     directory->size--;
-    entry_t *temporary = (entry_t *)realloc(directory->entries, directory->size * sizeof(entry_t));
+    entry_t **temporary = (entry_t **)realloc(directory->entries, directory->size * sizeof(entry_t *));
     if (NULL == temporary)
     {
         fprintf(stderr, "AllocationError: Can not reallocate the directory.\n");
@@ -233,13 +288,18 @@ void directory_remove(directory_t *directory, size_t index)
  */
 void directory_delete(directory_t *directory)
 {
-    if (!directory->entries) return;
+    if (!directory) return;
+    else if (!directory->entries) return;
+    path_delete(directory->root);
     for (size_t i = 0; i < directory->size; ++i)
     {
-        string_builder_delete(&directory->entries[i].content);
+        entry_delete(directory->entries[i]);
     }
     free(directory->entries);
     directory->entries = NULL;
+    free(directory);
+    directory = NULL;
+    buffer_reset();
 }
 
 #endif // DIRECTORY_IMPLEMENTATION

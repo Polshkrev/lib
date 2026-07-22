@@ -131,13 +131,6 @@ bool string_ends_with(const string_t *string, string_t expected);
  */
 bool string_equals(string_t a, string_t b);
 
-/**
- * @brief Determine if the the given string is empty.
- * @param string String to evaluate.
- * @returns True if the given string has data equal to null and a size of zero.
- */
-bool string_is_empty(string_t string);
-
 #endif // STRING_VIEW_H
 
 #ifdef STRING_VIEW_IMPLEMENTATION
@@ -320,16 +313,6 @@ bool string_equals(string_t a, string_t b)
         return false;
     }
     return memcmp(a.data, b.data, a.count) == 0;
-}
-
-/**
- * @brief Determine if the the given string is empty.
- * @param string String to evaluate.
- * @returns True if the given string has data equal to null and a size of zero.
- */
-bool string_is_empty(string_t string)
-{
-    return string_equals(string, string_null);
 }
 
 #if defined(__cplusplus)
