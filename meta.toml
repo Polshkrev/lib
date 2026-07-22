@@ -2,9 +2,10 @@
 name = "lib"
 author = {name = "Polshkrev"}
 description = "Library of single-file stb-like header files for c and c++."
+type = "library"
 
 [project.version]
-minor = 22
+minor = 26
 
 [license]
 type = "MIT"

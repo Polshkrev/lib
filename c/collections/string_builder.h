@@ -24,19 +24,17 @@ typedef struct
 /**
  * @brief Construct a new dynamic buffer of characters.
  * @returns A new dynamic buffer of characters.
- * @exception If the builder can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  * @exception If the underlying array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
-string_builder_t *string_builder_init(void);
+string_builder_t string_builder_init(void);
 
 /**
  * @brief Construct a new dynamic buffer of characters with a given capacity.
  * @param capacity capacity to set for the buffer.
  * @returns A new dynamic buffer of characters with a given initial capacity.
- * @exception If the builder can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  * @exception If the underlying array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
-string_builder_t *string_builder_with_capacity(size_t capacity);
+string_builder_t string_builder_with_capacity(size_t capacity);
 
 /**
  * @brief Append a character to the buffer of characters. If the buffer is full, the buffer is resized by an exponential factor of two.
@@ -166,8 +164,9 @@ extern "C" {
 /**
  * @brief Construct a new dynamic buffer of characters.
  * @returns A new dynamic buffer of characters.
+ * @exception If the underlying array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
-string_builder_t *string_builder_init(void)
+string_builder_t string_builder_init(void)
 {
     return string_builder_with_capacity(STRING_BUILDER_INITIAL_CAPACITY);
 }
@@ -176,31 +175,22 @@ string_builder_t *string_builder_init(void)
  * @brief Construct a new dynamic buffer of characters with a given capacity.
  * @param capacity capacity to set for the buffer.
  * @returns A new dynamic buffer of characters with a given initial capacity.
- * @exception If the builder can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  * @exception If the underlying array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
-string_builder_t *string_builder_with_capacity(size_t capacity)
+string_builder_t string_builder_with_capacity(size_t capacity)
 {
-    string_builder_t *builder = (string_builder_t *)malloc(sizeof(string_builder_t));
-    if (NULL == builder)
+    char *items = (char *)malloc(capacity * sizeof(char));
+    if (NULL == items)
     {
-        fprintf(stderr, "AllocationError: Can not allocate buffer.\n");
+        fprintf(stderr, "AllocationError: Can not allocate enough memory for the array of characters.\n");
         exit(1);
     }
-    builder->capacity = capacity;
-    builder->size = 0;
-    builder->items = (char *)calloc(builder->capacity, sizeof(char));
-    if (NULL == builder->items)
+    return (string_builder_t)
     {
-        fprintf(stderr, "AllocationError: Can not allocate buffer.\n");
-        if (builder)
-        {
-            free(builder);
-            builder = NULL;
-        }
-        exit(1);
-    }
-    return builder;
+        .size = 0,
+        .items = items,
+        .capacity = capacity,
+    };
 }
 
 /**
@@ -409,12 +399,9 @@ bool string_builder_empty(const string_builder_t *builder)
  */
 void string_builder_delete(string_builder_t *builder)
 {
-    if (!builder) return;
-    else if (!builder->items) return;
+    if (!builder->items) return;
     free(builder->items);
     builder->items = NULL;
-    free(builder);
-    builder = NULL;
 }
 
 #if defined(__cplusplus)

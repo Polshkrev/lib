@@ -35,8 +35,8 @@ typedef enum
 typedef struct
 {
     file_type_t type;
-    path_t *path;
-    string_builder_t *content;
+    path_t path;
+    string_builder_t content;
 } entry_t;
 
 /**
@@ -52,7 +52,7 @@ const char *file_type_to_string(file_type_t file_type);
  * @returns A new entry of the given path with its type set to `FILE_TYPE` and its content an empty `string_builder_t`.
  * @exception If a new entry can not be allocated, an `AllocationError` is printed to `stderr` and the programme exists.
  */
-entry_t *entry_init(path_t *path);
+entry_t entry_init(path_t path);
 
 /**
  * @brief Read a file's content into an entry.
@@ -60,7 +60,6 @@ entry_t *entry_init(path_t *path);
  * @returns True if the entry's path can be successfully read, else false.
  */
 bool entry_read(entry_t *entry);
-// bool entry_read_content_to_path(path_t *path, string_builder_t *content);
 
 /**
  * @brief Write a given entry's content to a persistant file.
@@ -75,7 +74,7 @@ bool entry_write(entry_t *entry);
  * @param content Content from which to write.
  * @returns True if the given content can be written to the given path, else false.
  */
-bool entry_write_content_to_path(path_t *path, string_builder_t *content);
+bool entry_write_content_to_path(const path_t *path, string_builder_t *content);
 
 /**
  * @brief Create a persistant file on the filesystem.
@@ -136,24 +135,11 @@ bool entry_copy(entry_t *source, entry_t *destination);
 bool entry_move(entry_t *source, entry_t *destination);
 
 /**
- * @brief Represent an entry as a string.
- * @param entry Entry to represent as a string.
- * @returns A string representation of the entry.
- */
-const char *entry_to_string(entry_t *entry);
-
-/**
  * @brief Obtain the size of the entry in bytes.
  * @param entry Entry from which to obtain the size.
  * @returns The size of the entry.
  */
 size_t entry_size(entry_t *entry);
-
-/**
- * @brief Deallocate an entry.
- * @param entry Entry to deallocate.
- */
-void entry_delete(entry_t *entry);
 
 #if defined(__cplusplus)
 }
@@ -166,9 +152,6 @@ void entry_delete(entry_t *entry);
 #if defined(__cplusplus)
 extern "C" {
 #endif
-
-#define BUFFER_IMPLEMENTATION
-#include "buffer.h" // buffer_sprintf
 
 #include <stdint.h> // SIZE_MAX
 
@@ -223,25 +206,14 @@ static file_type_t _get_file_type(const char *path)
  * @returns A new entry of the given path with its type set to `FILE_TYPE` and its content an empty `string_builder_t`.
  * @exception If a new entry can not be allocated, an `AllocationError` is printed to `stderr` and the programme exists.
  */
-entry_t *entry_init(path_t *path)
+entry_t entry_init(path_t path)
 {
-    entry_t *entry = (entry_t *)malloc(sizeof(entry_t));
-    if (NULL == entry)
+    return (entry_t)
     {
-        fprintf(stderr, "AllocationError: Can not allocate a new entry.\n");
-        exit(1);
-    }
-    entry->path = path;
-    entry->content = string_builder_init();
-    if (path_exists(path))
-    {
-        entry->type = _get_file_type(passtr(path));
-    }
-    else
-    {
-        entry->type = FILE_TYPE;
-    }
-    return entry;
+        .path = path,
+        .type = path_exists(&path) ? _get_file_type(passtr(&path)) : FILE_TYPE,
+        .content = string_builder_init()
+    };
 }
 
 /**
@@ -273,32 +245,48 @@ static bool _get_file_size(FILE *file, size_t *result) {
 }
 
 /**
+ * @brief Read the contents of a given path into a given result.
+ * @param path Path fromw which to read.
+ * @param result Buffer to which to append.
+ * @exception If the given path can not be read, an `IOError` is returned.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
+ */
+void _read_file(const path_t *path, string_builder_t *result)
+{
+    const char *filepath = passtr(path);
+    FILE *file = fopen(filepath, "r");
+    if (NULL == file)
+    {
+        fprintf(stderr, "IOError: Can not readfile: %s.\n", filepath);
+        string_builder_delete(result);
+        exit(1);
+    };
+    while (!feof(file) && !ferror(file))
+    {
+        int read = fgetc(file);
+        if (EOF == read) break;
+        string_builder_append(result, read);
+    }
+    fclose(file);
+    string_builder_fit(result);
+}
+
+/**
  * @brief Read a file's content into an entry.
  * @param entry Entry to which to set the read content.
  * @returns True if the entry's path can be successfully read, else false.
+ * @exception If the given path can not be read, an `IOError` is returned.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 bool entry_read(entry_t *entry)
 {
-    if (!path_exists(entry->path))
+    if (!path_exists(&entry->path))
     {
-        fprintf(stderr, "FileNotFoundError: Can not find file %s.\n", passtr(entry->path));
-        entry_delete(entry);
+        fprintf(stderr, "FileNotFoundError: Can not find file %s.\n", passtr(&entry->path));
+        string_builder_delete(&entry->content);
         exit(1);
     }
-    FILE *file = fopen(passtr(entry->path), "r");
-    if (NULL == file)
-    {
-        fprintf(stderr, "IOError: Can not readfile: %s.\n", passtr(entry->path));
-        entry_delete(entry);
-        exit(1);
-    };
-    char character;
-    while ((character = fgetc(file)) != EOF)
-    {
-        string_builder_append(entry->content, character);
-    }
-    fclose(file);
-    string_builder_fit(entry->content);
+    _read_file(&entry->path, &entry->content);
     return true;
 }
 
@@ -308,18 +296,17 @@ bool entry_read(entry_t *entry)
  * @param content Content from which to write.
  * @returns True if the given content can be written to the given path, else false.
  */
-bool entry_write_content_to_path(path_t *path, string_builder_t *content)
+bool entry_write_content_to_path(const path_t *path, string_builder_t *content)
 {
     if (string_builder_empty(content)) return false;
     FILE *file = fopen(passtr(path), "w");
     if (NULL == file)
     {
         fprintf(stderr, "IOError: Can not open file: %s.\n", passtr(path));
-        path_delete(path);
         string_builder_delete(content);
         exit(1);
     }
-    fprintf(file, "%s\n", string_builder_data(content));
+    fprintf(file, "%s", string_builder_data(content));
     fclose(file);
     return true;
 }
@@ -331,7 +318,7 @@ bool entry_write_content_to_path(path_t *path, string_builder_t *content)
  */
 bool entry_write(entry_t *entry)
 {
-    return entry_write_content_to_path(entry->path, entry->content);
+    return entry_write_content_to_path(&entry->path, &entry->content);
 }
 
 /**
@@ -342,27 +329,27 @@ bool entry_write(entry_t *entry)
  */
 bool entry_copy(entry_t *source, entry_t *destination)
 {
-    if (!path_exists(source->path))
+    if (!path_exists(&source->path))
     {
-        fprintf(stderr, "FileNotFoundError: Can not find file %s.\n", passtr(source->path));
-        entry_delete(source);
-        entry_delete(destination);
+        fprintf(stderr, "FileNotFoundError: Can not find file %s.\n", passtr(&source->path));
+        string_builder_delete(&source->content);
+        string_builder_delete(&destination->content);
         exit(1);
     }
-    else if (path_exists(destination->path))
+    else if (path_exists(&destination->path))
     {
-        fprintf(stderr, "FileExistsError: File '%s' already exists.\n", passtr(destination->path));
-        entry_delete(source);
-        entry_delete(destination);
+        fprintf(stderr, "FileExistsError: File '%s' already exists.\n", passtr(&destination->path));
+        string_builder_delete(&source->content);
+        string_builder_delete(&destination->content);
         exit(1);
     }
     else if (source->type != FILE_TYPE) return false;
     else if (destination->type != FILE_TYPE) return false;
-    else if (string_builder_empty(source->content))
+    else if (string_builder_empty(&source->content))
     {
         if (!entry_read(source)) return false;
     }
-    else if (!entry_write_content_to_path(destination->path, source->content)) return false;
+    if (!entry_write_content_to_path(&destination->path, &source->content)) return false;
     return true;
 }
 
@@ -385,18 +372,18 @@ bool entry_move(entry_t *source, entry_t *destination)
  */
 bool entry_touch(entry_t *entry)
 {
-    if (path_exists(entry->path))
+    if (path_exists(&entry->path))
     {
-        fprintf(stderr, "FileExistsError: File '%s' already exists.\n", passtr(entry->path));
-        entry_delete(entry);
+        fprintf(stderr, "FileExistsError: File '%s' already exists.\n", passtr(&entry->path));
+        string_builder_delete(&entry->content);
         exit(1);
     }
     else if (entry->type != FILE_TYPE) return false;
-    FILE *file = fopen(passtr(entry->path), "w");
+    FILE *file = fopen(passtr(&entry->path), "w");
     if (NULL == file)
     {
-        fprintf(stderr, "IOError: Can not open file: %s.\n", passtr(entry->path));
-        entry_delete(entry);
+        fprintf(stderr, "IOError: Can not open file: %s.\n", passtr(&entry->path));
+        string_builder_delete(&entry->content);
         exit(1);
     }
     fclose(file);
@@ -410,15 +397,15 @@ bool entry_touch(entry_t *entry)
  */
 bool entry_make_directory(entry_t *entry)
 {
-    if (path_exists(entry->path))
+    if (path_exists(&entry->path))
     {
-        fprintf(stderr, "FileExistsError: File '%s' already exists.\n", passtr(entry->path));
-        entry_delete(entry);
+        fprintf(stderr, "FileExistsError: File '%s' already exists.\n", passtr(&entry->path));
+        string_builder_delete(&entry->content);
         exit(1);
     }
     else if (entry->type != DIRECTORY_TYPE) return false;
 #ifdef _WIN32
-    int result = _mkdir(passtr(entry->path));
+    int result = _mkdir(passtr(&entry->path));
 #else
     int result = mkdir(passtr(entry->path), 0755);
 #endif
@@ -452,15 +439,15 @@ bool entry_create(entry_t *entry)
  */
 bool entry_remove_directory(entry_t *entry)
 {
-    if (!path_exists(entry->path))
+    if (!path_exists(&entry->path))
     {
-        fprintf(stderr, "FileNotFoundError: Can not find file %s.\n", passtr(entry->path));
-        entry_delete(entry);
+        fprintf(stderr, "FileNotFoundError: Can not find file %s.\n", passtr(&entry->path));
+        string_builder_delete(&entry->content);
         exit(1);
     }
     else if (entry->type != DIRECTORY_TYPE) return false;
 #ifdef _WIN32
-    int result = remove(passtr(entry->path));
+    int result = remove(passtr(&entry->path));
 #else
     int result = rmdir(passtr(entry->path));
 #endif // _WIN32
@@ -474,14 +461,14 @@ bool entry_remove_directory(entry_t *entry)
  */
 bool entry_remove_file(entry_t *entry)
 {
-    if (!path_exists(entry->path))
+    if (!path_exists(&entry->path))
     {
-        fprintf(stderr, "FileNotFoundError: Can not find file %s.\n", passtr(entry->path));
-        entry_delete(entry);
+        fprintf(stderr, "FileNotFoundError: Can not find file %s.\n", passtr(&entry->path));
+        string_builder_delete(&entry->content);
         exit(1);
     }
     else if (entry->type != FILE_TYPE) return false;
-    return remove(passtr(entry->path)) == 0;
+    return remove(passtr(&entry->path)) == 0;
 }
 
 /**
@@ -505,60 +492,37 @@ bool entry_remove(entry_t *entry)
 }
 
 /**
- * @brief Represent an entry as a string.
- * @param entry Entry to represent as a string.
- * @returns A string representation of the entry.
- */
-const char *entry_to_string(entry_t *entry)
-{
-    return buffer_sprintf("%s - %s", passtr(entry->path), file_type_to_string(entry->type));
-}
-
-/**
  * @brief Obtain the size of the entry in bytes.
  * @param entry Entry from which to obtain the size.
  * @returns The size of the entry.
  */
 size_t entry_size(entry_t *entry)
 {
-    if (!path_exists(entry->path))
+    if (!path_exists(&entry->path))
     {
         if (!entry_create(entry))
         {
-            fprintf(stderr, "IOError: Can not create file %s\n", passtr(entry->path));
-            entry_delete(entry);
+            fprintf(stderr, "IOError: Can not create file %s\n", passtr(&entry->path));
+            string_builder_delete(&entry->content);
             exit(1);
         }
     }
-    FILE *file = fopen(passtr(entry->path), "r");
+    FILE *file = fopen(passtr(&entry->path), "r");
     if (NULL == file)
     {
-        fprintf(stderr, "IOError: Can not open file: %s\n", passtr(entry->path));
-        entry_delete(entry);
+        fprintf(stderr, "IOError: Can not open file: %s\n", passtr(&entry->path));
+        string_builder_delete(&entry->content);
         exit(1);
     }
     size_t result = 0; // Size of zero is valid.
     if (!_get_file_size(file, &result))
     {
-        fprintf(stderr, "IOError: Can not get size of file: %s.\n", passtr(entry->path));
-        entry_delete(entry);
+        fprintf(stderr, "IOError: Can not get size of file: %s.\n", passtr(&entry->path));
+        string_builder_delete(&entry->content);
         exit(1);
     }
     fclose(file);
     return result;
-}
-
-/**
- * @brief Deallocate an entry.
- * @param entry Entry to deallocate.
- */
-void entry_delete(entry_t *entry)
-{
-    if (!entry) return;
-    path_delete(entry->path);
-    string_builder_delete(entry->content);
-    free(entry);
-    entry = NULL;
 }
 
 #if defined(__cplusplus)
