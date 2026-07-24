@@ -57,10 +57,17 @@ string_t string_new(const char *data, size_t count);
 
 /**
  * @brief Allocate a new string structure from a c-string literal marked with const.
- * @param cstr A char pointer marked with const to be passed to the `new_string` function that was previously defined.
- * @returns A new string with data as the given cstr and the `strlen` count.
+ * @param cstring A char pointer marked with const to be passed to the `new_string` function that was previously defined.
+ * @returns A new string with data as the given cstring and the `strlen` count.
  */
-string_t string_from_literal(const char *cstr);
+string_t string_from_literal(const char *cstring);
+
+/**
+ * @brief Obtain the length of the given string.
+ * @param string String from which to obtain the length.
+ * @returns The one-based length of the string in charactors.
+ */
+size_t string_length(const string_t *string);
 
 /**
  * @brief Trim a string of its preceeding spaces.
@@ -113,7 +120,7 @@ size_t string_find_last_of(const string_t *string, char_t charactor);
  * @param expected The expected prefix to check against.
  * @returns A boolean on whether `string` starts with `expected`.
  */
-bool string_starts_with(const string_t *string, string_t expected);
+bool string_starts_with(const string_t *string, const string_t *expected);
 
 /**
  * @brief Determine whether a given string ends with a given expected string.
@@ -121,22 +128,22 @@ bool string_starts_with(const string_t *string, string_t expected);
  * @param expected The expected suffix to check against.
  * @returns A boolean on whether `string` ends with `expected`.
  */
-bool string_ends_with(const string_t *string, string_t expected);
+bool string_ends_with(const string_t *string, const string_t *expected);
 
 /**
  * @brief Compare two given — case sensitive — string types.
- * @param a The string to check against.
- * @param b The string to which a comparison will be made in parametre `a`.
- * @returns A boolean on wheather `a` and `b` are equal.
+ * @param original The string to check against.
+ * @param operand The string to which a comparison will be made in parametre `original`.
+ * @returns A boolean on wheather `original` and `operand` are equal.
  */
-bool string_equals(string_t a, string_t b);
+bool string_equals(const string_t *original, const string_t *operand);
 
 /**
  * @brief Determine if the the given string is empty.
  * @param string String to evaluate.
  * @returns True if the given string has data equal to null and a size of zero.
  */
-bool string_is_empty(string_t string);
+bool string_is_empty(const string_t *string);
 
 #endif // STRING_VIEW_H
 
@@ -147,7 +154,41 @@ extern "C" {
 #endif
 
 #include <string.h> // strlen, strchr, strrchr, memcmp, NULL
+#include <stdint.h> // uint8_t
 #include <ctype.h> // isspace
+
+#ifdef _WIN32
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h>
+#endif // _WIN32
+
+static const uint8_t __bytes_for_utf8[] = {
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+    3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3, 4,4,4,4,4,4,4,4,5,5,5,5,6,6,6,6,
+};
+
+size_t __string_utf8_length(const string_t *string, size_t *bytes_overrun)
+{
+    size_t i = 0;
+    size_t n = 0;
+    while (true)
+    {
+        if (i >= string->count)
+        {
+            if (bytes_overrun) *bytes_overrun = i - string->count;
+            return n;
+        }
+        i += __bytes_for_utf8[(uint8_t)string->data[i]];
+        n += 1;
+    }
+    return 0;
+}
 
 /**
  * @brief Constructor for a new string with a given length and data.
@@ -164,13 +205,26 @@ string_t string_new(const char *data, size_t count)
 }
 
 /**
+ * @brief Obtain the length of the given string.
+ * @param string String from which to obtain the length.
+ * @returns The one-based length of the string in charactors.
+ */
+size_t string_length(const string_t *string)
+{
+    return __string_utf8_length(string, NULL);
+}
+
+/**
  * @brief Allocate a new string structure from a c-string literal marked with const.
- * @param cstr A char pointer marked with const to be passed to the `new_string` function that was previously defined.
+ * @param cstring A char pointer marked with const to be passed to the `new_string` function that was previously defined.
  * @returns A new string with data as the given cstr and the `strlen` count.
  */
-string_t string_from_literal(const char *cstr)
+string_t string_from_literal(const char *cstring)
 {
-    return string_new(cstr, strlen(cstr));
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+#endif // _WIN32
+    return string_new(cstring, strlen(cstring));
 }
 
 /**
@@ -180,12 +234,12 @@ string_t string_from_literal(const char *cstr)
  */
 string_t string_trim_left(const string_t *string)
 {
-    size_t i = 0;
-    while (i < string->count && isspace(string->data[i]))
+    size_t index = 0;
+    while (index < string->count && isspace(string->data[index]))
     {
-        i++;
+        index++;
     }
-    return string_new(string->data + i, string->count - i);
+    return string_new(string->data + index, string->count - index);
 }
 
 /**
@@ -195,12 +249,12 @@ string_t string_trim_left(const string_t *string)
  */
 string_t string_trim_right(const string_t *string)
 {
-    size_t i = 0;
-    while (i < string->count && isspace(string->data[string->count - 1 - i]))
+    size_t index = 0;
+    while (index < string->count && isspace(string->data[string->count - 1 - index]))
     {
-        i++;
+        index++;
     }
-    return string_new(string->data, string->count - i);
+    return string_new(string->data, string->count - index);
 }
 
 /**
@@ -222,21 +276,21 @@ string_t string_trim(const string_t *string)
  */
 string_t string_chop_by_delimetre(string_t *string, char delimetre)
 {
-    size_t i = 0;
-    while (i < string->count && string->data[i] != delimetre)
+    size_t index = 0;
+    while (index < string->count && string->data[index] != delimetre)
     {
-        i++;
+        index++;
     }
-    string_t result = string_new(string->data, i);
-    if (i < string->count)
+    string_t result = string_new(string->data, index);
+    if (index < string->count)
     {
-        string->count -= i + 1;
-        string->data += i + 1;
+        string->count -= index + 1;
+        string->data += index + 1;
     }
     else
     {
-        string->count -= i;
-        string->data += i;
+        string->count -= index;
+        string->data += index;
     }
     return result;
 }
@@ -250,7 +304,7 @@ string_t string_chop_by_delimetre(string_t *string, char delimetre)
 size_t string_find_first_of(const string_t *string, char_t charactor)
 {
     const char *result = strchr(string->data, charactor);
-    const size_t full_length = strlen(string->data);
+    size_t full_length = string_length(string) - 1;
     if (!result)
     {
         return 0;
@@ -267,7 +321,7 @@ size_t string_find_first_of(const string_t *string, char_t charactor)
 size_t string_find_last_of(const string_t *string, char_t charactor)
 {
     const char *result = strrchr(string->data, charactor);
-    const size_t full_length = strlen(string->data);
+    size_t full_length = string_length(string) - 1;
     if (!result)
     {
         return 0;
@@ -281,14 +335,14 @@ size_t string_find_last_of(const string_t *string, char_t charactor)
  * @param expected The expected prefix to check against.
  * @returns A boolean on whether `string` starts with `expected`.
  */
-bool string_starts_with(const string_t *string, string_t expected)
+bool string_starts_with(const string_t *string, const string_t *expected)
 {
-    if (expected.count > string->count)
+    if (expected->count > string->count)
     {
         return false;
     }
-    string_t actual = string_new(string->data, expected.count);
-    return string_equals(expected, actual);
+    string_t actual = string_new(string->data, expected->count);
+    return string_equals(expected, &actual);
 }
 
 /**
@@ -297,29 +351,29 @@ bool string_starts_with(const string_t *string, string_t expected)
  * @param expected The expected suffix to check against.
  * @returns A boolean on whether `string` ends with `expected`.
  */
-bool string_ends_with(const string_t *string, string_t expected)
+bool string_ends_with(const string_t *string, const string_t *expected)
 {
-    if (expected.count > string->count)
+    if (expected->count > string->count)
     {
         return false;
     }
-    string_t actual = string_new(string->data + string->count - expected.count, expected.count);
-    return string_equals(expected, actual);
+    string_t actual = string_new(string->data + string->count - expected->count, expected->count);
+    return string_equals(expected, &actual);
 }
 
 /**
  * @brief Compare two given — case sensitive — string types.
- * @param a The string to check against.
- * @param b The string to which a comparison will be made in parametre `a`.
- * @returns A boolean on wheather `a` and `b` are equal.
+ * @param original The string to check against.
+ * @param operand The string to which a comparison will be made in parametre `original`.
+ * @returns A boolean on wheather `original` and `operand` are equal.
  */
-bool string_equals(string_t a, string_t b)
+bool string_equals(const string_t *original, const string_t *operand)
 {
-    if (a.count != b.count)
+    if (original->count != operand->count)
     {
         return false;
     }
-    return memcmp(a.data, b.data, a.count) == 0;
+    return memcmp(original->data, operand->data, original->count) == 0;
 }
 
 /**
@@ -327,9 +381,10 @@ bool string_equals(string_t a, string_t b)
  * @param string String to evaluate.
  * @returns True if the given string has data equal to null and a size of zero.
  */
-bool string_is_empty(string_t string)
+bool string_is_empty(const string_t *string)
 {
-    return string_equals(string, string_null);
+    string_t null = string_null;
+    return string_equals(string, &null);
 }
 
 #if defined(__cplusplus)
