@@ -1,4 +1,11 @@
 # Changelog
+## v0.27.0 - 2026-07-24
+`Added`
+- C
+    - `collections`
+        - `string`
+            - Added `unicode` support.
+            - Added `string_length` function.
 ## v0.26.0 - 2026-07-20
 `Added`
 - C
