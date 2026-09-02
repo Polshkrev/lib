@@ -61,7 +61,7 @@ extern "C" {
 
 #include <stdlib.h> // NULL, exit
 #include <stdio.h> // fprintf, vsnprintf, stderr
-#include <string.h> // memcpy
+#include <string.h> // memcpy, strlen
 #include <stdarg.h> // va_list, va_start, va_end
 
 #ifndef TEMP_CAPACITY

@@ -8,7 +8,7 @@
 #define PATH_IMPLEMENTATION
 #include "../path.hpp"
 
-#include "printable.hpp"
+#include "printable.hpp" // printable_t
 
 
 namespace polutils

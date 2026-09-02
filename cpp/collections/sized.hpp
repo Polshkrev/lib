@@ -2,7 +2,6 @@
 #define SIZED_HPP
 
 #include <cstddef> // std::size_t
-#include <cstdbool> // bool
 
 namespace polutils
 {

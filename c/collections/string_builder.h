@@ -6,10 +6,10 @@ extern "C" {
 #endif
 
 #include <stddef.h> // size_t
-// #include <stdbool.h> // bool
+#include <stdbool.h> // bool
 
 #define STRING_VIEW_IMPLEMENTATION
-#include "./string_view.h"
+#include "./string_view.h" // string_t, string_new
 
 /**
  * @brief A dynamic buffer of characters.
@@ -156,6 +156,7 @@ extern "C" {
 
 #include <stdio.h> // fprintf, stderr
 #include <stdlib.h> // malloc, realloc, free, exit, NULL
+#include <string.h> // strlen
 
 #ifndef STRING_BUILDER_INITIAL_CAPACITY
 #define STRING_BUILDER_INITIAL_CAPACITY 256
@@ -291,6 +292,7 @@ const char *string_builder_data(string_builder_t *builder)
  */
 void string_builder_fit(string_builder_t *builder)
 {
+    if (builder->capacity <= builder->size) return;
     builder->capacity = builder->size;
 }
 

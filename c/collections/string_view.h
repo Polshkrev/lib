@@ -158,8 +158,9 @@ extern "C" {
 #include <ctype.h> // isspace
 
 #ifdef _WIN32
-    #define WIN32_LEAN_AND_MEAN
-    #include <windows.h>
+    #include <windef.h> // ! NEEDED FOR CONSOLEAPI2.H
+    #include <consoleapi2.h> // SetConsoleOutputCP
+    #include <winnls.h> // CP_UTF8
 #endif // _WIN32
 
 static const uint8_t __bytes_for_utf8[] = {
