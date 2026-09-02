@@ -1,7 +1,7 @@
 #ifndef ARRAY_HPP
 #define ARRAY_HPP
 
-#include "collection.hpp"
+#include "collection.hpp" // collection_t
 
 namespace polutils
 {
@@ -105,7 +105,7 @@ namespace polutils
 #include <cstdlib> // std::calloc, std::free, nullptr
 
 #define EXCEPTIONS_IMPLEMENTATION
-#include "../exceptions.hpp"
+#include "../exceptions.hpp" // AllocationError, ValueError, IndexError, OutOfRangeError
 
 #ifndef ARRAY_CAPACITY
 #define ARRAY_CAPACITY 256
