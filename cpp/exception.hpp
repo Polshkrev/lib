@@ -75,7 +75,7 @@ namespace polutils
 #ifdef EXCEPTION_IMPLEMENTATION
 
 #define BUFFER_IMPLEMENTATION
-#include "../c/collections/buffer.h"
+#include "../c/collections/buffer.h" // bufer_save, buffer_sprintf, buffer_rewind
 
 namespace polutils
 {
