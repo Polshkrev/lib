@@ -47,10 +47,11 @@ extern "C" {
 #endif
 
 #ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h> // HANDLE, FARPROC, LoadLibrary, GetProcAddress, FreeLibrary, GetLastError
+    #include <libloaderapi.h> // LoadLibrary, GetProcAddress, FreeLibrary
+    #include <minwindef.h> // HANDLE, DWORD
+    #include <fileapi.h> // GetFileAttributes, INVALID_FILE_ATTRIBUTES
 #else
-#include <dlfcn.h> // dlopen, dlsym, dlclose, dlerror
+    #include <dlfcn.h> // dlopen, dlsym, dlclose, dlerror
 #endif // _WIN32
 
 /**
@@ -119,7 +120,7 @@ void *library_load(const char *path)
 void *library_function(void *library, const char *name)
 {
 #ifdef _WIN32
-    void *function = (void*)GetProcAddress(library, name);
+    void *function = (void *)GetProcAddress(library, name);
     if (NULL == function)
     {
         fprintf(stderr, "ValueError: Can not load funtion '%s'.", name);
@@ -127,7 +128,7 @@ void *library_function(void *library, const char *name)
         exit(1);
     }
 #else
-    void *function = (void*)dlsym(library, name);
+    void *function = (void *)dlsym(library, name);
     if (NULL == function)
     {
         fprintf(stderr, "ValueError: Can not load function '%s': %s.", name, dlerror());
