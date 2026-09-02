@@ -3,7 +3,7 @@
 
 #include <string> // std::string
 
-#include "printable.hpp"
+#include "printable.hpp" // printable_t
 
 namespace polutils
 {
@@ -103,14 +103,13 @@ namespace
 }
 
 #ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-// #include <minwinbase.h> // DWORD
-// #include <winbase.h> // CopyFile
-// #include <fileapi.h> // GetFullPathName, GetFileAttributes, INVALID_FILE_ATTRIBUTES
-// #include<errhandlingapi.h> // GetLastError
+    #include <minwindef.h> // DWORD
+    #include <tchar.h> // ! NEEDED FOR STRSAFE.H
+    #include <strsafe.h> // StringCbPrintf
+    #include <fileapi.h> // GetFullPathName, GetFileAttributes, INVALID_FILE_ATTRIBUTES
+    #include <errhandlingapi.h> // GetLastError
 #else
-#include <sys/stat.h> // struct stat, stat, S_ISDIR
+    #include <sys/stat.h> // struct stat, stat, S_ISDIR
 #endif // _WIN32
 
 #define EXCEPTIONS_IMPLEMENTATION

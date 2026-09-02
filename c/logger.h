@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include <stdio.h> // FILE
+#include <stdio.h> // FILE, size_t, stderr, fprintf, fopen, fclose
 
 #define AVAILABLE_OUTPUTS 2
 
@@ -111,7 +111,6 @@ void logger_delete(logger_t *logger);
 extern "C" {
 #endif
 
-// #include <stdio.h> // FILE, size_t, fprintf, stderr, fopen, fclose
 #include <stdlib.h> // malloc, exit, free, NULL
 #include <time.h> // time_t, struct tm, strftime
 #include <locale.h> // setlocale, LC_TIME
