@@ -6,7 +6,7 @@
 #endif // DIRECTORY_CAPACITY
 
 #define ENTRY_IMPLEMENTATION
-#include "entry.h"
+#include "entry.h" // entry_t, 
 
 /**
  * @brief Representation of a directory on the filesystem.
@@ -88,11 +88,8 @@ void directory_delete(directory_t *directory);
 
 #ifdef DIRECTORY_IMPLEMENTATION
 
-#define FILES_IMPLEMENTATION
-#include "files.h"
-
-#define _GNU_SOURCE
-#include <string.h>
+#include <stdio.h> // fprintf, stderr
+#include <stdlib.h> // malloc, realloc, free, exit, NULL
 
 /**
  * @brief Construct a new directory at a given root.
