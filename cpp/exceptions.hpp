@@ -2,7 +2,7 @@
 #define EXCEPTIONS_HPP
 
 #define EXCEPTION_IMPLEMENTATION
-#include "exception.hpp"
+#include "exception.hpp" // Exception
 
 namespace polutils
 {
@@ -169,7 +169,7 @@ namespace polutils
 
 #endif // EXCEPTIONS_HPP
 
-// #ifdef EXCEPTIONS_IMPLEMENTATION
+#ifdef EXCEPTIONS_IMPLEMENTATION
 
 namespace polutils
 {
@@ -334,4 +334,4 @@ namespace polutils
     }
 }
 
-// #endif // EXCEPTIONS_IMPLMENTATION
+#endif // EXCEPTIONS_IMPLMENTATION
