@@ -11,14 +11,6 @@ extern "C" {
 #define STRING_BUILDER_IMPLEMENTATION
 #include "string_builder.h" // string_builder_t, sring_builder_init, string_builder_append, string_builder_empty, string_builder_data, string_builder_delete
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <direct.h> // _mkdir, remove
-#else
-#include <unistd.h> // mkdir, rmdir
-#endif // _WIN32
-
 /**
  * @brief Representation of a type of an entry.
  */
@@ -153,7 +145,15 @@ size_t entry_size(entry_t *entry);
 extern "C" {
 #endif
 
-#include <stdint.h> // SIZE_MAX
+#include <stdio.h> // fprintf, fopen, ftell, fseek, fgetc, feof, ferror, fclose, FILE, SEEK_END, SEEK_SET, EOF, stderr
+#include <stdint.h> // uintmax_t
+#include <limits.h> // LONG_MAX, SIZE_MAX
+
+#ifdef _WIN32
+    #include <direct.h> // _mkdir, remove
+#else
+    #include <unistd.h> // mkdir, rmdir
+#endif // _WIN32
 
 /**
  * @brief Represent a `file_type_t` as a string.
@@ -187,9 +187,9 @@ const char *file_type_to_string(file_type_t file_type)
 static file_type_t _get_file_type(const char *path)
 {
 #ifdef _WIN32
-    DWORD attr = GetFileAttributesA(path);
-    if (attr == INVALID_FILE_ATTRIBUTES) return NONE_TYPE;
-    else if (attr & FILE_ATTRIBUTE_DIRECTORY) return DIRECTORY_TYPE;
+    DWORD attribute = GetFileAttributesA(path);
+    if (attribute == INVALID_FILE_ATTRIBUTES) return NONE_TYPE;
+    else if (attribute & FILE_ATTRIBUTE_DIRECTORY) return DIRECTORY_TYPE;
     return FILE_TYPE;
 #else // _WIN32
     struct stat statbuf;
@@ -224,7 +224,13 @@ entry_t entry_init(path_t path)
  */
 static bool _safe_long_to_size(long value, size_t *result)
 {
-    if (value > SIZE_MAX || value < 0) return false;
+    if (value < 0) return false;
+    #if LONG_MAX > SIZE_MAX
+    if ((uintmax_t)value > (uintmax_t)SIZE_MAX)
+    {
+        return false;
+    }
+    #endif
     *result = (size_t)value;
     return true;
 }
@@ -235,7 +241,8 @@ static bool _safe_long_to_size(long value, size_t *result)
  * @param result Out result parametre.
  * @returns True if the size can be obtained, else false.
  */
-static bool _get_file_size(FILE *file, size_t *result) {
+static bool _get_file_size(FILE *file, size_t *result)
+{
     long current_pos = ftell(file);
     if (fseek(file, 0L, SEEK_END) != 0) return false;
     long size = ftell(file);
