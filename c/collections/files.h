@@ -93,14 +93,16 @@ void files_delete(files_t *files);
 extern "C" {
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdio.h> // fprintf, stderr
+#include <stdlib.h> // malloc, free, NULL
+#include <string.h> // strcmp, strlen
 
 #ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <tchar.h>
-#include <strsafe.h>
+#include <handleapi.h> // INVALID_HANDLE_VALUE, MAX_PATH
+#include <fileapi.h> // FindFirstFile, FindNextFile, WIN32_FIND_DATA, FILE_ATTRIBUTE_DIRECTORY, FindClose
+#include <minwindef.h> // HANDLE
+#include <tchar.h> // ! NEEDED FOR STRSAFE.H
+#include <strsafe.h> // StringCchCopy, StringCbCopy, StringCchCat
 #endif // _WIN32
 
 #ifndef FILES_CAPACITY
@@ -127,7 +129,7 @@ files_t files_init(const char *root)
  */
 files_t files_init_with_capacity(const char *root, size_t capacity)
 {
-    char **files = (char **)malloc(capacity * sizeof(char*));
+    char **files = (char **)malloc(capacity * sizeof(char *));
     if (NULL == files)
     {
         fprintf(stderr, "AllocationError: Can not allocate enough memory for the array of files.\n");
@@ -154,7 +156,7 @@ void files_append(files_t *files, const char *entry)
     {
         files_resize(files);
     }
-    files->files[files->size] = (char*)malloc((strlen(entry) + 1) * sizeof(char));
+    files->files[files->size] = (char *)malloc((strlen(entry) + 1) * sizeof(char));
     if (files->files[files->size] == NULL)
     {
         fprintf(stderr, "ValueError: Can not allocate enough memory for entry: '%s'.\n", entry);
@@ -225,7 +227,8 @@ void files_fit(files_t *files)
 void files_delete(files_t *files)
 {
     if (!files->files) return;
-    for (size_t i = 0; i < files->size; i++) {
+    for (size_t i = 0; i < files->size; ++i)
+    {
         free(files->files[i]);
     }
     free(files->files);
@@ -247,19 +250,24 @@ static bool _get_entries_windows(files_t *files, const char *path)
 {
     char buffer[MAX_PATH] = {0};
     WIN32_FIND_DATA data;
+
     HANDLE find = INVALID_HANDLE_VALUE;
     StringCchCopy(buffer, MAX_PATH, path);
     StringCchCat(buffer, MAX_PATH, "\\*");
     find = FindFirstFile(buffer, &data);
     if (INVALID_HANDLE_VALUE == find) return false;
+
     bool result = true;
-    do {
+    do
+    {
         if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0) continue;
+
         char full_path[MAX_PATH];
         StringCchCopy(full_path, MAX_PATH, path);
         StringCchCat(full_path, MAX_PATH, "\\");
         StringCchCat(full_path, MAX_PATH, data.cFileName);
         files_append(files, full_path);
+
         if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
         {
             if (!_get_entries_windows(files, full_path))
