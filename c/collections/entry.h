@@ -50,6 +50,9 @@ entry_t entry_init(path_t path);
  * @brief Read a file's content into an entry.
  * @param entry Entry to which to set the read content.
  * @returns True if the entry's path can be successfully read, else false.
+ * @exception If the entry's path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the entry's path can not be read, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the entry's content can not be reallocated, an `AllocationError` is printed to standard error and the programme exits after the entry's content is deallocated.
  */
 bool entry_read(entry_t *entry);
 
@@ -57,6 +60,8 @@ bool entry_read(entry_t *entry);
  * @brief Write a given entry's content to a persistant file.
  * @param entry Entry from which to write.
  * @returns True if the entry can be written to a file, else false.
+ * @exception If the entry's path can not be read, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the entry's content can not be reallocated, an `AllocationError` is printed to standard error and the programme exits after the entry's content is deallocated.
  */
 bool entry_write(entry_t *entry);
 
@@ -65,6 +70,8 @@ bool entry_write(entry_t *entry);
  * @param path Path to which to write.
  * @param content Content from which to write.
  * @returns True if the given content can be written to the given path, else false.
+ * @exception If the given path can not be read, an `IOError` is printed to `stderr` and the programme exits after the given content is deallocated.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits after the given content is deallocated.
  */
 bool entry_write_content_to_path(const path_t *path, string_builder_t *content);
 
@@ -72,6 +79,8 @@ bool entry_write_content_to_path(const path_t *path, string_builder_t *content);
  * @brief Create a persistant file on the filesystem.
  * @param entry Entry to create.
  * @returns True if the entry's path can be created on th filesystem, else false.
+ * @exception If the entry's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the entry's path can not be created, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 bool entry_touch(entry_t *entry);
 
@@ -79,6 +88,7 @@ bool entry_touch(entry_t *entry);
  * @brief Create a persistant directory on the filesystem.
  * @param entry Entry to create.
  * @returns True if the entry's path can be created on th filesystem, else false.
+ * @exception If the entry's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 bool entry_make_directory(entry_t *entry);
 
@@ -86,6 +96,8 @@ bool entry_make_directory(entry_t *entry);
  * @brief Generic entry creation dispatch.
  * @param entry Entry to create.
  * @returns True if the entry's path can be created on th filesystem, else false.
+ * @exception If the entry's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the entry's path can not be created, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 bool entry_create(entry_t *entry);
 
@@ -93,6 +105,7 @@ bool entry_create(entry_t *entry);
  * @brief Generic entry removal dispatch.
  * @param entry Entry to remove.
  * @returns True if the entry's path can be removed, else false.
+ * @exception If the entry's path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 bool entry_remove(entry_t *entry);
 
@@ -100,6 +113,7 @@ bool entry_remove(entry_t *entry);
  * @brief Remove directory on the filesystem.
  * @param entry Entry to remove.
  * @returns True if the entry's path can be removed, else false.
+ * @exception If the entry's path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 bool entry_remove_directory(entry_t *entry);
 
@@ -107,6 +121,7 @@ bool entry_remove_directory(entry_t *entry);
  * @brief Remove a file on the filesystem.
  * @param entry Entry to remove.
  * @returns True if the entry's path can be removed, else false.
+ * @exception If the entry's path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 bool entry_remove_file(entry_t *entry);
 
@@ -115,6 +130,10 @@ bool entry_remove_file(entry_t *entry);
  * @param source Source entry from which to copy.
  * @param destination Destination entry to which to copy.
  * @return True if the source entry can be copied to the destination entry, else false.
+ * @exception If the source's path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits after the source and destination entries' content is deallocated.
+ * @exception If the destination's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the source and destination entries' content is deallocated.
+ * @exception If the source's path can not be read, an `IOError` is printed to `stderr` and the programme exits after the source's content is deallocated.
+ * @exception If the destination's content can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the destination's content is deallocated.
  */
 bool entry_copy(entry_t *source, entry_t *destination);
 
@@ -123,6 +142,10 @@ bool entry_copy(entry_t *source, entry_t *destination);
  * @param source Source entry from which to move.
  * @param destination Destination entry to which to move.
  * @return True if the source entry can be moved to the destination entry, else false.
+ * @exception If the source's path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits after the source and destination entries' content is deallocated.
+ * @exception If the destination's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the source and destination entries' content is deallocated.
+ * @exception If the source's path can not be read, an `IOError` is printed to `stderr` and the programme exits after the source's content is deallocated.
+ * @exception If the destination's content can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the destination's content is deallocated.
  */
 bool entry_move(entry_t *source, entry_t *destination);
 
@@ -130,6 +153,9 @@ bool entry_move(entry_t *source, entry_t *destination);
  * @brief Obtain the size of the entry in bytes.
  * @param entry Entry from which to obtain the size.
  * @returns The size of the entry.
+ * @exception If the entry's path does not exist, and the entry can not be created, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the entry can not be read, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the size of the file can not be obtained, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 size_t entry_size(entry_t *entry);
 
@@ -219,7 +245,7 @@ entry_t entry_init(path_t path)
 /**
  * @brief Safely convert a given long value to a size.
  * @param value Long value to convert.
- * @param result Out result parametre.
+ * @param result Variable address where the end result will be stored.
  * @returns True if the value can be converted, else false.
  */
 static bool _safe_long_to_size(long value, size_t *result)
@@ -238,7 +264,7 @@ static bool _safe_long_to_size(long value, size_t *result)
 /**
  * @brief Obtain the size of a given file pointer.
  * @param file Opened file pointer of which to determine the size.
- * @param result Out result parametre.
+ * @param result Variable address where the end result will be stored.
  * @returns True if the size can be obtained, else false.
  */
 static bool _get_file_size(FILE *file, size_t *result)
@@ -255,8 +281,8 @@ static bool _get_file_size(FILE *file, size_t *result)
  * @brief Read the contents of a given path into a given result.
  * @param path Path fromw which to read.
  * @param result Buffer to which to append.
- * @exception If the given path can not be read, an `IOError` is returned.
- * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
+ * @exception If the given path can not be read, an `IOError` is printed to `stderr` and the programme exits after the given result is deallocated.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits after the given result is deallocated.
  */
 void _read_file(const path_t *path, string_builder_t *result)
 {
@@ -282,8 +308,9 @@ void _read_file(const path_t *path, string_builder_t *result)
  * @brief Read a file's content into an entry.
  * @param entry Entry to which to set the read content.
  * @returns True if the entry's path can be successfully read, else false.
- * @exception If the given path can not be read, an `IOError` is returned.
- * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
+ * @exception If the entry's path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the entry's path can not be read, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the entry's content can not be reallocated, an `AllocationError` is printed to standard error and the programme exits after the entry's content is deallocated.
  */
 bool entry_read(entry_t *entry)
 {
@@ -302,6 +329,8 @@ bool entry_read(entry_t *entry)
  * @param path Path to which to write.
  * @param content Content from which to write.
  * @returns True if the given content can be written to the given path, else false.
+ * @exception If the given path can not be read, an `IOError` is printed to `stderr` and the programme exits after the given content is deallocated.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits after the given content is deallocated.
  */
 bool entry_write_content_to_path(const path_t *path, string_builder_t *content)
 {
@@ -322,6 +351,8 @@ bool entry_write_content_to_path(const path_t *path, string_builder_t *content)
  * @brief Write a given entry's content to a persistant file.
  * @param entry Entry from which to write.
  * @returns True if the entry can be written to a file, else false.
+ * @exception If the entry's path can not be read, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the entry's content can not be reallocated, an `AllocationError` is printed to standard error and the programme exits after the entry's content is deallocated.
  */
 bool entry_write(entry_t *entry)
 {
@@ -333,6 +364,10 @@ bool entry_write(entry_t *entry)
  * @param source Source entry from which to copy.
  * @param destination Destination entry to which to copy.
  * @return True if the source entry can be copied to the destination entry, else false.
+ * @exception If the source's path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits after the source and destination entries' content is deallocated.
+ * @exception If the destination's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the source and destination entries' content is deallocated.
+ * @exception If the source's path can not be read, an `IOError` is printed to `stderr` and the programme exits after the source's content is deallocated.
+ * @exception If the destination's content can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the destination's content is deallocated.
  */
 bool entry_copy(entry_t *source, entry_t *destination)
 {
@@ -365,6 +400,10 @@ bool entry_copy(entry_t *source, entry_t *destination)
  * @param source Source entry from which to move.
  * @param destination Destination entry to which to move.
  * @return True if the source entry can be moved to the destination entry, else false.
+ * @exception If the source's path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits after the source and destination entries' content is deallocated.
+ * @exception If the destination's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the source and destination entries' content is deallocated.
+ * @exception If the source's path can not be read, an `IOError` is printed to `stderr` and the programme exits after the source's content is deallocated.
+ * @exception If the destination's content can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the destination's content is deallocated.
  */
 bool entry_move(entry_t *source, entry_t *destination)
 {
@@ -376,6 +415,8 @@ bool entry_move(entry_t *source, entry_t *destination)
  * @brief Create a persistant file on the filesystem.
  * @param entry Entry to create.
  * @returns True if the entry's path can be created on th filesystem, else false.
+ * @exception If the entry's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the entry's path can not be created, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 bool entry_touch(entry_t *entry)
 {
@@ -401,6 +442,7 @@ bool entry_touch(entry_t *entry)
  * @brief Create a persistant directory on the filesystem.
  * @param entry Entry to create.
  * @returns True if the entry's path can be created on th filesystem, else false.
+ * @exception If the entry's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 bool entry_make_directory(entry_t *entry)
 {
@@ -423,6 +465,8 @@ bool entry_make_directory(entry_t *entry)
  * @brief Generic entry creation dispatch.
  * @param entry Entry to create.
  * @returns True if the entry's path can be created on th filesystem, else false.
+ * @exception If the entry's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the entry's path can not be created, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 bool entry_create(entry_t *entry)
 {
@@ -443,6 +487,7 @@ bool entry_create(entry_t *entry)
  * @brief Remove directory on the filesystem.
  * @param entry Entry to remove.
  * @returns True if the entry's path can be removed, else false.
+ * @exception If the entry's path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 bool entry_remove_directory(entry_t *entry)
 {
@@ -465,6 +510,7 @@ bool entry_remove_directory(entry_t *entry)
  * @brief Remove a file on the filesystem.
  * @param entry Entry to remove.
  * @returns True if the entry's path can be removed, else false.
+ * @exception If the entry's path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 bool entry_remove_file(entry_t *entry)
 {
@@ -482,6 +528,7 @@ bool entry_remove_file(entry_t *entry)
  * @brief Generic entry removal dispatch.
  * @param entry Entry to remove.
  * @returns True if the entry's path can be removed, else false.
+ * @exception If the entry's path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 bool entry_remove(entry_t *entry)
 {
@@ -502,6 +549,9 @@ bool entry_remove(entry_t *entry)
  * @brief Obtain the size of the entry in bytes.
  * @param entry Entry from which to obtain the size.
  * @returns The size of the entry.
+ * @exception If the entry's path does not exist, and the entry can not be created, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the entry can not be read, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the size of the file can not be obtained, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 size_t entry_size(entry_t *entry)
 {
