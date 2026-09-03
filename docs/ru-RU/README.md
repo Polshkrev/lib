@@ -16,6 +16,7 @@
         2. [Строка](/docs/ru-RU/c/collections/string.md)
         3. [Буфер](/docs/ru-RU/c/collections/buffer.md)
         4. [Запись](/docs/ru-RU/c/collections/entry.md)
+        5. [Файлы](/docs/ru-RU/c/collections/files.md)
 3. CPP
     1. [Версия](/docs/ru-RU/cpp/version.md)
     2. [Ошибка](/docs/ru-RU/cpp/exception.md)
