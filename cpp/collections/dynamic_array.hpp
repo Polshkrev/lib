@@ -2,7 +2,7 @@
 #define DYNAMIC_ARRAY_HPP
 
 #define ARRAY_IMPLEMENTATION
-#include "array.hpp" // array_t, array_t::_resize
+#include "array.hpp" // array_t
 
 namespace polutils
 {

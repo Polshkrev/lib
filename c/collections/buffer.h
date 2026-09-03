@@ -13,6 +13,7 @@ extern "C" {
  * @brief Allocate a new region of memory.
  * @param size Additional size — in bytes — to allocate.
  * @returns A pointer to the allocated region of memory.
+ * @returns If the given size delta is greater than the capacity, `NULL` is returned.
  */
 void *buffer_allocate(size_t size);
 
@@ -20,6 +21,7 @@ void *buffer_allocate(size_t size);
  * @brief Duplicate a string into a static memory buffer.
  * @param string String from which to copy.
  * @returns A duplicate of the original given string.
+ * @exception If the internal allocation is `NULL`, an `AllocationError` is printed `stderr` and the programme exits.
  */
 char *buffer_duplicate(const char *string);
 
@@ -27,6 +29,8 @@ char *buffer_duplicate(const char *string);
  * @brief Obtain a pointer to a formated string.
  * @param format String format.
  * @returns A pointer to a new formated string.
+ * @exception If the total amount of bytes written is less than zero, an `AllocationError` is printed `stderr` and the programme exits.
+ * @exception If the internal allocation is `NULL`, an `AllocationError` is printed `stderr` and the programme exits.
  */
 char *buffer_sprintf(const char *format, ...);
 
@@ -68,22 +72,23 @@ extern "C" {
 #define TEMP_CAPACITY (5*1024)
 #endif // TEMP_CAPACITY
 
-static size_t temp_size = 0;
-static char temp_buffer[TEMP_CAPACITY] = {0};
+static size_t __temp_size = 0;
+static char __temp_buffer[TEMP_CAPACITY] = {0};
 
 /**
  * @brief Allocate a new region of memory.
  * @param size Additional size — in bytes — to allocate.
  * @returns A pointer to the allocated region of memory.
+ * @returns If the given size delta is greater than the capacity, `NULL` is returned.
  */
 void *buffer_allocate(size_t size)
 {
-    if (temp_size + size > TEMP_CAPACITY)
+    if (__temp_size + size > TEMP_CAPACITY)
     {
         return NULL;
     }
-    void *result = &temp_buffer[temp_size];
-    temp_size += size;
+    void *result = &__temp_buffer[__temp_size];
+    __temp_size += size;
     return result;
 }
 
@@ -91,6 +96,7 @@ void *buffer_allocate(size_t size)
  * @brief Duplicate a string into a static memory buffer.
  * @param string String from which to copy.
  * @returns A duplicate of the original given string.
+ * @exception If the internal allocation is `NULL`, an `AllocationError` is printed `stderr` and the programme exits.
  */
 char *buffer_duplicate(const char *string)
 {
@@ -110,6 +116,8 @@ char *buffer_duplicate(const char *string)
  * @brief Obtain a pointer to a formated string.
  * @param format String format.
  * @returns A pointer to a new formated string.
+ * @exception If the total amount of bytes written is less than zero, an `AllocationError` is printed `stderr` and the programme exits.
+ * @exception If the internal allocation is `NULL`, an `AllocationError` is printed `stderr` and the programme exits.
  */
 char *buffer_sprintf(const char *format, ...)
 {
@@ -140,7 +148,7 @@ char *buffer_sprintf(const char *format, ...)
  */
 size_t buffer_save(void)
 {
-    return temp_size;
+    return __temp_size;
 }
 
 /**
@@ -149,7 +157,7 @@ size_t buffer_save(void)
  */
 void buffer_rewind(size_t checkpoint)
 {
-    temp_size = checkpoint;
+    __temp_size = checkpoint;
 }
 
 /**
@@ -157,7 +165,7 @@ void buffer_rewind(size_t checkpoint)
  */
 void buffer_reset(void)
 {
-    temp_size = 0;
+    __temp_size = 0;
 }
 
 #if defined(__cplusplus)
