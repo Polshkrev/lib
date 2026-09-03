@@ -52,7 +52,7 @@ namespace polutils
              * @brief Obtain the file extension of the path.
              * @returns The associated string extension of the path.
              */
-            const charextension(void) const;
+            const char *extension(void) const;
 
             /**
              * @brief Obtain the parent directory of the given path.
