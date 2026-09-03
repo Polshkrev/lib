@@ -125,7 +125,7 @@ namespace
 #endif // _WIN32
 
 #define EXCEPTIONS_IMPLEMENTATION
-#include "exceptions.hpp"
+#include "exceptions.hpp" // IOError
 
 namespace
 {
