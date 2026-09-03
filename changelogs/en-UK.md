@@ -1,4 +1,35 @@
 # Changelog
+## v0.28.0 - 2026-09-03
+`Added`
+- C
+    - All include traces have been added.
+- CPP
+    - All include traces have been added.
+    - `path`
+        - The `filename` and `extension` methods have been added.
+
+`Changed`
+- C
+    - Removed `windows.h` from all files in favour of the more specific includes needed within the library.
+    - `logger`
+        - Within the `log` function, in the unlikely case of an unknown logging level being passed into the function, the message will not be logged.
+    - `collections`
+        - `string_builder`
+            - In the function `string_builder_fit`, if the capacity of the string builder is `less than or equal` to the current size, the function does nothing. This is to avoid an additional allocation.
+- CPP
+    - Removed `windows.h` from all files in favour of the more specific includes needed within the library.
+    - `path`
+        - The `absolute` method no longer throws an exception if the path does not exist.
+
+`Fixed`
+- C
+    - `logger`
+        - The previously private static variable `output_count`, has been added to the logger structure. All previous behaviour remains the same.
+- CPP
+    - `logger`
+        - The previously private static variable `output_count`, has been added to the logger structure. All previous behaviour remains the same.
+    - `path`
+        - The `parent` method no longer uses the absolute path.
 ## v0.27.0 - 2026-07-24
 `Added`
 - C
