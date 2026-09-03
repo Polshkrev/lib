@@ -57,7 +57,7 @@ namespace polutils
 
             /**
              * @brief Overload to interface with the parent exception class.
-             * @return a const c string.
+             * @return A const c string.
              */
             const char *what() const noexcept override;
     };
@@ -133,7 +133,7 @@ namespace polutils
 
     /**
      * @brief Overload to interface with the parent exception class.
-     * @return a const c string.
+     * @return A const c string.
      */
     const char *Exception::what() const noexcept
     {

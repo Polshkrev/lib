@@ -35,7 +35,7 @@ typedef struct
 /**
  * @brief Represent a logging level as a string.
  * @param level LoggingLevel to represent as a string.
- * @returns If the given logging level is not available, the function returns NULL; else a string representation of the given level is returned.s
+ * @returns If the given logging level is not available, the function returns `NULL`; else a string representation of the given level is returned.
  */
 const char *lltostr(LoggingLevel level);
 
@@ -141,7 +141,7 @@ static char timestamp[FORMAT_BUFFER_SIZE] = {0};
 /**
  * @brief Represent a logging level as a string.
  * @param level LoggingLevel to represent as a string.
- * @returns If the given logging level is not available, the function returns NULL; else a string representation of the given level is returned.s
+ * @returns If the given logging level is not available, the function returns `NULL`; else a string representation of the given level is returned.
  */
 const char *lltostr(LoggingLevel level)
 {
