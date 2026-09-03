@@ -33,7 +33,7 @@ namespace polutils
          * @brief Represent a logging level as a string.
          * @param level LoggingLevel to represent as a string.
          * @returns A string representation of the given level is returned.
-         * @exception If the given logging level is not available, a `UnreachableError` is thrown; else a string representation of the given level is returned.
+         * @exception If the given logging level is not available, a `UnreachableError` is thrown.
          */
         const char *lltostr(level_t level);
 
@@ -196,7 +196,7 @@ namespace polutils
          * @brief Represent a logging level as a string.
          * @param level LoggingLevel to represent as a string.
          * @returns A string representation of the given level is returned.
-         * @exception If the given logging level is not available, a `UnreachableError` is thrown; else a string representation of the given level is returned.
+         * @exception If the given logging level is not available, a `UnreachableError` is thrown.
          */
         const char *lltostr(level_t level)
         {

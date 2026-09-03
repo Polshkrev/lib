@@ -46,13 +46,13 @@ namespace polutils
              * @brief Obtain the base filename of the path.
              * @returns The base filename of the path.
              */
-            path_t filename(void) const;
+            path_t filename(void) const noexcept;
 
             /**
              * @brief Obtain the file extension of the path.
              * @returns The associated string extension of the path.
              */
-            const char *extension(void) const;
+            const char *extension(void) const noexcept;
 
             /**
              * @brief Obtain the parent directory of the given path.
@@ -60,7 +60,7 @@ namespace polutils
              * @exception If the given path does not exist, a `FileNotFoundError` is thrown.
              * @exception If the absolute path value can not be obtained, an `IOError` is thrown.
              */
-            path_t parent(void) const;
+            path_t parent(void) const noexcept;
 
             /**
              * @brief Obtain the root of the filesystem.
@@ -125,7 +125,7 @@ namespace
 #endif // _WIN32
 
 #define EXCEPTIONS_IMPLEMENTATION
-#include "exceptions.hpp"
+#include "exceptions.hpp" // IOError
 
 namespace
 {
@@ -235,15 +235,16 @@ namespace polutils
          * @brief Obtain the base filename of the path.
          * @returns The base filename of the path.
          */
-        path_t path_t::filename(void) const
+        path_t path_t::filename(void) const noexcept
         {
         #ifndef _WIN32
-            if (!path->raw || !*path->raw) return path_from(".");
-            char *string = strdupa(path->raw);
+            const char *raw = __path.c_str();
+            if (!raw || !*raw) return path_t(".");
+            char *string = strdupa(raw);
             size_t i = strlen(string) - 1;
             for (; i && string[i] == PATH_SEPERATOR; i--) string[i] = 0;
             for (; i && string[i-1] != PATH_SEPERATOR; i--);
-            return path_from(string + i);
+            return path_t(string + i);
         #else
             static char filename[_MAX_FNAME] = {0};
             errno_t result = _splitpath_s(to_string(), NULL, 0, NULL, 0, filename, _MAX_FNAME, NULL, 0);
@@ -257,10 +258,10 @@ namespace polutils
          * @brief Obtain the file extension of the path.
          * @returns The associated string extension of the path.
          */
-        const char *path_t::extension(void) const
+        const char *path_t::extension(void) const noexcept
         {
         #ifndef _WIN32
-            return strrchr(passtr(path), ".");
+            return strrchr(to_string(), ".");
         #else
             static char extension[_MAX_EXT + 1] = {0};
             errno_t result = _splitpath_s(to_string(), NULL, 0, NULL, 0, NULL, 0, extension, _MAX_EXT);
@@ -276,7 +277,7 @@ namespace polutils
          * @exception If the given path does not exist, a `FileNotFoundError` is thrown.
          * @exception If the absolute path value can not be obtained, an `IOError` is thrown.
          */
-        path_t path_t::parent(void) const
+        path_t path_t::parent(void) const noexcept
         {
             ssize_t last_stroke = _find_last_stroke(to_string());
             if (last_stroke < 0)
