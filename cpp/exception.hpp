@@ -57,7 +57,7 @@ namespace polutils
 
             /**
              * @brief Overload to interface with the parent exception class.
-             * @return a const c string.
+             * @return A const c string.
              */
             const char *what() const noexcept override;
     };
@@ -75,7 +75,7 @@ namespace polutils
 #ifdef EXCEPTION_IMPLEMENTATION
 
 #define BUFFER_IMPLEMENTATION
-#include "../c/collections/buffer.h"
+#include "../c/collections/buffer.h" // bufer_save, buffer_sprintf, buffer_rewind
 
 namespace polutils
 {
@@ -133,7 +133,7 @@ namespace polutils
 
     /**
      * @brief Overload to interface with the parent exception class.
-     * @return a const c string.
+     * @return A const c string.
      */
     const char *Exception::what() const noexcept
     {

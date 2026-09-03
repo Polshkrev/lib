@@ -6,10 +6,7 @@
 #include <string> // std::string
 
 #define PATH_IMPLEMENTATION
-#include "../path.hpp"
-
-#include "printable.hpp"
-
+#include "../path.hpp" // path_t
 
 namespace polutils
 {
@@ -175,15 +172,15 @@ namespace polutils
 
 #ifdef ENTRY_IMPLEMENTATION
 
+#include <cstdio> // std::fopen, std::fclose, std::remove, std::FILE
+
 #include <sstream> // std::stringstream
 #include <fstream> // std::ifstream
 
 #ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <direct.h>
+#include <direct.h> // _mkdir
 #else
-#include <sys/stat.h>
+#include <sys/stat.h> // mkdir
 #endif // _WIN32
 
 namespace
@@ -262,12 +259,12 @@ namespace polutils
             {
                 throw IOError("Can not touch a directory: %s.", __path.to_string());
             }
-            FILE *file = fopen(__path.to_string(), "w");
+            std::FILE *file = std::fopen(__path.to_string(), "w");
             if (nullptr == file)
             {
                 throw IOError("Can not open file: %s.", __path.to_string());
             }
-            fclose(file);
+            std::fclose(file);
         }
 
         /**
@@ -287,6 +284,7 @@ namespace polutils
                 throw IOError("Can not touch a directory: %s.", __path.to_string());
             }
         #ifdef _WIN32
+            // direct.h
             int result = _mkdir(__path.to_string());
         #else
             int result = mkdir(passtr(entry->path), 0755);

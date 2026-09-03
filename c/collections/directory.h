@@ -6,7 +6,7 @@
 #endif // DIRECTORY_CAPACITY
 
 #define ENTRY_IMPLEMENTATION
-#include "entry.h"
+#include "entry.h" // entry_t, 
 
 /**
  * @brief Representation of a directory on the filesystem.
@@ -23,7 +23,6 @@ typedef struct
  * @brief Construct a new directory at a given root.
  * @param root Root of the directory.
  * @returns A pointer to a directory at a given root.
- * @exception If the directory can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  * @exception If the underlying entry array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 directory_t directory_init(path_t root);
@@ -32,7 +31,6 @@ directory_t directory_init(path_t root);
  * @brief Construct a new directory at a given root with a given initial capacity.
  * @param root Root of the directory.
  * @returns A pointer to a directory at a given root with a given capacity.
- * @exception If the directory can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  * @exception If the underlying entry array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 directory_t directory_init_with_capacity(path_t root, size_t capacity);
@@ -88,17 +86,13 @@ void directory_delete(directory_t *directory);
 
 #ifdef DIRECTORY_IMPLEMENTATION
 
-#define FILES_IMPLEMENTATION
-#include "files.h"
-
-#define _GNU_SOURCE
-#include <string.h>
+#include <stdio.h> // fprintf, stderr
+#include <stdlib.h> // malloc, realloc, free, exit, NULL
 
 /**
  * @brief Construct a new directory at a given root.
  * @param root Root of the directory.
  * @returns A pointer to a directory at a given root.
- * @exception If the directory can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  * @exception If the underlying entry array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 directory_t directory_init(path_t root)
@@ -110,7 +104,6 @@ directory_t directory_init(path_t root)
  * @brief Construct a new directory at a given root with a given initial capacity.
  * @param root Root of the directory.
  * @returns A pointer to a directory at a given root with a given capacity.
- * @exception If the directory can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  * @exception If the underlying entry array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 directory_t directory_init_with_capacity(path_t root, size_t capacity)

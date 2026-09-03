@@ -80,8 +80,6 @@ path_t path_append_to(const char *destination, const path_t *source);
  * @brief Obtain the parent directory of the given path.
  * @param path Path from which a parent directory is obtained.
  * @returns A new path constructed from the parent directory of the given path.
- * @exception If the given path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits.
- * @exception If the absolute path value can not be obtained, an `IOError` is printed to `stderr` and the programme exits.
  */
 path_t path_get_parent(const path_t *path);
 
@@ -89,6 +87,8 @@ path_t path_get_parent(const path_t *path);
  * @brief Obtain the root of the filesystem.
  * @param path Path from which to obtain its root.
  * @returns A new path containing the root of the filesystem. If the root can not be obtained the original unchanged path is returned.
+ * @exception If the given path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits.
+ * @exception If the absolute path value can not be obtained, an `IOError` is printed to `stderr` and the programme exits.
  */
 path_t path_get_root(const path_t *path);
 
@@ -125,16 +125,13 @@ extern "C" {
 #include <stddef.h> // size_t
 
 #ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <tchar.h>
-#include <strsafe.h>
-// #include <minwinbase.h> // DWORD
-// #include <winbase.h> // CopyFile
-// #include <fileapi.h> // GetFullPathName, GetFileAttributes, INVALID_FILE_ATTRIBUTES
-// #include <errhandlingapi.h> // GetLastError
+    #include <minwindef.h> // DWORD
+    #include <tchar.h> // ! NEEDED FOR STRSAFE.H
+    #include <strsafe.h> // StringCbPrintf
+    #include <fileapi.h> // GetFullPathName, GetFileAttributes, INVALID_FILE_ATTRIBUTES
+    #include <errhandlingapi.h> // GetLastError
 #else
-#include <sys/stat.h> // struct stat, stat, S_ISDIR
+    #include <sys/stat.h> // struct stat, stat, S_ISDIR
 #endif // _WIN32
 
 #ifdef _WIN32
@@ -294,8 +291,6 @@ static ssize_t _find_last_stroke(const char *path)
  * @brief Obtain the parent directory of the given path.
  * @param path Path from which a parent directory is obtained.
  * @returns A new path constructed from the parent directory of the given path.
- * @exception If the given path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits.
- * @exception If the absolute path value can not be obtained, an `IOError` is printed to `stderr` and the programme exits.
  */
 path_t path_get_parent(const path_t *path)
 {
@@ -333,6 +328,8 @@ static ssize_t _find_first_stroke(const char *path)
  * @brief Obtain the root of the filesystem.
  * @param path Path from which to obtain its root.
  * @returns A new path containing the root of the filesystem. If the root can not be obtained the original unchanged path is returned.
+ * @exception If the given path does not exist, a `FileNotFoundError` is printed to `stderr` and the programme exits.
+ * @exception If the absolute path value can not be obtained, an `IOError` is printed to `stderr` and the programme exits.
  */
 path_t path_get_root(const path_t *path)
 {

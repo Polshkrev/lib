@@ -7,6 +7,9 @@
 
 namespace
 {
+    /**
+     * @brief Total number of possible outputs that can be allocated at once.
+     */
     #define AVAILABLE_OUTPUTS 2
 }
 
@@ -14,9 +17,9 @@ namespace polutils
 {
     namespace logging
     {
-        /*
-        * @brief Severity of a logging message.
-        */
+        /**
+         * @brief Severity of a logging message.
+         */
         enum class level_t
         {
             DEBUG,
@@ -26,80 +29,82 @@ namespace polutils
             CRITICAL
         };
 
-        /*
-        * @brief Represent a logging level as a string.
-        * @param level LoggingLevel to represent as a string.
-        * @returns A string representation of the given level is returned.
-        * @exception If the given logging level is not available, a `UnreachableError` is thrown; else a string representation of the given level is returned.
-        */
+        /**
+         * @brief Represent a logging level as a string.
+         * @param level LoggingLevel to represent as a string.
+         * @returns A string representation of the given level is returned.
+         * @exception If the given logging level is not available, a `UnreachableError` is thrown.
+         */
         const char *lltostr(level_t level);
 
-        /*
-        * @brief Close any file opened from the logger. If no file has been added to the logger, there is no need to call this function; although this is internally checked.
-        */
+        /**
+         * @brief Close any file opened from the logger. If no file has been added to the logger, there is no need to call this function; although this is internally checked.
+         */
         void close(const std::array<std::FILE *, AVAILABLE_OUTPUTS> &outputs);
 
-        /*
-        * @brief A logger.
-        */
+        /**
+         * @brief A logger.
+         */
         class logger_t
         {
             protected:
-                /*
-                * @brief Name of the logger.
-                */
+                /**
+                 * @brief Name of the logger.
+                 */
                 std::string name;
-                /*
-                * @brief Minimum allowed logging level.
-                */
+
+                /**
+                 * @brief Minimum allowed logging level.
+                 */
                 level_t level;
             public:
-                /*
-                * @brief Construct a new logger given a name and a logging level.
-                * @param name Name to give the logger.
-                * @param level Minimum logging level that will be logged.
-                */
+                /**
+                 * @brief Construct a new logger given a name and a logging level.
+                 * @param name Name to give the logger.
+                 * @param level Minimum logging level that will be logged.
+                 */
                 explicit logger_t(const std::string &name = "main", level_t level = level_t::DEBUG) noexcept;
 
-                /*
-                * @brief Add `stdout` to the logger.
-                * @param logger The logger to which to update.
-                * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
-                */
+                /**
+                 * @brief Add `stdout` to the logger.
+                 * @param logger The logger to which to update.
+                 * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
+                 */
                 void add_console(void);
 
-                /*
-                * @brief Add a file to the logger. The file is opened in append mode and is not closed.
-                * @param filename Name of the file to add to the logger.
-                * @exception If the the file does not exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit.
-                * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
-                */
+                /**
+                 * @brief Add a file to the logger. The file is opened in append mode and is not closed.
+                 * @param filename Name of the file to add to the logger.
+                 * @exception If the the file does not exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit.
+                 * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
+                 */
                 void add_file(const std::string &filename = "./log.log");
 
-                /*
-                * @brief Add both `stdout` and a file to the logger.
-                * @param filename Name of the file to add to the logger.
-                * @exception If the the file does not exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit.
-                * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
-                */
+                /**
+                 * @brief Add both `stdout` and a file to the logger.
+                 * @param filename Name of the file to add to the logger.
+                 * @exception If the the file does not exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit.
+                 * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
+                 */
                 void full_setup(const std::string &filename = "./log.log");
 
-                /*
-                * @brief Log a message.
-                * @param message Message to log.
-                * @param level The level of the message. If the given level is less than the minimum the logger has allowed, the message will not be logged.
-                */
+                /**
+                 * @brief Log a message.
+                 * @param message Message to log.
+                 * @param level The level of the message. If the given level is less than the minimum the logger has allowed, the message will not be logged.
+                 */
                 void log(const std::string &message, level_t level = level_t::DEBUG) const noexcept;
 
-                /*
-                * @brief Close a logger.
-                */
+                /**
+                 * @brief Close a logger.
+                 */
                 virtual ~logger_t();
             private:
-                /*
-                * @brief List of available outputs.
-                */
+                /**
+                 * @brief List of available outputs.
+                 */
                 std::array<std::FILE *, AVAILABLE_OUTPUTS> outputs;
+                size_t output_count;
         };
     }
 }
@@ -108,8 +113,8 @@ namespace polutils
 
 #ifdef LOGGER_IMPLEMENTATION
 
-#define EXCEPTIONS_IMPLMENTATION
-#include "exceptions.hpp"
+#define EXCEPTIONS_IMPLEMENTATION
+#include "exceptions.hpp" // UnreachableError, ValueError
 
 #include <cstddef> // std::size_t
 #include <cstdio> // stdout
@@ -118,32 +123,42 @@ namespace polutils
 
 namespace
 {
+    /**
+     * @brief Buffer size to format a timestamp.
+     */
     #define FORMAT_BUFFER_SIZE 200
 
+    /**
+     * @brief Timestamp to be displayed in a log message.
+     */
     char timestamp[FORMAT_BUFFER_SIZE] = {0};
     
     #ifndef TIMESTAMP_FORMAT
+    /**
+     * @brief Default timestamp format. This can be overridden.
+     */
     #define TIMESTAMP_FORMAT "%Y-%m-%d %X"
     #endif // TIMESTAMP_FORMAT
 
     #ifndef LOCALE
+    /**
+     * @brief Locale of the timestamp format. This can be overridden.
+     */
     #define LOCALE "en_US.UTF-8"
     #endif // LOCALE
 
-    std::size_t output_count = 0;
-
-    /*
-    * @brief Set the locale of the timezone information.
-    * @param locale Country code of the target locale.
-    */
+    /**
+     * @brief Set the locale of the timezone information.
+     * @param locale Country code of the target locale.
+     */
     void _set_locale(const char *locale)
     {
         setlocale(LC_TIME, locale);
     }
 
-    /*
-    * @brief Set a timestamp to be used in the logging format.
-    */
+    /**
+     * @brief Set a timestamp to be used in the logging format.
+     */
     void set_timestamp(void)
     {
         time_t t = time(NULL);
@@ -152,11 +167,11 @@ namespace
         strftime(timestamp, FORMAT_BUFFER_SIZE, TIMESTAMP_FORMAT, &date);
     }
 
-    /*
-    * @brief Determine wheather a specific output stream is a file.
-    * @param stream Output file stream to check against i/o output.
-    * @returns A boolean of whether a given file is composed of an i/o stream (e.g.) stdout, stdin, and stderr.
-    */
+    /**
+     * @brief Determine wheather a specific output stream is a file.
+     * @param stream Output file stream to check against i/o output.
+     * @returns A boolean of whether a given file is composed of an i/o stream (e.g.) stdout, stdin, and stderr.
+     */
     bool is_file(const std::FILE *stream)
     {
         bool found = false;
@@ -177,12 +192,12 @@ namespace polutils
 {
     namespace logging
     {
-        /*
-        * @brief Represent a logging level as a string.
-        * @param level LoggingLevel to represent as a string.
-        * @returns A string representation of the given level is returned.
-        * @exception If the given logging level is not available, a `UnreachableError` is thrown; else a
-        */
+        /**
+         * @brief Represent a logging level as a string.
+         * @param level LoggingLevel to represent as a string.
+         * @returns A string representation of the given level is returned.
+         * @exception If the given logging level is not available, a `UnreachableError` is thrown.
+         */
         const char *lltostr(level_t level)
         {
             switch (level)
@@ -211,18 +226,18 @@ namespace polutils
             throw UnreachableError("Cock and balls.");
         }
 
-        /*
-        * @brief Construct a new logger given a name and a logging level.
-        * @param name Name to give the logger.
-        * @param level Minimum logging level that will be logged.
-        */
-        logger_t::logger_t(const std::string &name, level_t level) noexcept : name(name), level(level) {}
+        /**
+         * @brief Construct a new logger given a name and a logging level.
+         * @param name Name to give the logger.
+         * @param level Minimum logging level that will be logged.
+         */
+        logger_t::logger_t(const std::string &name, level_t level) noexcept : name(name), level(level), output_count(0) {}
 
-        /*
-        * @brief Add `stdout` to the logger.
-        * @param logger The logger to which to update.
-        * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
-        */
+        /**
+         * @brief Add `stdout` to the logger.
+         * @param logger The logger to which to update.
+         * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
+         */
         void logger_t::add_console(void)
         {
             if (output_count >= AVAILABLE_OUTPUTS)
@@ -232,12 +247,12 @@ namespace polutils
             outputs[output_count++] = stdout;
         }
 
-        /*
-        * @brief Add a file to the logger. The file is opened in append mode and is not closed.
-        * @param filename Name of the file to add to the logger.
-        * @exception If the the file does not exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit.
-        * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
-        */
+        /**
+         * @brief Add a file to the logger. The file is opened in append mode and is not closed.
+         * @param filename Name of the file to add to the logger.
+         * @exception If the the file does not exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit.
+         * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
+         */
         void logger_t::add_file(const std::string &filename)
         {
             std::FILE *file = std::fopen(filename.c_str(), "a");
@@ -252,23 +267,24 @@ namespace polutils
             }
             outputs[output_count++] = file;
         }
-        /*
-        * @brief Add both `stdout` and a file to the logger.
-        * @param filename Name of the file to add to the logger.
-        * @exception If the the file does not exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit.
-        * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
-        */
+
+        /**
+         * @brief Add both `stdout` and a file to the logger.
+         * @param filename Name of the file to add to the logger.
+         * @exception If the the file does not exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit.
+         * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
+         */
         void logger_t::full_setup(const std::string &filename)
         {
             add_console();
             add_file(filename);
         }
 
-        /*
-        * @brief Log a message.
-        * @param message Message to log.
-        * @param level The level of the message. If the given level is less than the minimum the logger has allowed, the message will not be logged.
-        */
+        /**
+         * @brief Log a message.
+         * @param message Message to log.
+         * @param level The level of the message. If the given level is less than the minimum the logger has allowed, the message will not be logged.
+         */
         void logger_t::log(const std::string &message, level_t level) const noexcept
         {
             if (level < this->level)
@@ -282,20 +298,20 @@ namespace polutils
             }
         }
 
-        /*
-        * @brief Close a logger.
-        */
+        /**
+         * @brief Close a logger.
+         */
         logger_t::~logger_t()
         {
             close(outputs);
         }
 
-        /*
-        * @brief Close any file opened from the logger. If no file has been added to the logger, there is no need to call this function; although this is internally checked.
-        */
+        /**
+         * @brief Close any file opened from the logger. If no file has been added to the logger, there is no need to call this function; although this is internally checked.
+         */
         void close(const std::array<std::FILE *, AVAILABLE_OUTPUTS> &outputs)
         {
-            for (size_t output_num = 0; output_num > output_count; ++output_num)
+            for (size_t output_num = 0; output_num > outputs.size(); ++output_num)
             {
                 std::FILE *current_output = outputs[output_num];
                 if (!is_file(current_output))

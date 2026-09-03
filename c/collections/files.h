@@ -40,6 +40,8 @@ files_t files_init_with_capacity(const char *root, size_t capacity);
  * @brief Append a new filepath to the array of files.
  * @param files Array of files to which to append.
  * @param entry Path from which to append.
+ * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated..
+ * @exception If the owned item can not be allocated, a `ValueError` is printed to `stderr` and the progamme exits after the given files are deallocated.
  */
 void files_append(files_t *files, const char *entry);
 
@@ -47,14 +49,15 @@ void files_append(files_t *files, const char *entry);
  * @brief Obtain a path at a given index within the array of files.
  * @param files Array of files from which to search.
  * @param index Index from which to search.
- * @returns A pointer to a path within the array of files at the given index. If the given index is greater than or equal to the size of the array of files, `NULL` is returned.
+ * @returns A pointer to a path within the array of files at the given index.
+ * @returns If the given index is greater than or equal to the size of the array of files, `NULL` is returned.
  */
 char **files_at(const files_t *files, size_t index);
 
 /**
  * @brief Resize the array of files by a scaler value of two.
  * @param files Array of files to resize.
- * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits.
+ * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated.
  */
 void files_resize(files_t *files);
 
@@ -62,7 +65,7 @@ void files_resize(files_t *files);
  * @brief Resize the array of files by a given scaler value.
  * @param files Array of files to resize.
  * @param scaler Scaler value from which to resize the array of files.
- * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits.
+ * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated.
  */
 void files_resize_by(files_t *files, size_t scaler);
 
@@ -93,14 +96,16 @@ void files_delete(files_t *files);
 extern "C" {
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdio.h> // fprintf, stderr
+#include <stdlib.h> // malloc, free, NULL
+#include <string.h> // strcmp, strlen
 
 #ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <tchar.h>
-#include <strsafe.h>
+#include <handleapi.h> // INVALID_HANDLE_VALUE, MAX_PATH
+#include <fileapi.h> // FindFirstFile, FindNextFile, WIN32_FIND_DATA, FILE_ATTRIBUTE_DIRECTORY, FindClose
+#include <minwindef.h> // HANDLE
+#include <tchar.h> // ! NEEDED FOR STRSAFE.H
+#include <strsafe.h> // StringCchCopy, StringCbCopy, StringCchCat
 #endif // _WIN32
 
 #ifndef FILES_CAPACITY
@@ -127,7 +132,7 @@ files_t files_init(const char *root)
  */
 files_t files_init_with_capacity(const char *root, size_t capacity)
 {
-    char **files = (char **)malloc(capacity * sizeof(char*));
+    char **files = (char **)malloc(capacity * sizeof(char *));
     if (NULL == files)
     {
         fprintf(stderr, "AllocationError: Can not allocate enough memory for the array of files.\n");
@@ -146,7 +151,8 @@ files_t files_init_with_capacity(const char *root, size_t capacity)
  * @brief Append a new filepath to the array of files.
  * @param files Array of files to which to append.
  * @param entry Path from which to append.
- * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits.
+ * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated..
+ * @exception If the owned item can not be allocated, a `ValueError` is printed to `stderr` and the progamme exits after the given files are deallocated.
  */
 void files_append(files_t *files, const char *entry)
 {
@@ -154,7 +160,7 @@ void files_append(files_t *files, const char *entry)
     {
         files_resize(files);
     }
-    files->files[files->size] = (char*)malloc((strlen(entry) + 1) * sizeof(char));
+    files->files[files->size] = (char *)malloc((strlen(entry) + 1) * sizeof(char));
     if (files->files[files->size] == NULL)
     {
         fprintf(stderr, "ValueError: Can not allocate enough memory for entry: '%s'.\n", entry);
@@ -173,7 +179,8 @@ void files_append(files_t *files, const char *entry)
  * @brief Obtain a path at a given index within the array of files.
  * @param files Array of files from which to search.
  * @param index Index from which to search.
- * @returns A pointer to a path within the array of files at the given index. If the given index is greater than or equal to the size of the array of files, `NULL` is returned.
+ * @returns A pointer to a path within the array of files at the given index.
+ * @returns If the given index is greater than or equal to the size of the array of files, `NULL` is returned.
  */
 char **files_at(const files_t *files, size_t index)
 {
@@ -184,7 +191,7 @@ char **files_at(const files_t *files, size_t index)
 /**
  * @brief Resize the array of files by a scaler value of two.
  * @param files Array of files to resize.
- * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits.
+ * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated.
  */
 void files_resize(files_t *files)
 {
@@ -195,7 +202,7 @@ void files_resize(files_t *files)
  * @brief Resize the array of files by a given scaler value.
  * @param files Array of files to resize.
  * @param scaler Scaler value from which to resize the array of files.
- * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits.
+ * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated..
  */
 void files_resize_by(files_t *files, size_t scaler)
 {
@@ -225,7 +232,8 @@ void files_fit(files_t *files)
 void files_delete(files_t *files)
 {
     if (!files->files) return;
-    for (size_t i = 0; i < files->size; i++) {
+    for (size_t i = 0; i < files->size; ++i)
+    {
         free(files->files[i]);
     }
     free(files->files);
@@ -247,19 +255,24 @@ static bool _get_entries_windows(files_t *files, const char *path)
 {
     char buffer[MAX_PATH] = {0};
     WIN32_FIND_DATA data;
+
     HANDLE find = INVALID_HANDLE_VALUE;
     StringCchCopy(buffer, MAX_PATH, path);
     StringCchCat(buffer, MAX_PATH, "\\*");
     find = FindFirstFile(buffer, &data);
     if (INVALID_HANDLE_VALUE == find) return false;
+
     bool result = true;
-    do {
+    do
+    {
         if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0) continue;
+
         char full_path[MAX_PATH];
         StringCchCopy(full_path, MAX_PATH, path);
         StringCchCat(full_path, MAX_PATH, "\\");
         StringCchCat(full_path, MAX_PATH, data.cFileName);
         files_append(files, full_path);
+
         if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
         {
             if (!_get_entries_windows(files, full_path))

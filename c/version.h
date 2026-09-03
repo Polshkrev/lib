@@ -5,9 +5,9 @@
 extern "C" {
 #endif
 
-#include <stddef.h> // size_t
+#include <stddef.h> // size_t, NULL
 #include <stdbool.h> // bool
-#include <stdio.h> // FILE, fprintf, stderr
+#include <stdio.h> // FILE, stderr, fprintf
 
 /**
  * @brief Representation of a semantic-versioning object.
@@ -171,7 +171,7 @@ void version_print(FILE *stream, const version_t *version);
 extern "C" {
 #endif
 
-#include <stdlib.h> // malloc, NULL, exit
+#include <stdlib.h> // exit
 #include <string.h> // memset
 
 /**

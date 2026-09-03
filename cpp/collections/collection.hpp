@@ -25,6 +25,7 @@ namespace polutils
              * @brief Obtain a mutable pointer to an item within the collection at a given index.
              * @param index Index at which an item is located.
              * @returns A mutable pointer to an item located within the collection at a given index.
+             * @exception If the collection is evaluated to be empty, a `ValueError` is thrown.
              * @exception If the given index is greater than the size of the collection, an `IndexError` is thrown.
              */
             virtual Type *at(std::size_t index) const = 0;
@@ -32,7 +33,9 @@ namespace polutils
             /**
              * @brief Remove an item within the collection at a given index.
              * @param index Index in the collection at which the removeable value is located.
-             * @exception If the given index is greater than the size of the collection, an `IndexError` is thrown.
+             * @exception If the array is empty, a `ValueError` is thrown.
+             * @exception If the given index is greater than the size of the array, an `OutOfRangeError` is thrown.
+             * @exception If the array's memory can not be reallocated, an `AllocationError` is thrown.
              */
             virtual void remove(std::size_t index) = 0;
         };

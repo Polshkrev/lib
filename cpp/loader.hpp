@@ -2,6 +2,7 @@
 #define LOADER_HPP
 
 #include <string> // std::string
+
 namespace polutils
 {
     /**
@@ -36,9 +37,11 @@ namespace polutils
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h> // HANDLE, FARPROC, LoadLibrary, GetProcAddress, FreeLibrary, GetLastError
+    #include <libloaderapi.h> // LoadLibrary, GetProcAddress, FreeLibrary
+    #include <minwindef.h> // HANDLE, DWORD
+    #include <fileapi.h> // GetFileAttributes, INVALID_FILE_ATTRIBUTES
 #else
-#include <dlfcn.h> // dlopen, dlsym, dlclose, dlerror
+    #include <dlfcn.h> // dlopen, dlsym, dlclose, dlerror
 #endif // _WIN32
 
 #define EXCEPTIONS_IMPLEMENTATION

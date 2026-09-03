@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include <stdio.h> // FILE
+#include <stdio.h> // FILE, size_t, stderr, fprintf, fopen, fclose
 
 #define AVAILABLE_OUTPUTS 2
 
@@ -29,12 +29,13 @@ typedef struct
     const char *name;
     LoggingLevel level;
     FILE *outputs[AVAILABLE_OUTPUTS];
+    size_t output_count;
 } logger_t;
 
 /**
  * @brief Represent a logging level as a string.
  * @param level LoggingLevel to represent as a string.
- * @returns If the given logging level is not available, the function returns NULL; else a string representation of the given level is returned.s
+ * @returns If the given logging level is not available, the function returns `NULL`; else a string representation of the given level is returned.
  */
 const char *lltostr(LoggingLevel level);
 
@@ -111,7 +112,6 @@ void logger_delete(logger_t *logger);
 extern "C" {
 #endif
 
-// #include <stdio.h> // FILE, size_t, fprintf, stderr, fopen, fclose
 #include <stdlib.h> // malloc, exit, free, NULL
 #include <time.h> // time_t, struct tm, strftime
 #include <locale.h> // setlocale, LC_TIME
@@ -139,14 +139,9 @@ extern "C" {
 static char timestamp[FORMAT_BUFFER_SIZE] = {0};
 
 /**
- * @brief Count of the alloted outputs.
- */
-static size_t output_count = 0;
-
-/**
  * @brief Represent a logging level as a string.
  * @param level LoggingLevel to represent as a string.
- * @returns If the given logging level is not available, the function returns NULL; else a string representation of the given level is returned.s
+ * @returns If the given logging level is not available, the function returns `NULL`; else a string representation of the given level is returned.
  */
 const char *lltostr(LoggingLevel level)
 {
@@ -185,7 +180,7 @@ const char *lltostr(LoggingLevel level)
  */
 logger_t *logger_init(const char *name, LoggingLevel level)
 {
-    logger_t *logger = malloc(sizeof(logger_t));
+    logger_t *logger = (logger_t *)malloc(sizeof(logger_t));
     if (NULL == logger)
     {
         fprintf(stderr, "AllocationError: Can not allocate enough memory for a new logger.\n");
@@ -193,6 +188,7 @@ logger_t *logger_init(const char *name, LoggingLevel level)
     }
     logger->name = name;
     logger_set_level(logger, level);
+    logger->output_count = 0;
     return logger;
 }
 
@@ -213,12 +209,12 @@ void logger_set_level(logger_t *logger, LoggingLevel level)
  */
 void logger_add_console(logger_t *logger)
 {
-    if (output_count >= AVAILABLE_OUTPUTS)
+    if (logger->output_count >= AVAILABLE_OUTPUTS)
     {
         fprintf(stderr, "ValueError: The number of allocated outputs has exceded the maximum allowed.\n");
         exit(1);
     }
-    logger->outputs[output_count++] = stdout;
+    logger->outputs[logger->output_count++] = stdout;
 }
 
 /**
@@ -237,14 +233,14 @@ void logger_add_file(logger_t *logger, const char *filename)
         logger_delete(logger);
         exit(1);
     }
-    else if (output_count >= AVAILABLE_OUTPUTS)
+    else if (logger->output_count >= AVAILABLE_OUTPUTS)
     {
         fprintf(stderr, "ValueError: The number of allocated outputs has exceded the maximum allowed.\n");
         fclose(file);
         logger_delete(logger);
         exit(1);
     }
-    logger->outputs[output_count++] = file;
+    logger->outputs[logger->output_count++] = file;
 }
 
 /**
@@ -288,7 +284,9 @@ static void set_timestamp(void)
  */
 static void publish_message(const logger_t *logger, const char *message, LoggingLevel level)
 {
-    for (size_t output_num = 0; output_num < output_count; ++output_num)
+    const char *level_string = lltostr(level);
+    if (!level_string) return;
+    for (size_t output_num = 0; output_num < logger->output_count; ++output_num)
     {
         fprintf(logger->outputs[output_num], "%s:%s[%s] - %s\n", timestamp, logger->name, lltostr(level), message);
     }
@@ -336,7 +334,7 @@ static bool is_file(const FILE *stream)
  */
 void logger_close(logger_t *logger)
 {
-    for (size_t output_num = 0; output_num > output_count; ++output_num)
+    for (size_t output_num = 0; output_num > logger->output_count; ++output_num)
     {
         FILE *current_output = logger->outputs[output_num];
         if (!is_file(current_output))
