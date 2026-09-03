@@ -44,7 +44,9 @@ namespace polutils
                 /**
                  * @brief Remove an element from the array at a given index. This method is marked as virtual and can be overridden.
                  * @param index Index at which the element within the array is located.
-                 * @exception If the given index is greater than the size of the array, an `IndexError` is thrown.
+                 * @exception If the array is empty, a `ValueError` is thrown.
+                 * @exception If the given index is greater than the size of the array, an `OutOfRangeError` is thrown.
+                 * @exception If the array's memory can not be reallocated, an `AllocationError` is thrown.
                  */
                 virtual void remove(std::size_t index) override;
 
@@ -91,8 +93,19 @@ namespace polutils
                 virtual void _delete(void);
 
             protected:
+                /**
+                 * @brief Buffer of type generic items.
+                 */
                 Type *__items;
+
+                /**
+                 * @brief Size of the allocated items.
+                 */
                 std::size_t __size;
+
+                /**
+                 * @brief Full capacity of the buffer.
+                 */
                 std::size_t __capacity;
         };
     }
@@ -196,7 +209,8 @@ namespace polutils
         /**
          * @brief Remove an element from the array at a given index. This method is marked as virtual and can be overridden.
          * @param index Index at which the element within the array is located.
-         * @exception If the given index is greater than the size of the array, an `IndexError` is thrown.
+         * @exception If the array is empty, a `ValueError` is thrown.
+         * @exception If the given index is greater than the size of the array, an `OutOfRangeError` is thrown.
          * @exception If the array's memory can not be reallocated, an `AllocationError` is thrown.
          */
         template <typename Type>
