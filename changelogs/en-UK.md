@@ -1,4 +1,30 @@
 # Changelog
+## v0.29.0 - 2026-09-04
+`Added`
+- C
+    - `collections`
+        - `string`
+            - Added basic `UTF-8` support.
+            - The `string_is_valid_utf8()` function has been added.
+            - The `string_utf8_length()` funtion has been added.
+            - The `string_is_null()` function has been added.
+            - The `STRING_NOT_FOUND` sentinel value has been added.
+
+`Changed`
+- C
+    - `collections`
+        - `string`
+            - To more closely align with the conventions of the library, the `string_from_literal()` function has been renamed to simply `string_from()`.
+            - Due to a basic typographic error, the `string_chop_by_delimetre()` function has been renamed to `string_chop_by_delimiter()`.
+            - To more closely align with `unicode` support, all `search` and `comparison` functions are now explicitly `byte-oriented`.
+            - `string_chop_by_delimiter()` now leaves the original string empty when the delimiter is not found.
+            - `char_t` is now defined as an `unsigned char`.
+
+`Removed`
+- C
+    - `collections`
+        - `string`
+            - Removed the `string_length` function.
 ## v0.28.0 - 2026-09-03
 `Added`
 - C
@@ -36,7 +62,7 @@
     - `collections`
         - `string`
             - Added `unicode` support.
-            - Added `string_length` function.
+            - Added the `string_length` function.
 ## v0.26.0 - 2026-07-20
 `Added`
 - C
