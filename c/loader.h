@@ -135,7 +135,6 @@ function_t library_function(library_t library, const char *name)
 }
 
 #ifdef _WIN32
-
 #ifndef WIN32_ERROR_MESSAGE_SIZE
 #define WIN32_ERROR_MESSAGE_SIZE (4 * 1024)
 #endif // WIN32_ERROR_MESSAGE_SIZE
