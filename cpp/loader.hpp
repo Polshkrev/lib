@@ -151,7 +151,7 @@ namespace polutils
      * @brief Load a function from a given library handle with a given name.
      * @param library Handle to the library containing the function.
      * @param name Name of the function to find.
-     * @exception If the function can not be loaded, `nullptr` is returned.
+     * @returns If the function can not be loaded, `nullptr` is returned.
      */
     function_t library_function(library_t library, const std::string &name)
     {
