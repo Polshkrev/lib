@@ -1,4 +1,30 @@
 # Changelog
+## v0.30.0 - 2026-09-04
+`Added`
+- C
+    - `loader`
+        - Added the generic `library_t` type.
+        - Added the generic `function_t` type.
+        - Added the `library_error` function.
+- CPP
+    - `loader`
+        - Added the generic `library_t` type.
+        - Added the generic `function_t` type.
+        - Added the `library_error` function.
+
+`Changed`
+- C
+    - `loader`
+        - To simplify the responsibility of the library, each of the functions no longer exit. If a failure state occurs, each of the functions return either `false` or `NULL`.
+        - `library_load` now returns the more generic `library_t` instead of just a `void` pointer.
+        - `library_function` now returns the more generic `function_t` instead of just a `void` pointer.
+        - `library_delete` has been renamed to `library_close`.
+- CPP
+    - `loader`
+        - To simplify the responsibility of the library, each of the functions no longer exit. If a failure state occurs, each of the functions return either `false` or a `nullptr`.
+        - `library_load` now returns the more generic `library_t` instead of just a `void` pointer.
+        - `library_function` now returns the more generic `function_t` instead of just a `void` pointer.
+        - `library_delete` has been renamed to `library_close`.
 ## v0.29.0 - 2026-09-04
 `Added`
 - C
