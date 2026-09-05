@@ -1,4 +1,31 @@
 # Changelog
+## v0.31.0 - 2026-09-05
+`Added`
+- CPP
+    - `logger`
+        - Added `name` and `level` getters.
+        - Added `name` and `level` setters.
+
+`Changed`
+- C
+    - `logger`
+        - The `logger_init` constructor now returns `NULL` in the case of a failed allocation, rather than exiting with an error.
+        - The `lltostr` function now returns `NONE` in the case of an invalid `level_t` parameter, rather than exiting with an error.
+        - All setup methods now return a boolean, rather than exiting with an error.
+        - `logger_delete` now accepts a double pointer due to ownership issues.
+        - In the case that a `timestamp` can not be set, `__publish_message` now no longer publishes a message with a timestamp. All other behaviour is the same.
+- CPP
+    - `logger`
+        - The `lltostr` function now returns `NONE` in the case of an invalid `level_t` parameter, rather than exiting with an error.
+        - All setup methods now return a boolean, rather than exiting with an error.
+        - `close` is now a public method rather than a friend function.
+        - In the case that a `timestamp` can not be set, `__publish_message` now no longer publishes a message with a timestamp. All other behaviour is the same.
+        - `output_count` is now a private member variable, instead of being global.
+
+`Removed`
+- CPP
+    - `logger`
+        - The default destructor has been removed. The `close` method will now have to be called explicitly.
 ## v0.30.0 - 2026-09-04
 `Added`
 - C

@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+#include <stdbool.h> // bool
 #include <stdio.h> // FILE, size_t, stderr, fprintf, fopen, fclose
 
 #define AVAILABLE_OUTPUTS 2
@@ -18,7 +19,8 @@ typedef enum
     LOG_INFO,
     LOG_WARNING,
     LOG_ERROR,
-    LOG_CRITICAL
+    LOG_CRITICAL,
+    __total_levels
 } LoggingLevel;
 
 /**
@@ -35,7 +37,7 @@ typedef struct
 /**
  * @brief Represent a logging level as a string.
  * @param level LoggingLevel to represent as a string.
- * @returns If the given logging level is not available, the function returns `NULL`; else a string representation of the given level is returned.
+ * @returns If the given logging level is not valid, the function returns `NULL`; else a string representation of the given level is returned.
  */
 const char *lltostr(LoggingLevel level);
 
@@ -44,7 +46,7 @@ const char *lltostr(LoggingLevel level);
  * @param name Name to give the logger.
  * @param level Minimum logging level that will be logged.
  * @returns A new logger.
- * @exception If the logger can not be allocated, an `AllocationError` will be printed to `stderr` and the programme will exit.
+ * @returns If the logger can not be allocated, `NULL` is returned.
  */
 logger_t *logger_init(const char *name, LoggingLevel level);
 
@@ -58,27 +60,26 @@ void logger_set_level(logger_t *logger, LoggingLevel level);
 /**
  * @brief Add `stdout` to the logger.
  * @param logger The logger to which to update.
- * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
+ * @returns True if `stdout` can be added to the logger, else false.
  */
-void logger_add_console(logger_t *logger);
+bool logger_add_console(logger_t *logger);
 
 /**
  * @brief Add a file to the logger. The file is opened in append mode and is not closed.
  * @param logger Logger to which to add the file.
  * @param filename Name of the file to add to the logger.
+ * @returns True if a file can be added to the logger, else false.
  * @exception If the the file does not exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit.
- * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
  */
-void logger_add_file(logger_t *logger, const char *filename);
+bool logger_add_file(logger_t *logger, const char *filename);
 
 /**
  * @brief Add both `stdout` and a file to the logger.
  * @param logger The logger to which to update.
  * @param filename Name of the file to add to the logger.
  * @exception If the the file does not exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit.
- * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
  */
-void logger_full_setup(logger_t *logger, const char *filename);
+bool logger_full_setup(logger_t *logger, const char *filename);
 
 /**
  * @brief Log a message.
@@ -98,7 +99,7 @@ void logger_close(logger_t *logger);
  * @brief Deallocate the logger.
  * @param logger Logger to deallocate.
  */
-void logger_delete(logger_t *logger);
+void logger_delete(logger_t **logger);
 
 #if defined(__cplusplus)
 }
@@ -115,7 +116,6 @@ extern "C" {
 #include <stdlib.h> // malloc, exit, free, NULL
 #include <time.h> // time_t, struct tm, strftime
 #include <locale.h> // setlocale, LC_TIME
-#include <stdbool.h> // bool
 
 #ifndef LOCALE
 #define LOCALE "en_US.UTF-8"
@@ -127,7 +127,7 @@ extern "C" {
 #define FORMAT_BUFFER_SIZE 200
 
 /**
- * @brief Format of the timestamp.
+ * @brief Format of the __timestamp.
  */
 #ifndef TIMESTAMP_FORMAT
 #define TIMESTAMP_FORMAT "%Y-%m-%d %X"
@@ -136,39 +136,39 @@ extern "C" {
 /**
  * @brief Global output array.
  */
-static char timestamp[FORMAT_BUFFER_SIZE] = {0};
+static char __timestamp[FORMAT_BUFFER_SIZE] = {0};
+
+/**
+ * @brief Static mapping of logger levels to names.
+ */
+static const char *const __logging_level_names[__total_levels] =
+{
+    [LOG_DEBUG] = "DEBUG",
+    [LOG_INFO] = "INFO",
+    [LOG_WARNING] = "WARNING",
+    [LOG_ERROR] = "ERROR",
+    [LOG_CRITICAL] = "CRITICAL"
+};
+
+/**
+ * @brief Determine if the given logging level is valid.
+ * @param level Given level to evaluate.
+ * @returns True if the given level is evaluated to be valid, else false.
+ */
+static bool __is_valid_level(LoggingLevel level)
+{
+    return level >= LOG_DEBUG && level <= LOG_CRITICAL;
+}
 
 /**
  * @brief Represent a logging level as a string.
  * @param level LoggingLevel to represent as a string.
- * @returns If the given logging level is not available, the function returns `NULL`; else a string representation of the given level is returned.
+ * @returns If the given logging level is not valid, the function returns `NULL`; else a string representation of the given level is returned.
  */
 const char *lltostr(LoggingLevel level)
 {
-    switch (level)
-    {
-        case LOG_DEBUG:
-        {
-            return "DEBUG";
-        } break;
-        case LOG_INFO:
-        {
-            return "INFO";
-        } break;
-        case LOG_WARNING:
-        {
-            return "WARNING";
-        } break;
-        case LOG_ERROR:
-        {
-            return "ERROR";
-        } break;
-        case LOG_CRITICAL:
-        {
-            return "CRITICAL";
-        } break;
-    }
-    return NULL;
+    if (!__is_valid_level(level)) return "NONE";
+    return __logging_level_names[level];
 }
 
 /**
@@ -176,19 +176,16 @@ const char *lltostr(LoggingLevel level)
  * @param name Name to give the logger.
  * @param level Minimum logging level that will be logged.
  * @returns A new logger.
- * @exception If the logger can not be allocated, an `AllocationError` will be printed to `stderr` and the programme will exit.
+ * @returns If the logger can not be allocated, `NULL` is returned.
  */
 logger_t *logger_init(const char *name, LoggingLevel level)
 {
     logger_t *logger = (logger_t *)malloc(sizeof(logger_t));
-    if (NULL == logger)
-    {
-        fprintf(stderr, "AllocationError: Can not allocate enough memory for a new logger.\n");
-        exit(1);
-    }
+    if (NULL == logger) return NULL;
     logger->name = name;
     logger_set_level(logger, level);
     logger->output_count = 0;
+    _set_locale(LOCALE);
     return logger;
 }
 
@@ -205,42 +202,35 @@ void logger_set_level(logger_t *logger, LoggingLevel level)
 /**
  * @brief Add `stdout` to the logger.
  * @param logger The logger to which to update.
+ * @returns True if `stdout` can be added to the logger, else false.
  * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
  */
-void logger_add_console(logger_t *logger)
+bool logger_add_console(logger_t *logger)
 {
-    if (logger->output_count >= AVAILABLE_OUTPUTS)
-    {
-        fprintf(stderr, "ValueError: The number of allocated outputs has exceded the maximum allowed.\n");
-        exit(1);
-    }
+    if (logger->output_count >= AVAILABLE_OUTPUTS) return false;
     logger->outputs[logger->output_count++] = stdout;
+    return true;
 }
 
 /**
  * @brief Add a file to the logger. The file is opened in append mode and is not closed.
  * @param logger Logger to which to add the file.
  * @param filename Name of the file to add to the logger.
+ * @returns True if a file can be added to the logger, else false.
  * @exception If the the file does not exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit.
- * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
  */
-void logger_add_file(logger_t *logger, const char *filename)
+bool logger_add_file(logger_t *logger, const char *filename)
 {
+    if (logger->output_count >= AVAILABLE_OUTPUTS) return false;
     FILE *file = fopen(filename, "a");
     if (NULL == file)
     {
         fprintf(stderr, "FileNotFoundError: Unable to open file.");
-        logger_delete(logger);
-        exit(1);
-    }
-    else if (logger->output_count >= AVAILABLE_OUTPUTS)
-    {
-        fprintf(stderr, "ValueError: The number of allocated outputs has exceded the maximum allowed.\n");
-        fclose(file);
-        logger_delete(logger);
+        logger_delete(&logger);
         exit(1);
     }
     logger->outputs[logger->output_count++] = file;
+    return true;
 }
 
 /**
@@ -250,10 +240,10 @@ void logger_add_file(logger_t *logger, const char *filename)
  * @exception If the the file does not exist, a `FileNotFoundError` will be printed to `stderr` and the programme will exit.
  * @exception If the number of outputs that have been added to the logger has exceded the maximum allowed, a `ValueError` will be printed to `stderr` and the programme exits.
  */
-void logger_full_setup(logger_t *logger, const char *filename)
+bool logger_full_setup(logger_t *logger, const char *filename)
 {
-    logger_add_console(logger);
-    logger_add_file(logger, filename);
+    if (!logger_add_console(logger)) return false;
+    return logger_add_file(logger, filename);
 }
 
 /**
@@ -267,13 +257,19 @@ static void _set_locale(const char *locale)
 
 /**
  * @brief Set a timestamp to be used in the logging format.
+ * @returns True if the timestamp can be set, else false.
  */
-static void set_timestamp(void)
+static bool __set_timestamp(void)
 {
-    time_t t = time(NULL);
-    struct tm date = *localtime(&t);
-    _set_locale(LOCALE);
-    strftime(timestamp, FORMAT_BUFFER_SIZE, TIMESTAMP_FORMAT, &date);
+    struct tm date;
+    time_t current_time = time(NULL);
+    if (current_time == (time_t)-1) return false;
+#ifdef _WIN32
+    else if (localtime_s(&date, &current_time) != 0) return false;
+#else
+    else if (localtime_r(&current_time, &date) == NULL) return false;
+#endif
+    return strftime(__timestamp, FORMAT_BUFFER_SIZE, TIMESTAMP_FORMAT, &date) != 0;
 }
 
 /**
@@ -282,13 +278,17 @@ static void set_timestamp(void)
  * @param message Message to log.
  * @param level The level of the message. If the given level is less than the minimum the logger has allowed, the message will not be logged.
  */
-static void publish_message(const logger_t *logger, const char *message, LoggingLevel level)
+static void __publish_message(const logger_t *logger, const char *message, LoggingLevel level)
 {
     const char *level_string = lltostr(level);
-    if (!level_string) return;
     for (size_t output_num = 0; output_num < logger->output_count; ++output_num)
     {
-        fprintf(logger->outputs[output_num], "%s:%s[%s] - %s\n", timestamp, logger->name, lltostr(level), message);
+        if (!__set_timestamp())
+        {
+            fprintf(logger->outputs[output_num], "%s[%s] - %s\n", logger->name, level_string, message);
+            continue;
+        }
+        fprintf(logger->outputs[output_num], "%s:%s[%s] - %s\n", __timestamp, logger->name, level_string, message);
     }
 }
 
@@ -300,12 +300,8 @@ static void publish_message(const logger_t *logger, const char *message, Logging
  */
 void logger_log(const logger_t *logger, const char *message, LoggingLevel level)
 {
-    if (level < logger->level)
-    {
-        return;
-    }
-    set_timestamp();
-    publish_message(logger, message, level);
+    if (level < logger->level) return;
+    __publish_message(logger, message, level);
 }
 
 /**
@@ -319,10 +315,7 @@ static bool is_file(const FILE *stream)
     FILE *streams[3] = {stdout, stdin, stderr};
     for (int output = 0; output < 3; ++output)
     {
-        if (streams[output] != stream)
-        {
-            continue;
-        }
+        if (streams[output] != stream) continue;
         found = true;
     }
     return !found;
@@ -334,21 +327,11 @@ static bool is_file(const FILE *stream)
  */
 void logger_close(logger_t *logger)
 {
-    for (size_t output_num = 0; output_num > logger->output_count; ++output_num)
+    for (size_t output_num = 0; output_num < logger->output_count; ++output_num)
     {
         FILE *current_output = logger->outputs[output_num];
-        if (!is_file(current_output))
-        {
-            continue;
-        }
-        else if (NULL == current_output)
-        {
-            continue;
-        }
-        else if (!current_output)
-        {
-            continue;
-        }
+        if (!current_output) continue;
+        else if (!is_file(current_output)) continue;
         fclose(current_output);
     }
 }
@@ -357,15 +340,12 @@ void logger_close(logger_t *logger)
  * @brief Deallocate the logger.
  * @param logger Logger to deallocate.
  */
-void logger_delete(logger_t *logger)
+void logger_delete(logger_t **logger)
 {
-    if (!logger)
-    {
-        return;
-    }
-    logger_close(logger);
-    free(logger);
-    logger = NULL;
+    if (!(*logger)) return;
+    logger_close(*logger);
+    free(*logger);
+    *logger = NULL;
 }
 
 #endif // LOGGER_IMPLEMENTATION
