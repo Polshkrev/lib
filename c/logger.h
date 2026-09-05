@@ -283,6 +283,11 @@ static void __publish_message(const logger_t *logger, const char *message, Loggi
     const char *level_string = lltostr(level);
     for (size_t output_num = 0; output_num < logger->output_count; ++output_num)
     {
+        if (!__set_timestamp())
+        {
+            fprintf(logger->outputs[output_num], "%s[%s] - %s\n", logger->name, level_string, message);
+            continue;
+        }
         fprintf(logger->outputs[output_num], "%s:%s[%s] - %s\n", __timestamp, logger->name, level_string, message);
     }
 }
@@ -296,11 +301,6 @@ static void __publish_message(const logger_t *logger, const char *message, Loggi
 void logger_log(const logger_t *logger, const char *message, LoggingLevel level)
 {
     if (level < logger->level) return;
-    else if (!__set_timestamp())
-    {
-        fprintf(stderr, "IOError: Can not set the current timestamp.\n");
-        exit(1);
-    }
     __publish_message(logger, message, level);
 }
 
