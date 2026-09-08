@@ -1,4 +1,38 @@
 # Changelog
+## v0.32.0 - 2026-09-08
+`Added`
+- CPP
+    - `printable`
+        - Added the `print` method.
+    - `path`
+        - Added all permutations of `string` to `path` `operator/` concatenation overloads.
+
+`Changed`
+- C
+    - `path`
+        - The main path structure is now a sized buffer string.
+        - All functions now no longer use a global buffer.
+        - `path_init` now obtains the full current working directory rather than simply `.`. Due to this change, this function might panic with an error.
+        - Due to changes in logic, `path_from` may panic.
+        - On `windows`, if the console `input` and `output` are not set to unicode, both the `path_init` and `path_from` set the console `input` and `output` to support unicode.
+        - All documentation comments have been updated.
+- CPP
+    - `path`
+        - The main path structure is now a sized buffer string.
+        - All functions and methods now no longer use a global buffer.
+        - The default constructor now obtains the full current working directory rather than simply `.`. Due to this change, this constructor might throw an exception.
+        - Due to changes in logic, the `string` constructor overload may throw an exception.
+        - Due to changes in logic, the `filename` method may throw an exception.
+        - On `windows`, if the console `input` and `output` are not set to unicode, both the default constructor and the `string` constructor overload set the console `input` and `output` to support unicode.
+        - All documentation comments have been updated.
+
+`Fixed`
+- C
+    - `path`
+        - The logic bug within the `posix` implementation of the `path_exists` function has been fixed.
+- CPP
+    - `path`
+        - The logic bug within the `posix` implementation of the `exists` method has been fixed.
 ## v0.31.0 - 2026-09-05
 `Added`
 - CPP
