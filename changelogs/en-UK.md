@@ -1,4 +1,21 @@
 # Changelog
+## v0.33.0 - 2026-09-08
+`Added`
+- C
+    - `collections`
+        - `string_builder`
+            - Added `MIN` macro.
+            - Added `MAX` macro.
+            - Added `CLAMP` macro.
+
+`Changed`
+- C
+    - `collections`
+        - `string_builder`
+            - `string_builder_find` now returns a `ptrdiff_t`.
+            - `string_builder_fit` can now panic with an `AllocationError`.
+            - `string_builder_resize_by` can now panic with an `OverflowError`.
+            - All documentation has been updated.
 ## v0.32.0 - 2026-09-08
 `Added`
 - CPP
