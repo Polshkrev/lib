@@ -1,4 +1,21 @@
 # Список изменений
+## v0.33.0 - 2026-09-08
+`Добавлено`
+- C
+  - `collections`
+    - `string_builder`
+      - Добавлен макрос `MIN`.
+      - Добавлен макрос `MAX`.
+      - Добавлен макрос `CLAMP`.
+
+`Изменено`
+- C
+  - `collections`
+    - `string_builder`
+      - `string_builder_find` теперь возвращает `ptrdiff_t`.
+      - `string_builder_fit` теперь может завершиться с ошибкой `AllocationError`.
+      - `string_builder_resize_by` теперь может завершиться с ошибкой `OverflowError`.
+      - Вся документация обновлена.
 ## v0.32.0 - 2026-09-08
 `Добавлено`
 - CPP
