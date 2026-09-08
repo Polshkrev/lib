@@ -180,6 +180,11 @@ bool string_is_null(const string_t *string);
 extern "C" {
 #endif
 
+#ifdef _WIN32
+    #include <winnls.h> // CP_UTF8
+    #include <consoleapi2.h> // SetConsoleOutputCP
+#endif // _WIN32
+
 #include <string.h> // strlen, memcmp
 #include <ctype.h>  // isspace
 
@@ -226,17 +231,11 @@ static bool __string_utf8_is_continuation(uint8_t character)
  */
 static bool __string_utf8_sequence_is_valid(const char *data, size_t count, size_t sequence_length)
 {
-    if ((sequence_length == 0 || sequence_length > 4) || (count < sequence_length))
-    {
-        return false;
-    }
+    if ((sequence_length == 0 || sequence_length > 4) || (count < sequence_length)) return false;
 
     uint8_t first = (uint8_t) data[0];
 
-    if ((sequence_length == 1) || (sequence_length == 2))
-    {
-        return true;
-    }
+    if ((sequence_length == 1) || (sequence_length == 2)) return true;
     else if (!__string_utf8_is_continuation((uint8_t) data[1]) ||
              (first == 0xE0 && (uint8_t) data[1] < 0xA0) ||
              (first == 0xED && (uint8_t) data[1] > 0x9F) ||
@@ -248,10 +247,7 @@ static bool __string_utf8_sequence_is_valid(const char *data, size_t count, size
 
     for (size_t index = 2; index < sequence_length; index++)
     {
-        if (__string_utf8_is_continuation((uint8_t) data[index]))
-        {
-            continue;
-        }
+        if (__string_utf8_is_continuation((uint8_t) data[index])) continue;
         return false;
     }
 
@@ -313,10 +309,7 @@ bool string_is_valid_utf8(const string_t *string)
         uint8_t character = (uint8_t) string->data[index];
         size_t sequence_length = __bytes_for_utf8[character];
 
-        if ((sequence_length == 0) || (!__string_utf8_sequence_is_valid(string->data + index, string->count - index, sequence_length)))
-        {
-            return false;
-        }
+        if ((sequence_length == 0) || (!__string_utf8_sequence_is_valid(string->data + index, string->count - index, sequence_length))) return false;
         index += sequence_length;
     }
     return true;
@@ -329,10 +322,11 @@ bool string_is_valid_utf8(const string_t *string)
  */
 string_t string_from(const char *cstring)
 {
-    if (!cstring)
-    {
-        return string_null;
-    }
+#ifdef _WIN32
+    if (GetConsoleOutputCP() != CP_UTF8) SetConsoleOutputCP(CP_UTF8);
+    if (GetConsoleCP() != CP_UTF8) SetConsoleCP(CP_UTF8);
+#endif // _WIN32
+    if (!cstring) return string_null;
     return string_new(cstring, strlen(cstring));
 }
 
@@ -344,14 +338,8 @@ string_t string_from(const char *cstring)
 string_t string_trim_left(const string_t *string)
 {
     size_t index = 0;
-    while (index < string->count && isspace((unsigned char) string->data[index]))
-    {
-        index++;
-    }
-    if (index == 0)
-    {
-        return *string;
-    }
+    while (index < string->count && isspace((unsigned char) string->data[index])) index++;
+    if (index == 0) return *string;
     return string_new(string->data + index, string->count - index);
 }
 
