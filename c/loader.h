@@ -135,19 +135,19 @@ function_t library_function(library_t library, const char *name)
 }
 
 #ifdef _WIN32
-#ifndef WIN32_ERROR_MESSAGE_SIZE
-#define WIN32_ERROR_MESSAGE_SIZE (4 * 1024)
-#endif // WIN32_ERROR_MESSAGE_SIZE
+#ifndef WIN32_LIBRARY_ERROR_MESSAGE_SIZE
+#define WIN32_LIBRARY_ERROR_MESSAGE_SIZE (4 * 1024)
+#endif // WIN32_LIBRARY_ERROR_MESSAGE_SIZE
 
 /**
  * @brief Format a windows error code as a string.
  * @param error Error code to format.
  * @returns The given error code formatted as a string.
  */
-static char *__win32_error_message(DWORD error)
+static char *__library_error_message_windows(DWORD error)
 {
-    static char win32_error_message[WIN32_ERROR_MESSAGE_SIZE] = {0};
-    DWORD error_message_size = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error, LANG_USER_DEFAULT, win32_error_message, WIN32_ERROR_MESSAGE_SIZE, NULL);
+    static char win32_error_message[WIN32_LIBRARY_ERROR_MESSAGE_SIZE] = {0};
+    DWORD error_message_size = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error, LANG_USER_DEFAULT, win32_error_message, WIN32_LIBRARY_ERROR_MESSAGE_SIZE, NULL);
     if (error_message_size == 0)
     {
         if (GetLastError() != ERROR_MR_MID_NOT_FOUND)
@@ -173,7 +173,7 @@ const char *library_error(void)
 #ifndef _WIN32
     return dlerror();
 #else
-    return __win32_error_message(GetLastError());
+    return __library_error_message_windows(GetLastError());
 #endif // _WIN32
 }
 
