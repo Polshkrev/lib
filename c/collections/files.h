@@ -98,17 +98,14 @@ extern "C" {
 
 #include <stdio.h> // fprintf, stderr
 #include <stdlib.h> // malloc, free, NULL
-#include <string.h> // strcmp, strlen
+#include <string.h> // strcmp
 
 #ifdef _WIN32
 #include <handleapi.h> // INVALID_HANDLE_VALUE, MAX_PATH
 #include <fileapi.h> // FindFirstFile, FindNextFile, WIN32_FIND_DATA, FILE_ATTRIBUTE_DIRECTORY, FindClose
 #include <minwindef.h> // HANDLE
 #include <tchar.h> // ! NEEDED FOR STRSAFE.H
-#include <strsafe.h> // StringCchCopy, StringCbCopy, StringCchCat
-#endif // _WIN32
-
-#ifndef FILES_CAPACITY
+#include <strsafe.h> // StringCbCopy, StringCchCopy, StringCchCat
 #define FILES_CAPACITY 256
 #endif // FILES_CAPACITY
 
