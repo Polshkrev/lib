@@ -56,7 +56,7 @@ string_builder_t string_builder_init(void);
 /**
  * @brief Construct a new dynamic buffer of characters with a given capacity.
  * @param capacity Initial capacity of the buffer. A value of zero is changed to one.
- * @returns A new dynamic buffer of characters with the given initial capacity.
+ * @returns A new dynamic buffer of characters with a given initial capacity.
  * @exception If the underlying array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
 string_builder_t string_builder_with_capacity(size_t capacity);
@@ -83,7 +83,7 @@ void string_builder_append_data(string_builder_t *builder, const char *items, si
  * @brief Append a null-terminated string to the buffer of characters not including the aforementioned null byte.
  * @param builder Buffer of characters to which to append.
  * @param items Null-terminated string from which to append to the buffer.
- * @exception If the given items are `NULL`, an `IllegalParameterError` is printed to `stderr` and the programme exits.
+ * @exception If the given items are `NULL`, an `IllegalParameterError` is printed to `stderr` and the programme exits after the given builder is deallocated.
  * @exception If the builder can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given builder is deallocated.
  */
 void string_builder_extend(string_builder_t *builder, const char *items);
@@ -102,7 +102,7 @@ char *string_builder_at(const string_builder_t *builder, size_t index);
  * @param builder Builder within which to search.
  * @param character Character for which to search.
  * @returns The index within the builder where the given character is stored.
- * @returns Negative one if the character can not be found.
+ * @returns If the character can not be found, negative one is returned.
  */
 ptrdiff_t string_builder_find(const string_builder_t *builder, char character);
 
@@ -124,6 +124,7 @@ const char *string_builder_data(string_builder_t *builder);
 /**
  * @brief Fit the capacity of the builder to its size.
  * @param builder Builder to fit.
+ * @exception If the builder can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the builder is deallocated.
  */
 void string_builder_fit(string_builder_t *builder);
 
@@ -214,7 +215,7 @@ string_builder_t string_builder_init(void)
 /**
  * @brief Construct a new dynamic buffer of characters with a given capacity.
  * @param capacity Initial capacity of the buffer. A value of zero is changed to one.
- * @returns A new dynamic buffer of characters with the given initial capacity.
+ * @returns A new dynamic buffer of characters with a given initial capacity.
  * @exception If the underlying array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
 string_builder_t string_builder_with_capacity(size_t capacity)
@@ -310,7 +311,7 @@ char *string_builder_at(const string_builder_t *builder, size_t index)
  * @param builder Builder within which to search.
  * @param character Character for which to search.
  * @returns The index within the builder where the given character is stored.
- * @returns Negative one if the character can not be found.
+ * @returns If the character can not be found, negative one is returned.
  */
 ptrdiff_t string_builder_find(const string_builder_t *builder, char character)
 {
