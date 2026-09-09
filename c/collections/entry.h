@@ -6,19 +6,19 @@ extern "C" {
 #endif
 
 #define PATH_IMPLEMENTATION
-#include "../path.h" // path_t, passtr, path_exists, path_delete
+#include "../path.h" // path_t, passtr, path_exists
 
 #define STRING_BUILDER_IMPLEMENTATION
-#include "string_builder.h" // string_builder_t, sring_builder_init, string_builder_append, string_builder_empty, string_builder_data, string_builder_delete
+#include "string_builder.h" // string_builder_t, string_builder_init, string_builder_empty, string_builder_data, string_builder_delete, string_builder_fit
 
 /**
  * @brief Representation of a type of an entry.
  */
 typedef enum
 {
-    NONE_TYPE,
-    DIRECTORY_TYPE,
-    FILE_TYPE,
+    NONE_ENTRY_TYPE,
+    DIRECTORY_ENTRY_TYPE,
+    FILE_ENTRY_TYPE,
 } file_type_t;
 
 /**
@@ -39,12 +39,21 @@ typedef struct
 const char *file_type_to_string(file_type_t file_type);
 
 /**
- * @brief Construct a new entry of a given path.
+ * @brief Construct an entry by determining the type of a given path.
  * @param path Path of the entry.
- * @returns A new entry of the given path with its type set to `FILE_TYPE` and its content an empty `string_builder_t`.
- * @exception If a new entry can not be allocated, an `AllocationError` is printed to `stderr` and the programme exists.
+ * @returns A new entry of the given path. If the path does not exist, the `NONE_ENTRY_TYPE` is used as the entry's type.
+ * @exception If the entry's content buffer can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
 entry_t entry_init(path_t path);
+
+/**
+ * @brief Construct a new entry of a given type and path.
+ * @param type Type of the entry to construct.
+ * @param path Path of the entry.
+ * @returns A new entry with the given type and path and an empty content buffer.
+ * @exception If the entry's content buffer can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
+ */
+entry_t entry_init_as(file_type_t type, path_t path);
 
 /**
  * @brief Read a file's content into an entry.
@@ -57,7 +66,7 @@ entry_t entry_init(path_t path);
 bool entry_read(entry_t *entry);
 
 /**
- * @brief Write a given entry's content to a persistant file.
+ * @brief Write a given entry's content to a persistent file.
  * @param entry Entry from which to write.
  * @returns True if the entry can be written to a file, else false.
  * @exception If the entry's path can not be read, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
@@ -70,24 +79,24 @@ bool entry_write(entry_t *entry);
  * @param path Path to which to write.
  * @param content Content from which to write.
  * @returns True if the given content can be written to the given path, else false.
- * @exception If the given path can not be read, an `IOError` is printed to `stderr` and the programme exits after the given content is deallocated.
- * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits after the given content is deallocated.
+ * @exception If the given path can not be opened, an `IOError` is printed to `stderr` and the programme exits after the given content is deallocated.
+ * @exception If the given content can not be completely written, an `IOError` is printed to `stderr` and the given content is deallocated before the programme exits.
  */
 bool entry_write_content_to_path(const path_t *path, string_builder_t *content);
 
 /**
- * @brief Create a persistant file on the filesystem.
+ * @brief Create a persistent file on the filesystem.
  * @param entry Entry to create.
- * @returns True if the entry's path can be created on th filesystem, else false.
+ * @returns True if the entry's path can be created on the filesystem, else false.
  * @exception If the entry's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  * @exception If the entry's path can not be created, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 bool entry_touch(entry_t *entry);
 
 /**
- * @brief Create a persistant directory on the filesystem.
+ * @brief Create a persistent directory on the filesystem.
  * @param entry Entry to create.
- * @returns True if the entry's path can be created on th filesystem, else false.
+ * @returns True if the entry's path can be created on the filesystem, else false.
  * @exception If the entry's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 bool entry_make_directory(entry_t *entry);
@@ -95,7 +104,7 @@ bool entry_make_directory(entry_t *entry);
 /**
  * @brief Generic entry creation dispatch.
  * @param entry Entry to create.
- * @returns True if the entry's path can be created on th filesystem, else false.
+ * @returns True if the entry's path can be created on the filesystem, else false.
  * @exception If the entry's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  * @exception If the entry's path can not be created, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
@@ -150,12 +159,11 @@ bool entry_copy(entry_t *source, entry_t *destination);
 bool entry_move(entry_t *source, entry_t *destination);
 
 /**
- * @brief Obtain the size of the entry in bytes.
+ * @brief Obtain the size of an entry in bytes.
  * @param entry Entry from which to obtain the size.
- * @returns The size of the entry.
- * @exception If the entry's path does not exist, and the entry can not be created, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
- * @exception If the entry can not be read, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
- * @exception If the size of the file can not be obtained, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @returns The size of the entry in bytes.
+ * @exception If the entry's file can not be opened, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the file's size can not be obtained, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 size_t entry_size(entry_t *entry);
 
@@ -171,13 +179,18 @@ size_t entry_size(entry_t *entry);
 extern "C" {
 #endif
 
-#include <stdio.h> // fprintf, fopen, ftell, fseek, fgetc, feof, ferror, fclose, FILE, SEEK_END, SEEK_SET, EOF, stderr
-#include <stdint.h> // uintmax_t
-#include <limits.h> // LONG_MAX, SIZE_MAX
+#include <stdio.h> // FILE, SEEK_END, SEEK_SET, fclose, fopen, fprintf, fread, fwrite, fseek, ftell, remove, stderr
+#include <stdlib.h> // exit
+#include <stdint.h> // uintmax_t, SIZE_MAX
+#include <limits.h> // LONG_MAX
 
 #ifdef _WIN32
-    #include <direct.h> // _mkdir, remove
+    #include <minwindef.h> // DWORD
+    #include <fileapi.h> // GetFileAttributes, INVALID_FILE_ATTRIBUTES
+    #include <winnt.h> // FILE_ATTRIBUTE_DIRECTORY
+    #include <direct.h> // _mkdir, _rmdir
 #else
+    #include <sys/stat.h> // struct stat, lstat, S_ISREG, S_ISDIR
     #include <unistd.h> // mkdir, rmdir
 #endif // _WIN32
 
@@ -190,11 +203,11 @@ const char *file_type_to_string(file_type_t file_type)
 {
     switch (file_type)
     {
-        case DIRECTORY_TYPE:
+        case DIRECTORY_ENTRY_TYPE:
         {
             return "DIRECTORY";
         } break;
-        case FILE_TYPE:
+        case FILE_ENTRY_TYPE:
         {
             return "FILE";
         } break;
@@ -213,31 +226,43 @@ const char *file_type_to_string(file_type_t file_type)
 static file_type_t _get_file_type(const char *path)
 {
 #ifdef _WIN32
-    DWORD attribute = GetFileAttributesA(path);
-    if (attribute == INVALID_FILE_ATTRIBUTES) return NONE_TYPE;
-    else if (attribute & FILE_ATTRIBUTE_DIRECTORY) return DIRECTORY_TYPE;
-    return FILE_TYPE;
+    DWORD attribute = GetFileAttributes(path);
+    if (attribute == INVALID_FILE_ATTRIBUTES) return NONE_ENTRY_TYPE;
+    else if (attribute & FILE_ATTRIBUTE_DIRECTORY) return DIRECTORY_ENTRY_TYPE;
+    return FILE_ENTRY_TYPE;
 #else // _WIN32
     struct stat statbuf;
-    if (lstat(path, &statbuf) < 0) return NONE_TYPE;
-    else if (S_ISREG(statbuf.st_mode)) return FILE_TYPE;
-    else if (S_ISDIR(statbuf.st_mode)) return DIRECTORY_TYPE;
-    return NONE_TYPE;
+    if (lstat(path, &statbuf) < 0) return NONE_ENTRY_TYPE;
+    else if (S_ISREG(statbuf.st_mode)) return FILE_ENTRY_TYPE;
+    else if (S_ISDIR(statbuf.st_mode)) return DIRECTORY_ENTRY_TYPE;
+    return NONE_ENTRY_TYPE;
 #endif // _WIN32
 }
 
 /**
- * @brief Construct a new entry of a given path.
+ * @brief Construct an entry by determining the type of a given path.
  * @param path Path of the entry.
- * @returns A new entry of the given path with its type set to `FILE_TYPE` and its content an empty `string_builder_t`.
- * @exception If a new entry can not be allocated, an `AllocationError` is printed to `stderr` and the programme exists.
+ * @returns A new entry of the given path. If the path does not exist, the `NONE_ENTRY_TYPE` is used as the entry's type.
+ * @exception If the entry's content buffer can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
 entry_t entry_init(path_t path)
+{
+    return entry_init_as(_get_file_type(passtr(&path)), path);
+}
+
+/**
+ * @brief Construct a new entry of a given type and path.
+ * @param type Type of the entry to construct.
+ * @param path Path of the entry.
+ * @returns A new entry with the given type and path and an empty content buffer.
+ * @exception If the entry's content buffer can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
+ */
+entry_t entry_init_as(file_type_t type, path_t path)
 {
     return (entry_t)
     {
         .path = path,
-        .type = path_exists(&path) ? _get_file_type(passtr(&path)) : FILE_TYPE,
+        .type = type,
         .content = string_builder_init()
     };
 }
@@ -252,10 +277,7 @@ static bool _safe_long_to_size(long value, size_t *result)
 {
     if (value < 0) return false;
     #if LONG_MAX > SIZE_MAX
-    if ((uintmax_t)value > (uintmax_t)SIZE_MAX)
-    {
-        return false;
-    }
+    if ((uintmax_t)value > (uintmax_t)SIZE_MAX) return false;
     #endif
     *result = (size_t)value;
     return true;
@@ -269,17 +291,25 @@ static bool _safe_long_to_size(long value, size_t *result)
  */
 static bool _get_file_size(FILE *file, size_t *result)
 {
-    long current_pos = ftell(file);
-    if (fseek(file, 0L, SEEK_END) != 0) return false;
+    long current_position = ftell(file);
+    if (current_position <  0) return false;
+    else if (fseek(file, 0L, SEEK_END) != 0) return false;
     long size = ftell(file);
-    if (size == -1) return false;
-    else if (fseek(file, current_pos, SEEK_SET) != 0) return false;
+    if (size < 0) return false;
+    else if (fseek(file, current_position, SEEK_SET) != 0) return false;
     return _safe_long_to_size(size, result);
 }
 
+#ifndef __IO_ENTRY_BUFFER_CAPACITY
+/**
+ * @brief Buffer capacaity of the io operations within the entry functions.
+ */
+#define __IO_ENTRY_BUFFER_CAPACITY (10 * 1024)
+#endif // __IO_ENTRY_BUFFER_CAPACITY
+
 /**
  * @brief Read the contents of a given path into a given result.
- * @param path Path fromw which to read.
+ * @param path Path from which to read.
  * @param result Buffer to which to append.
  * @exception If the given path can not be read, an `IOError` is printed to `stderr` and the programme exits after the given result is deallocated.
  * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits after the given result is deallocated.
@@ -287,20 +317,34 @@ static bool _get_file_size(FILE *file, size_t *result)
 void _read_file(const path_t *path, string_builder_t *result)
 {
     const char *filepath = passtr(path);
-    FILE *file = fopen(filepath, "r");
+    FILE *file = fopen(filepath, "rb");
     if (NULL == file)
     {
-        fprintf(stderr, "IOError: Can not readfile: %s.\n", filepath);
+        fprintf(stderr, "IOError: Can not read file: %s.\n", filepath);
         string_builder_delete(result);
         exit(1);
     };
-    while (!feof(file) && !ferror(file))
+    char buffer[__IO_ENTRY_BUFFER_CAPACITY];
+    size_t count;
+    while ((count = fread(buffer, sizeof(char), sizeof(buffer), file)) > 0)
     {
-        int read = fgetc(file);
-        if (EOF == read) break;
-        string_builder_append(result, read);
+        string_builder_append_data(result, buffer, count);
     }
-    fclose(file);
+
+    if (ferror(file))
+    {
+        fprintf(stderr, "IOError: Can not read file: %s.\n", filepath);
+        fclose(file);
+        string_builder_delete(result);
+        exit(1);
+    }
+    else if (fclose(file) != 0)
+    {
+        fprintf(stderr, "IOError: Can not close file: %s.\n", filepath);
+        string_builder_delete(result);
+        exit(1);
+    }
+
     string_builder_fit(result);
 }
 
@@ -320,6 +364,7 @@ bool entry_read(entry_t *entry)
         string_builder_delete(&entry->content);
         exit(1);
     }
+    else if (entry->type != FILE_ENTRY_TYPE) return false;
     _read_file(&entry->path, &entry->content);
     return true;
 }
@@ -329,26 +374,40 @@ bool entry_read(entry_t *entry)
  * @param path Path to which to write.
  * @param content Content from which to write.
  * @returns True if the given content can be written to the given path, else false.
- * @exception If the given path can not be read, an `IOError` is printed to `stderr` and the programme exits after the given content is deallocated.
- * @exception If the builder can not be reallocated, an `AllocationError` is printed to standard error and the programme exits after the given content is deallocated.
+ * @exception If the given path can not be opened, an `IOError` is printed to `stderr` and the programme exits after the given content is deallocated.
+ * @exception If the given content can not be completely written, an `IOError` is printed to `stderr` and the given content is deallocated before the programme exits.
  */
 bool entry_write_content_to_path(const path_t *path, string_builder_t *content)
 {
-    if (string_builder_empty(content)) return false;
-    FILE *file = fopen(passtr(path), "w");
+    FILE *file = fopen(passtr(path), "wb");
     if (NULL == file)
     {
         fprintf(stderr, "IOError: Can not open file: %s.\n", passtr(path));
         string_builder_delete(content);
         exit(1);
     }
-    fprintf(file, "%s", string_builder_data(content));
-    fclose(file);
+
+    size_t count = content->size;
+    size_t written = fwrite(string_builder_data(content), sizeof(char), count, file);
+
+    if (written != count)
+    {
+        fprintf(stderr, "IOError: Can not write file: %s.\n", passtr(path));
+        fclose(file);
+        string_builder_delete(content);
+        exit(1);
+    }
+    else if (fclose(file) != 0)
+    {
+        fprintf(stderr, "IOError: Can not close file: %s.\n", passtr(path));
+        string_builder_delete(content);
+        exit(1);
+    }
     return true;
 }
 
 /**
- * @brief Write a given entry's content to a persistant file.
+ * @brief Write a given entry's content to a persistent file.
  * @param entry Entry from which to write.
  * @returns True if the entry can be written to a file, else false.
  * @exception If the entry's path can not be read, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
@@ -371,7 +430,9 @@ bool entry_write(entry_t *entry)
  */
 bool entry_copy(entry_t *source, entry_t *destination)
 {
-    if (!path_exists(&source->path))
+    if (source->type != FILE_ENTRY_TYPE) return false;
+    else if (destination->type != FILE_ENTRY_TYPE) return false;
+    else if (!path_exists(&source->path))
     {
         fprintf(stderr, "FileNotFoundError: Can not find file %s.\n", passtr(&source->path));
         string_builder_delete(&source->content);
@@ -385,8 +446,6 @@ bool entry_copy(entry_t *source, entry_t *destination)
         string_builder_delete(&destination->content);
         exit(1);
     }
-    else if (source->type != FILE_TYPE) return false;
-    else if (destination->type != FILE_TYPE) return false;
     else if (string_builder_empty(&source->content))
     {
         if (!entry_read(source)) return false;
@@ -412,9 +471,9 @@ bool entry_move(entry_t *source, entry_t *destination)
 }
 
 /**
- * @brief Create a persistant file on the filesystem.
+ * @brief Create a persistent file on the filesystem.
  * @param entry Entry to create.
- * @returns True if the entry's path can be created on th filesystem, else false.
+ * @returns True if the entry's path can be created on the filesystem, else false.
  * @exception If the entry's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  * @exception If the entry's path can not be created, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
@@ -426,22 +485,21 @@ bool entry_touch(entry_t *entry)
         string_builder_delete(&entry->content);
         exit(1);
     }
-    else if (entry->type != FILE_TYPE) return false;
-    FILE *file = fopen(passtr(&entry->path), "w");
+    else if (entry->type != FILE_ENTRY_TYPE) return false;
+    FILE *file = fopen(passtr(&entry->path), "wb");
     if (NULL == file)
     {
         fprintf(stderr, "IOError: Can not open file: %s.\n", passtr(&entry->path));
         string_builder_delete(&entry->content);
         exit(1);
     }
-    fclose(file);
-    return true;
+    return fclose(file) == 0;
 }
 
 /**
- * @brief Create a persistant directory on the filesystem.
+ * @brief Create a persistent directory on the filesystem.
  * @param entry Entry to create.
- * @returns True if the entry's path can be created on th filesystem, else false.
+ * @returns True if the entry's path can be created on the filesystem, else false.
  * @exception If the entry's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 bool entry_make_directory(entry_t *entry)
@@ -452,11 +510,11 @@ bool entry_make_directory(entry_t *entry)
         string_builder_delete(&entry->content);
         exit(1);
     }
-    else if (entry->type != DIRECTORY_TYPE) return false;
+    else if (entry->type != DIRECTORY_ENTRY_TYPE) return false;
 #ifdef _WIN32
     int result = _mkdir(passtr(&entry->path));
 #else
-    int result = mkdir(passtr(entry->path), 0755);
+    int result = mkdir(passtr(&entry->path), 0755);
 #endif
     return result == 0;
 }
@@ -464,7 +522,7 @@ bool entry_make_directory(entry_t *entry)
 /**
  * @brief Generic entry creation dispatch.
  * @param entry Entry to create.
- * @returns True if the entry's path can be created on th filesystem, else false.
+ * @returns True if the entry's path can be created on the filesystem, else false.
  * @exception If the entry's path already exists, a `FileExistsError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  * @exception If the entry's path can not be created, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
@@ -472,13 +530,17 @@ bool entry_create(entry_t *entry)
 {
     switch (entry->type)
     {
-        case DIRECTORY_TYPE:
+        case DIRECTORY_ENTRY_TYPE:
         {
             return entry_make_directory(entry);
         } break;
-        default:
+        case FILE_ENTRY_TYPE:
         {
             return entry_touch(entry);
+        } break;
+        default:
+        {
+            return false;
         } break;
     }
 }
@@ -497,12 +559,12 @@ bool entry_remove_directory(entry_t *entry)
         string_builder_delete(&entry->content);
         exit(1);
     }
-    else if (entry->type != DIRECTORY_TYPE) return false;
+    else if (entry->type != DIRECTORY_ENTRY_TYPE) return false;
 #ifdef _WIN32
-    int result = remove(passtr(&entry->path));
+    int result = _rmdir(passtr(&entry->path));
 #else
-    int result = rmdir(passtr(entry->path));
-#endif // _WIN32
+    int result = rmdir(passtr(&entry->path));
+#endif
     return result == 0;
 }
 
@@ -520,7 +582,7 @@ bool entry_remove_file(entry_t *entry)
         string_builder_delete(&entry->content);
         exit(1);
     }
-    else if (entry->type != FILE_TYPE) return false;
+    else if (entry->type != FILE_ENTRY_TYPE) return false;
     return remove(passtr(&entry->path)) == 0;
 }
 
@@ -534,37 +596,32 @@ bool entry_remove(entry_t *entry)
 {
     switch (entry->type)
     {
-        case DIRECTORY_TYPE:
+        case DIRECTORY_ENTRY_TYPE:
         {
             return entry_remove_directory(entry);
         } break;
-        default:
+        case FILE_ENTRY_TYPE:
         {
             return entry_remove_file(entry);
+        } break;
+        default:
+        {
+            return false;
         } break;
     }
 }
 
 /**
- * @brief Obtain the size of the entry in bytes.
+ * @brief Obtain the size of an entry in bytes.
  * @param entry Entry from which to obtain the size.
- * @returns The size of the entry.
- * @exception If the entry's path does not exist, and the entry can not be created, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
- * @exception If the entry can not be read, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
- * @exception If the size of the file can not be obtained, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @returns The size of the entry in bytes.
+ * @exception If the entry's file can not be opened, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
+ * @exception If the file's size can not be obtained, an `IOError` is printed to `stderr` and the programme exits after the entry's content is deallocated.
  */
 size_t entry_size(entry_t *entry)
 {
-    if (!path_exists(&entry->path))
-    {
-        if (!entry_create(entry))
-        {
-            fprintf(stderr, "IOError: Can not create file %s\n", passtr(&entry->path));
-            string_builder_delete(&entry->content);
-            exit(1);
-        }
-    }
-    FILE *file = fopen(passtr(&entry->path), "r");
+    if (!path_exists(&entry->path)) return entry->content.size;
+    FILE *file = fopen(passtr(&entry->path), "rb");
     if (NULL == file)
     {
         fprintf(stderr, "IOError: Can not open file: %s\n", passtr(&entry->path));
