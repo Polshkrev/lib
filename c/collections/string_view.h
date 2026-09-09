@@ -182,8 +182,7 @@ extern "C" {
 
 #ifdef _WIN32
     #include <winnls.h> // CP_UTF8
-    #include <consoleapi.h> // ConsoleCP, ConsoleOutputCP
-    #include <consoleapi2.h> // SetConsoleCP, SetConsoleOutputCP
+    #include <consoleapi2.h> // SetConsoleOutputCP
 #endif // _WIN32
 
 #include <string.h> // strlen, memcmp
