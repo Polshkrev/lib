@@ -1,4 +1,49 @@
 # Changelog
+## v0.34.0 - 2026-09-09
+`Added`
+- C
+    - `collections`
+        - `entry`
+            - Added the `entry_init_as` constructor.
+        - `string_builder`
+            - Add the `string_builder_append_data` function.
+- CPP
+    - `collections`
+        - `entry`
+            - Added the `type_t` constructor overload.
+            - Added the `path_t` and `type_t` constructor overload.
+            - Added a `path` setter.
+            - Added a `content` getter and setter.
+
+`Changed`
+- C
+    - `collections`
+        - `entry`
+            - The names of the type enums have been changed to `*_ENTRY_TYPE`; such as `FILE_ENTRY_TYPE` for example.
+            - `entry_read` now takes advantage of a buffered read.
+            - `entry_read` now has more strict error handling; i.e checking for a file type.
+            - `entry_write_content_to_path` now has more strict error handling; i.e checking for buffer overflow.
+            - All switch-cases dealing with `file_type_t` now uses `NONE_ENTRY_TYPE`, &mdash; or `NONE` &mdash; as a default case.
+            - `entry_size` now accurately evaluates the size of the file on the disk rather than just returning the size of the content buffer.
+            - All documentation has been updated.
+            - All includes have been updated.
+        - `string_builder`
+            - All documentation has been updated.
+- CPP
+    - `collections`
+        - `entry`
+            - All constructor overloads that do not take in a `path_t` parameter are no longer marked with `noexcept`. This is due to any `path_t` constructor throwing an exception.
+            - The `type_to_string` is now marked as `constexpr`.
+            - The `path_t` getter now returns a view to a `path_t`.
+            - The `size` getter is no longer marked as `noexcept`.
+            - The `is_empty` method is no longer marked as `noexcept`.
+            - The `write_content_to_path` function now contains more strict error handling.
+            - The `copy` method now uses `os-specific` implementations.
+            - The `read` method now takes advantage of a buffered read.
+            - The `move` method now uses a standardize implementation.
+            - The `remove` method now throws if the entry is not a file.
+            - All documentation has been updated.
+            - All includes have been updated.
 ## v0.33.0 - 2026-09-08
 `Added`
 - C
