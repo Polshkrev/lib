@@ -564,7 +564,7 @@ bool entry_remove_directory(entry_t *entry)
     int result = _rmdir(passtr(&entry->path));
 #else
     int result = rmdir(passtr(&entry->path));
-#endif
+#endif // _WIN32
     return result == 0;
 }
 
