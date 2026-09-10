@@ -128,7 +128,7 @@ extern "C" {
  * @returns A new dynamic array of files on the filesystem with a given root.
  * @exception If the array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-files_t files_init(char *root)
+files_t files_init(const char *root)
 {
     return files_init_with_capacity(root, FILES_INITIAL_CAPACITY);
 }
@@ -140,7 +140,7 @@ files_t files_init(char *root)
  * @returns A new dynamic array of files on the filesystem with a given root and capacity.
  * @exception If the array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-files_t files_init_with_capacity(char *root, size_t capacity)
+files_t files_init_with_capacity(const char *root, size_t capacity)
 {
     char **files = (char **)malloc(capacity * sizeof(char *));
     if (NULL == files)
