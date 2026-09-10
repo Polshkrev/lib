@@ -10,7 +10,6 @@ namespace polutils
     {
         /**
          * @brief Construct a new dynamic array.
-         * @exception If the array can not be allocated, an `AllocationError` is thrown.
          */
         template <typename Type>
         struct dynamic_array_t : public array_t<Type>
@@ -19,7 +18,7 @@ namespace polutils
              * @brief Construct a new dynamic array.
              * @exception If the array can not be allocated, an `AllocationError` is thrown.
              */
-            explicit dynamic_array_t();
+            explicit dynamic_array_t(void);
 
             /**
              * @brief Construct a new dynamic array with a given initial capacity.
@@ -51,7 +50,7 @@ namespace polutils
          * @exception If the array can not be allocated, an `AllocationError` is thrown.
          */
         template <typename Type>
-        dynamic_array_t<Type>::dynamic_array_t() : array_t<Type>() {}
+        dynamic_array_t<Type>::dynamic_array_t(void) : array_t<Type>() {}
 
         /**
          * @brief Construct a new dynamic array with a given initial capacity.
@@ -73,7 +72,7 @@ namespace polutils
             {
                 this->_resize();
             }
-            this->__items[this->__size++] = item;
+            array_t<Type>::append(item);
         }
     }
 }
