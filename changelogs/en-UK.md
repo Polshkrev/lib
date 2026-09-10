@@ -1,4 +1,19 @@
 # Changelog
+## v0.35.0 - 2026-09-09
+`Added`
+- C
+    - `collections`
+        - `directory`
+            - Added the `directory_empty` function.
+
+`Changed`
+- C
+    - `files`
+        - The `linux` version has now been implemented.
+        - `files_fit` has been made more semantically correct.
+        - The heap allocation and string copying in the `windows` implementation has been made less `os-specific`.
+        - All includes have been updated.
+        - All documentation has been updated.
 ## v0.34.0 - 2026-09-09
 `Added`
 - C
