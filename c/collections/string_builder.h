@@ -439,7 +439,7 @@ void string_builder_resize(string_builder_t *builder)
  * @returns The quotient of the given sizes.
  * @exception If the given divisor is zero, a `ZeroDivisionError` is printed to `stderr` and the programme exits.
  */
-static size_t __safe_size_divide(size_t dividend, size_t divisor)
+static size_t __safe_builder_size_divide(size_t dividend, size_t divisor)
 {
     if (divisor == 0)
     {
@@ -459,7 +459,7 @@ static size_t __safe_size_divide(size_t dividend, size_t divisor)
 void string_builder_resize_by(string_builder_t *builder, size_t scaler)
 {
     if (scaler < 2) return;
-    else if (builder->capacity > __safe_size_divide(SIZE_MAX, scaler))
+    else if (builder->capacity > __safe_builder_size_divide(SIZE_MAX, scaler))
     {
         fprintf(stderr, "OverflowError: The capacity has overflown its type.\n");
         string_builder_delete(builder);
