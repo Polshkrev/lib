@@ -47,7 +47,7 @@ directory_t directory_init_with_capacity(path_t root, size_t capacity);
 void directory_append(directory_t *directory, entry_t entry);
 
 /**
- * @brief Obtain a pointer to an `entry_t` at a given index.
+ * @brief Obtain a pointer to an entry at a given index.
  * @param directory Directory from which to access.
  * @param index Index at which the directory is to be accessed.
  * @exception If the index is outside of the bounds of the directory, an `IndexError` is printed to standard error and the programme exits.
@@ -73,7 +73,7 @@ void directory_resize_by(directory_t *directory, size_t scaler);
 /**
  * @brief Remove from a given directory at a given index.
  * @param directory Directory from which to remove.
- * @param index Index at which to remove an `entry_t`.
+ * @param index Index at which to remove an entry.
  * @exception If the given index is outside of the bounds of the directory, an `IndexError` is printed to standard error and the programme exits.
  */
 void directory_remove(directory_t *directory, size_t index);
