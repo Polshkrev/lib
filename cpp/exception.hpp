@@ -1,0 +1,154 @@
+#ifndef EXCEPTION_HPP
+#define EXCEPTION_HPP
+
+#include <string> // string
+#include <ostream> // ostream
+
+namespace polutils
+{
+    /**
+     * @brief Base Exception class to wrap the cpp `std::exception`.
+     */
+    class Exception : public std::exception
+    {
+        private:
+            /**
+             * @brief Name (de facto python-like type) of the exception.
+             */
+            std::string __name;
+            /**
+             * @brief Full string representation of the exception. Composed of the name, a colon, and the message.
+             */
+            std::string __repr;
+            /**
+             * @brief Message to occompany the exception.
+             */
+            std::string  __message;
+        protected:
+            /**
+             * @brief Assign the name – the main type of exception – to be displayed. This function is marked with the noexcept keyword.
+             * @param name Name to assign.
+             */
+            void _assign_name(const std::string &name) noexcept;
+
+            /**
+             * @brief Assign the representation – a combination of the name and message seperated by a colon – to be displayed. This function is marked with the noexcept keyword.
+             */
+            void _assign_repr() noexcept;
+        public:
+            /**
+             * @brief Default constructor for an exception.
+             */
+            explicit Exception();
+
+            /**
+             * @brief Standard constructor for an exception.
+             * @param message A message string (without newline) to be displayed when the exception is thrown. The parametre is marked with const.
+             */
+            explicit Exception(const std::string &message);
+
+            /**
+             * @brief Standard constructor for an exception.
+             * @param format A message string (without newline) to be displayed when the exception is thrown. The parametre is marked with const.
+             * @param arguemtns Variadic fomatting arguments.
+             */
+            template <typename... Arguments>
+            explicit Exception(const std::string &format, Arguments...arguments);
+
+            /**
+             * @brief Overload to interface with the parent exception class.
+             * @return A const c string.
+             */
+            const char *what() const noexcept override;
+    };
+
+    /**
+     * @brief Operator << overlaod for an exception to aid in printing.
+     * @param stream Output stream to which to write.
+     * @param exception `Exception` from which to write.
+     */
+    void operator<<(std::ostream &stream, const Exception &exception);
+}
+
+#endif // EXCEPTION_HPP_
+
+#ifdef EXCEPTION_IMPLEMENTATION
+
+#define BUFFER_IMPLEMENTATION
+#include "../c/collections/buffer.h" // bufer_save, buffer_sprintf, buffer_rewind
+
+namespace polutils
+{
+    /**
+     * @brief Default constructor for an exception.
+     */
+    Exception::Exception()
+    {
+        _assign_name("Exception");
+        _assign_repr();
+    }
+
+    /**
+     * @brief Standard constructor for an exception.
+     * @param message A message string (without newline) to be displayed when the exception is thrown. The parametre is marked with const.
+     */
+    Exception::Exception(const std::string &message) : __message(message)
+    {
+        _assign_name("Exception");
+        _assign_repr();
+    }
+
+    /**
+     * @brief Standard constructor for an exception.
+     * @param format A message string (without newline) to be displayed when the exception is thrown. The parametre is marked with const.
+     * @param arguemtns Variadic fomatting arguments.
+     */
+    template <typename... Arguments>
+    Exception::Exception(const std::string &format, Arguments... arguments)
+    {
+        std::size_t checkpoint = buffer_save();
+        _assign_name("Exception");
+        __message.assign(buffer_sprintf(format.c_str(), arguments...));
+        _assign_repr();
+        buffer_rewind(checkpoint);
+    }
+
+    /**
+     * @brief Assign the name – the main type of exception – to be displayed. This function is marked with the noexcept keyword.
+     * @param name Name to assign.
+     */
+    void Exception::_assign_name(const std::string &name) noexcept
+    {
+        __name = name.data();
+        _assign_repr();
+    }
+
+    /**
+     * @brief Assign the representation – a combination of the name and message seperated by a colon – to be displayed. This function is marked with the noexcept keyword.
+     */
+    void Exception::_assign_repr() noexcept
+    {
+        __repr = __name + ": " + __message;
+    }
+
+    /**
+     * @brief Overload to interface with the parent exception class.
+     * @return A const c string.
+     */
+    const char *Exception::what() const noexcept
+    {
+        return (__repr).c_str();
+    }
+
+    /**
+     * @brief Operator << overlaod for an exception to aid in printing.
+     * @param stream Output stream to which to write.
+     * @param exception `Exception` from which to write.
+     */
+    void operator<<(std::ostream &stream, const Exception &exception)
+    {
+        stream << exception.what() << "\n";
+    }
+}
+
+#endif // EXCEPTION_IMPLEMENTATION
