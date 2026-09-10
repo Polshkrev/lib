@@ -6,6 +6,7 @@ type = "library"
 
 [project.version]
 minor = 38
+name = "The Fayl Update"
 
 [license]
 type = "MIT"
