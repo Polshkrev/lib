@@ -29,7 +29,7 @@ namespace polutils
                 /**
                  * @brief Append an item to the array. This method is marked as virtual and can be overridden.
                  * @param item Item to be appended.
-                 * @exception If the array if full, a `ValueError` is thrown.
+                 * @exception If the array is full, a `ValueError` is thrown.
                  */
                 virtual void append(Type item) override;
 
@@ -37,16 +37,15 @@ namespace polutils
                  * @brief Obtain a mutable pointer to an element at a given index within the array. This method is marked as virtual and can be overridden.
                  * @param index Index at which the element within the array is located.
                  * @exception If the array is evaluated to be empty, a `ValueError` is thrown.
-                 * @exception If the given index is greater than the size of the array, an `IndexError` is thrown.
+                 * @exception If the given index is outside of the array bounds, an `IndexError` is thrown.
                  */
                 virtual Type *at(std::size_t index) const override;
 
                 /**
-                 * @brief Remove an element from the array at a given index. This method is marked as virtual and can be overridden.
+                 * @brief Remove an element from the array at a given index.
                  * @param index Index at which the element within the array is located.
                  * @exception If the array is empty, a `ValueError` is thrown.
-                 * @exception If the given index is greater than the size of the array, an `OutOfRangeError` is thrown.
-                 * @exception If the array's memory can not be reallocated, an `AllocationError` is thrown.
+                 * @exception If the given index is outside of the array bounds, an `OutOfRangeError` is thrown.
                  */
                 virtual void remove(std::size_t index) override;
 
@@ -54,19 +53,19 @@ namespace polutils
                  * @brief Obtain the size of the collection.
                  * @returns The size of the collection.
                  */
-                std::size_t size() const noexcept;
+                std::size_t size(void) const noexcept;
 
                 /**
                  * @brief Determine if the collection is empty.
                  * @returns True if the collection is determined to be empty, else false.
                  */
-                virtual bool is_empty() const noexcept;
+                virtual bool is_empty(void) const noexcept;
 
                 /**
                  * @brief Determine if the array is full.
                  * @returns True if the size of the array is greater than or equal to its capacity.
                  */
-                virtual bool is_full() const noexcept;
+                virtual bool is_full(void) const noexcept;
 
                 /**
                  * @brief Virtual destructor override to cleanup resources.
@@ -81,11 +80,11 @@ namespace polutils
                 void _resize(void);
 
                 /**
-                 * @brief Resize the array by a given scaler.
-                 * @param scaler Scaler value by which to resize the array.
+                 * @brief Resize the array by a given scalar.
+                 * @param scalar Scalar value by which to resize the array.
                  * @exception If the array can not be reallocated, an `AllocationError` is thrown.
                  */
-                void _resize(std::size_t scaler);
+                void _resize(std::size_t scalar);
 
                 /**
                  * @brief Deallocate the array.
@@ -115,7 +114,7 @@ namespace polutils
 
 #ifdef ARRAY_IMPLEMENTATION
 
-#include <cstdlib> // std::calloc, std::free, nullptr
+#include <cstdlib> // std::malloc, std::realloc, std::free
 
 #define EXCEPTIONS_IMPLEMENTATION
 #include "../exceptions.hpp" // AllocationError, ValueError, IndexError, OutOfRangeError
@@ -127,11 +126,11 @@ namespace polutils
 namespace
 {
     /**
-     * @brief Determine whether a given size is between a given upper and lower boundry.
-     * @param index Size to fit into each boundry.
-     * @param lower_limit The lowest most value the index can be checked against.
-     * @param upper_limit The highest most value the index can be checked against.
-     * @returns Whether or not the given index is within the two given upper and lower boundry.
+     * @brief Determine whether a given index is within a given range.
+     * @param index Index to check.
+     * @param lower_limit Lowest value the index can contain.
+     * @param upper_limit Highest value the index can contain.
+     * @returns True if the index is within the given range, else false.
      */
     constexpr bool __check_bounds(std::size_t index, std::size_t lower_limit, std::size_t upper_limit) noexcept
     {
@@ -148,9 +147,9 @@ namespace polutils
          * @exception If the array can not be allocated, an `AllocationError` is thrown.
          */
         template <typename Type>
-        array_t<Type>::array_t() : __size(0), __capacity(ARRAY_CAPACITY)
+        array_t<Type>::array_t(void) : __items(nullptr), __size(0), __capacity(ARRAY_CAPACITY)
         {
-            __items = static_cast<Type *>(std::calloc(__capacity, sizeof(Type)));
+            __items = static_cast<Type *>(std::malloc(__capacity * sizeof(Type)));
             if (nullptr == __items)
             {
                 throw AllocationError("Can not allocate enough memory for the array.");
@@ -162,9 +161,13 @@ namespace polutils
          * @exception If the array can not be allocated, an `AllocationError` is thrown.
          */
         template <typename Type>
-        array_t<Type>::array_t(std::size_t capacity) : __size(0), __capacity(capacity)
+        array_t<Type>::array_t(std::size_t capacity) : __items(nullptr), __size(0), __capacity(capacity)
         {
-            __items = static_cast<Type *>(std::calloc(__capacity, sizeof(Type)));
+            if (capacity == 0)
+            {
+                throw AllocationError("Can not allocate a capacity of zero.");
+            }
+            __items = static_cast<Type *>(std::malloc(__capacity * sizeof(Type)));
             if (nullptr == __items)
             {
                 throw AllocationError("Can not allocate enough memory for the array.");
@@ -174,7 +177,7 @@ namespace polutils
         /**
          * @brief Append an item to the array. This method is marked as virtual and can be overridden.
          * @param item Item to be appended.
-         * @exception If the array if full, a `ValueError` is thrown.
+         * @exception If the array is full, a `ValueError` is thrown.
          */
         template <typename Type>
         void array_t<Type>::append(Type item)
@@ -190,28 +193,27 @@ namespace polutils
          * @brief Obtain a mutable pointer to an element at a given index within the array. This method is marked as virtual and can be overridden.
          * @param index Index at which the element within the array is located.
          * @exception If the array is evaluated to be empty, a `ValueError` is thrown.
-         * @exception If the given index is greater than the size of the array, an `IndexError` is thrown.
+         * @exception If the given index is outside of the array bounds, an `IndexError` is thrown.
          */
         template <typename Type>
         Type *array_t<Type>::at(std::size_t index) const
         {
             if (is_empty())
             {
-                throw ValueError("Can not remove an element from an empty array.");
+                throw ValueError("Can not access an element from an empty array.");
             }
-            else if (!__check_bounds(index, 0, __size))
+            else if (!__check_bounds(index, 0, __size - 1))
             {
-                throw IndexError("Can not access element outside of array capacity.");
+                throw IndexError("Can not access element outside of array bounds.");
             }
             return &__items[index];
         }
 
         /**
-         * @brief Remove an element from the array at a given index. This method is marked as virtual and can be overridden.
+         * @brief Remove an element from the array at a given index.
          * @param index Index at which the element within the array is located.
          * @exception If the array is empty, a `ValueError` is thrown.
-         * @exception If the given index is greater than the size of the array, an `OutOfRangeError` is thrown.
-         * @exception If the array's memory can not be reallocated, an `AllocationError` is thrown.
+         * @exception If the given index is outside of the array bounds, an `OutOfRangeError` is thrown.
          */
         template <typename Type>
         void array_t<Type>::remove(std::size_t index)
@@ -220,20 +222,17 @@ namespace polutils
             {
                 throw ValueError("Can not remove an element from an empty array.");
             }
-            else if (index >= __size) {
+            else if (index >= __size)
+            {
                 throw OutOfRangeError("Can not access element outside of array bounds.");
             }
-            for (size_t i = index; i < __size - 1; i++) {
-                __items[i] = __items[i + 1];
+
+            for (std::size_t current_index = index; current_index + 1 < __size; ++current_index)
+            {
+                __items[current_index] = __items[current_index + 1];
             }
-            __size--;
-            Type *temp = static_cast<Type*>(std::realloc(__items, __size * sizeof(Type)));
-            if (temp == nullptr) {
-                throw AllocationError("Can not resize array.");
-            }
-            __items = temp;
-            std::free(temp);
-            temp = nullptr;
+
+            --__size;
         }
 
         /**
@@ -241,7 +240,7 @@ namespace polutils
          * @returns The size of the collection.
          */
         template <typename Type>
-        std::size_t array_t<Type>::size() const noexcept
+        std::size_t array_t<Type>::size(void) const noexcept
         {
             return __size;
         }
@@ -251,7 +250,7 @@ namespace polutils
          * @returns True if the collection is determined to be empty, else false.
          */
         template <typename Type>
-        bool array_t<Type>::is_empty() const noexcept
+        bool array_t<Type>::is_empty(void) const noexcept
         {
             return __size == 0 || nullptr == __items;
         }
@@ -261,7 +260,7 @@ namespace polutils
          * @returns True if the size of the array is greater than or equal to its capacity.
          */
         template <typename Type>
-        bool array_t<Type>::is_full() const noexcept
+        bool array_t<Type>::is_full(void) const noexcept
         {
             return __size >= __capacity;
         }
@@ -271,32 +270,38 @@ namespace polutils
          * @exception If the array can not be reallocated, an `AllocationError` is thrown.
          */
         template <typename Type>
-        void array_t<Type>::_resize()
+        void array_t<Type>::_resize(void)
         {
             _resize(2);
         }
 
         /**
-         * @brief Resize the array by a given scaler.
-         * @param scaler Scaler value by which to resize the array.
+         * @brief Resize the array by a given scalar.
+         * @param scalar Scalar value by which to resize the array.
          * @exception If the array can not be reallocated, an `AllocationError` is thrown.
          */
         template <typename Type>
-        void array_t<Type>::_resize(std::size_t scaler)
+        void array_t<Type>::_resize(std::size_t scalar)
         {
-            __capacity *= scaler;
-            __items = static_cast<Type *>(std::realloc(__items, sizeof(Type) * __capacity));
-            if (nullptr == __items)
+            if (scalar < 2) return;
+            std::size_t new_capacity = __capacity * scalar;
+
+            Type *resized_items = static_cast<Type *>(std::realloc(__items, sizeof(Type) * new_capacity));
+
+            if (nullptr == resized_items)
             {
                 throw AllocationError("Can not resize array.");
             }
+
+            __items = resized_items;
+            __capacity = new_capacity;
         }
 
         /**
          * @brief Deallocate the array.
          */
         template <typename Type>
-        void array_t<Type>::_delete()
+        void array_t<Type>::_delete(void)
         {
             __capacity = 0;
             __size = 0;
