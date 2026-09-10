@@ -13,7 +13,7 @@ extern "C" {
  */
 typedef struct
 {
-    const char *root;
+    char *root;
     char **files;
     size_t size;
     size_t capacity;
@@ -25,7 +25,7 @@ typedef struct
  * @returns A new dynamic array of files on the filesystem with a given root.
  * @exception If the array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-files_t files_init(const char *root);
+files_t files_init(char *root);
 
 /**
  * @brief Construct a new dynamic array of files with a given root and initial capacity.
@@ -34,51 +34,51 @@ files_t files_init(const char *root);
  * @returns A new dynamic array of files on the filesystem with a given root and capacity.
  * @exception If the array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-files_t files_init_with_capacity(const char *root, size_t capacity);
+files_t files_init_with_capacity(char *root, size_t capacity);
 
 /**
  * @brief Append a new filepath to the array of files.
  * @param files Array of files to which to append.
- * @param entry Path from which to append.
- * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated..
- * @exception If the owned item can not be allocated, a `ValueError` is printed to `stderr` and the progamme exits after the given files are deallocated.
+ * @param entry Path to append.
+ * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated.
+ * @exception If the entry can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated.
  */
 void files_append(files_t *files, const char *entry);
 
 /**
  * @brief Obtain a path at a given index within the array of files.
- * @param files Array of files from which to search.
- * @param index Index from which to search.
- * @returns A pointer to a path within the array of files at the given index.
+ * @param files Array of files from which to obtain a path.
+ * @param index Index of the path to obtain.
+ * @returns A pointer to the path within the array of files at the given index.
  * @returns If the given index is greater than or equal to the size of the array of files, `NULL` is returned.
  */
 char **files_at(const files_t *files, size_t index);
 
 /**
- * @brief Resize the array of files by a scaler value of two.
+ * @brief Resize the array of files by a scaling factor of two.
  * @param files Array of files to resize.
  * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated.
  */
 void files_resize(files_t *files);
 
 /**
- * @brief Resize the array of files by a given scaler value.
+ * @brief Resize the array of files by a given scaling factor.
  * @param files Array of files to resize.
- * @param scaler Scaler value from which to resize the array of files.
+ * @param scaler Scaling factor by which to resize the array of files.
  * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated.
  */
 void files_resize_by(files_t *files, size_t scaler);
 
 /**
- * @brief Assign the capacity of the array to the size.
+ * @brief Reduce the capacity of the array to its current size.
  * @param files Array to fit.
  */
 void files_fit(files_t *files);
 
 /**
- * @brief Extend the array of files.
- * @param files Array of files to extend.
- * @returns True if the paths stored at the root can be added, else false.
+ * @brief Fill the array of files with the files contained at its root.
+ * @param files Array of files to fill.
+ * @returns True if the files contained at the root can be obtained, else false.
  */
 bool files_fill(files_t *files);
 
@@ -88,6 +88,10 @@ bool files_fill(files_t *files);
  */
 void files_delete(files_t *files);
 
+#if defined(__cplusplus)
+}
+#endif
+
 #endif // FILES_H
 
 #ifdef FILES_IMPLEMENTATION
@@ -96,18 +100,27 @@ void files_delete(files_t *files);
 extern "C" {
 #endif
 
-#include <stdio.h> // fprintf, stderr
-#include <stdlib.h> // malloc, free, NULL
-#include <string.h> // strcmp
+#include <stdio.h> // fprintf, stderr, snprintf
+#include <stdlib.h> // malloc, realloc, free, exit, NULL
+#include <string.h> // strlen, strcmp, strcpy_s
+#include <stdint.h> // SIZE_MAX
 
 #ifdef _WIN32
-#include <handleapi.h> // INVALID_HANDLE_VALUE, MAX_PATH
-#include <fileapi.h> // FindFirstFile, FindNextFile, WIN32_FIND_DATA, FILE_ATTRIBUTE_DIRECTORY, FindClose
-#include <minwindef.h> // HANDLE
-#include <tchar.h> // ! NEEDED FOR STRSAFE.H
-#include <strsafe.h> // StringCbCopy, StringCchCopy, StringCchCat
-#define FILES_CAPACITY 256
-#endif // FILES_CAPACITY
+    #include <minwindef.h> // MAX_PATH, HANDLE
+    #include <handleapi.h> // INVALID_HANDLE_VALUE, FindClose
+    #include <fileapi.h> // FindFirstFile, FindNextFile, WIN32_FIND_DATA, FILE_ATTRIBUTE_DIRECTORY
+    #include <strsafe.h> // StringCchCopy, StringCchCat
+#elif defined(__linux__)
+    #include <dirent.h> // DIR, opendir, readdir, closedir, struct dirent
+    #include <limits.h> // PATH_MAX
+    #include <sys/stat.h> // stat, struct stat, S_ISDIR
+#else
+    #error "NotImplementedError: The current platform is not supported."
+#endif // _WIN32
+
+#ifndef FILES_INITIAL_CAPACITY 
+#define FILES_INITIAL_CAPACITY 256
+#endif // FILES_INITIAL_CAPACITY
 
 /**
  * @brief Construct a new dynamic array of files with a given root.
@@ -115,9 +128,9 @@ extern "C" {
  * @returns A new dynamic array of files on the filesystem with a given root.
  * @exception If the array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-files_t files_init(const char *root)
+files_t files_init(char *root)
 {
-    return files_init_with_capacity(root, FILES_CAPACITY);
+    return files_init_with_capacity(root, FILES_INITIAL_CAPACITY);
 }
 
 /**
@@ -127,7 +140,7 @@ files_t files_init(const char *root)
  * @returns A new dynamic array of files on the filesystem with a given root and capacity.
  * @exception If the array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-files_t files_init_with_capacity(const char *root, size_t capacity)
+files_t files_init_with_capacity(char *root, size_t capacity)
 {
     char **files = (char **)malloc(capacity * sizeof(char *));
     if (NULL == files)
@@ -147,36 +160,39 @@ files_t files_init_with_capacity(const char *root, size_t capacity)
 /**
  * @brief Append a new filepath to the array of files.
  * @param files Array of files to which to append.
- * @param entry Path from which to append.
- * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated..
- * @exception If the owned item can not be allocated, a `ValueError` is printed to `stderr` and the progamme exits after the given files are deallocated.
+ * @param entry Path to append.
+ * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated.
+ * @exception If the entry can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated.
  */
 void files_append(files_t *files, const char *entry)
 {
-    if (files->size >= files->capacity)
+    if (files->size >= files->capacity) files_resize(files);
+
+    size_t entry_size = strlen(entry) + 1;
+
+    files->files[files->size] = (char *)malloc(entry_size);
+
+    if (NULL == files->files[files->size])
     {
-        files_resize(files);
-    }
-    files->files[files->size] = (char *)malloc((strlen(entry) + 1) * sizeof(char));
-    if (files->files[files->size] == NULL)
-    {
-        fprintf(stderr, "ValueError: Can not allocate enough memory for entry: '%s'.\n", entry);
+        fprintf(stderr, "AllocationError: Can not allocate enough memory for entry: '%s'.\n", entry);
         files_delete(files);
         exit(1);
     }
-#ifdef _WIN32
-    StringCbCopy(files->files[files->size], (strlen(entry) + 1) * sizeof(char), entry);
-#else
-#error "NotImplementedError: The linux version of `files_append()` has not been defined yet."
-#endif
+    else if (strcpy_s(files->files[files->size], entry_size, entry) != 0)
+    {
+        fprintf(stderr, "RuntimeError: Can not copy entry: '%s'.\n", entry);
+        files_delete(files);
+        exit(1);
+    }
+
     files->size++;
 }
 
 /**
  * @brief Obtain a path at a given index within the array of files.
- * @param files Array of files from which to search.
- * @param index Index from which to search.
- * @returns A pointer to a path within the array of files at the given index.
+ * @param files Array of files from which to obtain a path.
+ * @param index Index of the path to obtain.
+ * @returns A pointer to the path within the array of files at the given index.
  * @returns If the given index is greater than or equal to the size of the array of files, `NULL` is returned.
  */
 char **files_at(const files_t *files, size_t index)
@@ -186,7 +202,7 @@ char **files_at(const files_t *files, size_t index)
 }
 
 /**
- * @brief Resize the array of files by a scaler value of two.
+ * @brief Resize the array of files by a scaling factor of two.
  * @param files Array of files to resize.
  * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated.
  */
@@ -196,16 +212,40 @@ void files_resize(files_t *files)
 }
 
 /**
- * @brief Resize the array of files by a given scaler value.
+ * @brief Safely divide a given dividend size by a given divisor size.
+ * @param dividend Dividend to which to divide.
+ * @param divisor Divisor from which to divide.
+ * @returns The quotient of the given sizes.
+ * @exception If the given divisor is zero, a `ZeroDivisionError` is printed to `stderr` and the programme exits.
+ */
+static size_t __safe_file_size_divide(size_t dividend, size_t divisor)
+{
+    if (divisor == 0)
+    {
+        fprintf(stderr, "ZeroDivisionError: Can not divide by zero.\n");
+        exit(1);
+    }
+    return (dividend / divisor);
+}
+
+/**
+ * @brief Resize the array of files by a given scaling factor.
  * @param files Array of files to resize.
- * @param scaler Scaler value from which to resize the array of files.
- * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated..
+ * @param scaler Scaling factor by which to resize the array of files.
+ * @exception If the array of files can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given files are deallocated.
  */
 void files_resize_by(files_t *files, size_t scaler)
 {
+    if (scaler < 2) return;
+    else if (files->capacity > __safe_file_size_divide(SIZE_MAX, scaler))
+    {
+        fprintf(stderr, "OverflowError: The capacity has overflown its type.\n");
+        files_delete(files);
+        exit(1);
+    }
     files->capacity *= scaler;
-    files->files = (char **)realloc(files->files, files->capacity);
-    if (NULL == files)
+    files->files = (char **)realloc(files->files, files->capacity * sizeof(char *));
+    if (NULL == files->files)
     {
         fprintf(stderr, "AllocationError: Can not allocate files array.\n");
         files_delete(files);
@@ -214,11 +254,29 @@ void files_resize_by(files_t *files, size_t scaler)
 }
 
 /**
- * @brief Assign the capacity of the array to the size.
+ * @brief Reduce the capacity of the array to its current size.
  * @param files Array to fit.
  */
 void files_fit(files_t *files)
 {
+    if (files->size == files->capacity) return;
+
+    if (files->size == 0)
+    {
+        free(files->files);
+        files->files = NULL;
+        files->capacity = 0;
+        return;
+    }
+
+    files->files = realloc(files->files, files->size * sizeof(char *));
+    if (NULL == files->files)
+    {
+        fprintf(stderr, "AllocationError: Can not fit files array.\n");
+        files_delete(files);
+        exit(1);
+    }
+
     files->capacity = files->size;
 }
 
@@ -232,9 +290,11 @@ void files_delete(files_t *files)
     for (size_t i = 0; i < files->size; ++i)
     {
         free(files->files[i]);
+        files->files[i] = NULL;
     }
     free(files->files);
     files->files = NULL;
+    files->root = NULL;
     files->size = 0;
     files->capacity = 0;
 }
@@ -242,59 +302,121 @@ void files_delete(files_t *files)
 #ifdef _WIN32
 
 /**
- * @brief Obtain the entries at the given array root.
+ * @brief Obtain the files contained at the given directory path.
  * @param files Array of files to which to append.
- * @param handle Handle to the directory to open.
- * @param data Pointer to the data within the directory.
- * @returns True if the entries contained at the directory root can be obtained, else false.
+ * @param path Directory path from which to obtain files.
+ * @returns True if the files contained at the given path can be obtained, else false.
  */
 static bool _get_entries_windows(files_t *files, const char *path)
 {
-    char buffer[MAX_PATH] = {0};
+    char search_path[MAX_PATH];
     WIN32_FIND_DATA data;
 
-    HANDLE find = INVALID_HANDLE_VALUE;
-    StringCchCopy(buffer, MAX_PATH, path);
-    StringCchCat(buffer, MAX_PATH, "\\*");
-    find = FindFirstFile(buffer, &data);
+    StringCchCopy(search_path, MAX_PATH, path);
+    StringCchCat(search_path, MAX_PATH, "\\*");
+
+    HANDLE find = FindFirstFile(search_path, &data);
+
     if (INVALID_HANDLE_VALUE == find) return false;
 
-    bool result = true;
     do
     {
         if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0) continue;
 
         char full_path[MAX_PATH];
+
         StringCchCopy(full_path, MAX_PATH, path);
         StringCchCat(full_path, MAX_PATH, "\\");
         StringCchCat(full_path, MAX_PATH, data.cFileName);
-        files_append(files, full_path);
 
         if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
         {
             if (!_get_entries_windows(files, full_path))
             {
-                result = false;
+                FindClose(find);
+                return false;
             }
         }
+        else
+        {
+            files_append(files, full_path);
+        }
+
     } while (FindNextFile(find, &data) != 0);
+
     FindClose(find);
-    return result;
+
+    return true;
 }
+
 #else
+
+/**
+ * @brief Obtain the files contained at the given directory path.
+ * @param files Array of files to which to append.
+ * @param path Directory path from which to obtain files.
+ * @returns True if the files contained at the given path can be obtained, else false.
+ */
+static bool _get_entries_linux(files_t *files, const char *path)
+{
+    DIR *directory = opendir(path);
+
+    if (NULL == directory) return false;
+
+    struct dirent *entry;
+
+    while (NULL != (entry = readdir(directory)))
+    {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
+
+        char full_path[PATH_MAX];
+
+        int result = snprintf(full_path, sizeof(full_path), "%s/%s", path, entry->d_name);
+
+        if (result < 0 || (size_t)result >= sizeof(full_path))
+        {
+            closedir(directory);
+            return false;
+        }
+
+        struct stat information;
+
+        if (stat(full_path, &information) != 0)
+        {
+            closedir(directory);
+            return false;
+        }
+        else if (entry->d_type == DT_DIR)
+        {
+            if (!_get_entries_linux(files, full_path))
+            {
+                closedir(directory);
+                return false;
+            }
+        }
+        else
+        {
+            files_append(files, full_path);
+        }
+    }
+
+    closedir(directory);
+
+    return true;
+}
 #endif // _WIN32
 
 /**
- * @brief Extend the array of files.
- * @param files Array of files to extend.
- * @returns True if the paths stored at the root can be added, else false.
+ * @brief Fill the array of files with the files contained at its root.
+ * @param files Array of files to fill.
+ * @returns True if the files contained at the root can be obtained, else false.
  */
 bool files_fill(files_t *files)
 {
 #ifdef _WIN32
     bool result = _get_entries_windows(files, files->root);
 #else
-#error "NotImplementedError: The linux version of `files_fill()` has not been defined yet."
+    bool result = _get_entries_linux(files, files->root);
 #endif // _WIN32
     return result;
 }
