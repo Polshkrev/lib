@@ -5,7 +5,8 @@
 extern "C" {
 #endif
 
-#include <stddef.h> // size_t, NULL
+#include <stddef.h> // NULL
+#include <stdint.h> // uint8_t, UINT8_MAX
 #include <stdbool.h> // bool
 #include <stdio.h> // FILE, stderr, fprintf
 
@@ -16,15 +17,14 @@ typedef struct
 {
     const char *name;
     const char *description;
-    size_t major;
-    size_t minor;
-    size_t patch;
+    uint8_t major;
+    uint8_t minor;
+    uint8_t patch;
 } version_t;
 
 /**
  * @brief Construct a new version object. Each of the version properties are set to zero and the name is set to NULL.
  * @returns A new version object.
- * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
 version_t version_init(void);
 
@@ -33,16 +33,14 @@ version_t version_init(void);
  * @param major Major release number.
  * @param minor Minor release number.
  * @param patch Patch fix number.
- * @returns A new version object with each of the properties set to the given parametres.
- * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
+ * @returns A new version object with each of the properties set to the given parameters.
  */
-version_t version_convert(size_t major, size_t minor, size_t patch);
+version_t version_convert(uint8_t major, uint8_t minor, uint8_t patch);
 
 /**
  * @brief Construct a new version object with a given name.
  * @param name Constant string to pass to the version object.
  * @returns A new version with the given name and each of its release properties set to zero.
- * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
 version_t version_init_with_name(const char *name);
 
@@ -50,8 +48,7 @@ version_t version_init_with_name(const char *name);
  * @brief Construct a version object using only the string properties.
  * @param name Name to set for the version object.
  * @param description Description, or changlog, of a version object.
- * @returns A new version with its string realted properties set as the given arguments and its numeric properties set to 0.
- * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
+ * @returns A new version with its string realted properties set as the given arguments and its numeric properties set to zero.
  */
 version_t version_init_strings(const char *name, const char *description);
 
@@ -62,31 +59,30 @@ version_t version_init_strings(const char *name, const char *description);
  * @param major Major release number.
  * @param minor Minor release number.
  * @param patch Patch fix number.
- * @returns A new version initialized with all its properties set to the given parametres.
- * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
+ * @returns A new version initialized with all its properties set to the given parameters.
  */
-version_t version_init_full(const char *name, const char *description, size_t major, size_t minor, size_t patch);
+version_t version_init_full(const char *name, const char *description, uint8_t major, uint8_t minor, uint8_t patch);
 
 /**
  * @brief Set the major value of a version object.
  * @param version Object to update.
  * @param major Value from which to set.
  */
-void version_set_major(version_t *version, size_t major);
+void version_set_major(version_t *version, uint8_t major);
 
 /**
  * @brief Set the minor value of a version object.
  * @param version Object to update.
  * @param minor Value from which to set.
  */
-void version_set_minor(version_t *version, size_t minor);
+void version_set_minor(version_t *version, uint8_t minor);
 
 /**
  * @brief Set the patch value of a version object.
  * @param version Object to update.
  * @param patch Value from which to set.
  */
-void version_set_patch(version_t *version, size_t patch);
+void version_set_patch(version_t *version, uint8_t patch);
 
 /**
  * @brief Publish a new version. Sets the given version's major release number to one.
@@ -98,18 +94,21 @@ void version_publish(version_t *version);
 /**
  * @brief Release a given version. Increment the given version object's major release number.
  * @param version Version object to upgrade.
+ * @exception If the version's major property is equal to the maximum `uint8_t`, a `ValueError` is printed to `stderr` and the programme exits.
  */
 void version_release(version_t *version);
 
 /**
  * @brief Update a given version. Increment the given version object's minor release number.
  * @param version Version object to update.
+ * @exception If the version's minor property is equal to the maximum `uint8_t`, a `ValueError` is printed to `stderr` and the programme exits.
  */
 void version_update(version_t *version);
 
 /**
  * @brief Fix a given version. Increment the given version object's patch release number.
  * @param version Version object to patch.
+ * @exception If the version's patch property is equal to the maximum `uint8_t`, a `ValueError` is printed to `stderr` and the programme exits.
  */
 void version_fix(version_t *version);
 
@@ -126,7 +125,7 @@ bool version_is_public(const version_t *version);
  * @param major Major release number to compare.
  * @returns False if the given version object's major version is not equal to the given major parametre, else true.
  */
-bool version_compare_major(const version_t *version, size_t major);
+bool version_compare_major(const version_t *version, uint8_t major);
 
 /**
  * @brief Compare the minor release of a given version object.
@@ -134,7 +133,7 @@ bool version_compare_major(const version_t *version, size_t major);
  * @param minor Minor release number to compare.
  * @returns False if the given version object's minor version is not equal to the given minor parametre, else true.
  */
-bool version_compare_minor(const version_t *version, size_t minor);
+bool version_compare_minor(const version_t *version, uint8_t minor);
 
 /**
  * @brief Compare the patch release of a given version object.
@@ -142,7 +141,7 @@ bool version_compare_minor(const version_t *version, size_t minor);
  * @param patch Patch release number to compare.
  * @returns False if the given version object's patch version is not equal to the given patch parametre, else true.
  */
-bool version_compare_patch(const version_t *version, size_t patch);
+bool version_compare_patch(const version_t *version, uint8_t patch);
 
 /**
  * @brief Compare one given version object to another.
@@ -150,7 +149,7 @@ bool version_compare_patch(const version_t *version, size_t patch);
  * @param other Version object to compare.
  * @returns False if all of one given version object's properties are not equal to each other, else true.
  */
-bool version_comapre(const version_t *version, const version_t *other);
+bool version_compare(const version_t *version, const version_t *other);
 
 /**
  * @brief Print a given version in a given output stream. If the version's name is not given or NULL, then the name is not printed.
@@ -172,12 +171,11 @@ extern "C" {
 #endif
 
 #include <stdlib.h> // exit
-#include <string.h> // memset
+#include <inttypes.h> // PRIu8
 
 /**
  * @brief Construct a new version object. Each of the version properties are set to zero and the name is set to NULL.
  * @returns A new version object.
- * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
 version_t version_init(void)
 {
@@ -189,10 +187,9 @@ version_t version_init(void)
  * @param major Major release number.
  * @param minor Minor release number.
  * @param patch Patch fix number.
- * @returns A new version object with each of the properties set to the given parametres.
- * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
+ * @returns A new version object with each of the properties set to the given parameters.
  */
-version_t version_convert(size_t major, size_t minor, size_t patch)
+version_t version_convert(uint8_t major, uint8_t minor, uint8_t patch)
 {
     return version_init_full(NULL, NULL, major, minor, patch);
 }
@@ -201,7 +198,6 @@ version_t version_convert(size_t major, size_t minor, size_t patch)
  * @brief Initialize a new version object with a given name.
  * @param name Constant string to pass to the version object.
  * @returns A new version with the given name and each of its release properties set to zero.
- * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
 version_t version_init_with_name(const char *name)
 {
@@ -212,8 +208,7 @@ version_t version_init_with_name(const char *name)
  * @brief Construct a version object using only the string properties.
  * @param name Name to set for the version object.
  * @param description Description, or changlog, of a version object.
- * @returns A new version with its string realted properties set as the given arguments and its numeric properties set to 0.
- * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
+ * @returns A new version with its string realted properties set as the given arguments and its numeric properties set to zero.
  */
 version_t version_init_strings(const char *name, const char *description)
 {
@@ -227,10 +222,9 @@ version_t version_init_strings(const char *name, const char *description)
  * @param major Major release number.
  * @param minor Minor release number.
  * @param patch Patch fix number.
- * @returns A new version initialized with all its properties set to the given parametres.
- * @exception If the version object can not be heap allocated, an `AllocationError` is printed to `stderr` and the programme exits.
+ * @returns A new version initialized with all its properties set to the given parameters.
  */
-version_t version_init_full(const char *name, const char *description, size_t major, size_t minor, size_t patch)
+version_t version_init_full(const char *name, const char *description, uint8_t major, uint8_t minor, uint8_t patch)
 {
     return (version_t)
     {
@@ -247,7 +241,7 @@ version_t version_init_full(const char *name, const char *description, size_t ma
  * @param version Object to update.
  * @param major Value from which to set.
  */
-void version_set_major(version_t *version, size_t major)
+void version_set_major(version_t *version, uint8_t major)
 {
     version->major = major;
 }
@@ -257,7 +251,7 @@ void version_set_major(version_t *version, size_t major)
  * @param version Object to update.
  * @param minor Value from which to set.
  */
-void version_set_minor(version_t *version, size_t minor)
+void version_set_minor(version_t *version, uint8_t minor)
 {
     version->minor = minor;
 }
@@ -267,34 +261,35 @@ void version_set_minor(version_t *version, size_t minor)
  * @param version Object to update.
  * @param patch Value from which to set.
  */
-void version_set_patch(version_t *version, size_t patch)
+void version_set_patch(version_t *version, uint8_t patch)
 {
     version->patch = patch;
 }
 
 /**
- * @brief Internal way of printing a given version object for error reporting.
- * @param version Version object to print.
+ * @brief Generic print function for a given version.
+ * @param stream Stream to which to print the given version.
+ * @param version Version to print.
+ * @param newline Flag to add a newline to the output.
  */
-static void _version_error_print(FILE *stream, const version_t *version)
+static void _version_print(FILE *stream, const version_t *version, bool newline)
 {
-    if ((NULL == version->name) && (NULL == version->description))
+    if (version->name != NULL)
     {
-        fprintf(stream, "%d.%d.%d", (int)version->major, (int)version->minor, (int)version->patch);
-        return;
+        fprintf(stream, "%s: ", version->name);
     }
-    else if ((NULL == version->name) && (!(NULL == version->description)))
-    {
-        fprintf(stream, "%d.%d.%d - %s", (int)version->major, (int)version->minor, (int)version->patch, version->description);
-        return;
-    }
-    else if ((!(NULL == version->name)) && (NULL == version->description))
-    {
-        fprintf(stream, "%s: %d.%d.%d", version->name, (int)version->major, (int)version->minor, (int)version->patch);
-        return;
 
+    fprintf(stream, "%"PRIu8".%"PRIu8".%"PRIu8, version->major, version->minor, version->patch);
+
+    if (version->description != NULL)
+    {
+        fprintf(stream, " - %s", version->description);
     }
-    fprintf(stream, "%s: %d.%d.%d - %s", version->name, (int)version->major, (int)version->minor, (int)version->patch, version->description);
+
+    if (newline)
+    {
+        fprintf(stream, "\n");
+    }
 }
 
 /**
@@ -307,7 +302,7 @@ void version_publish(version_t *version)
     if (version_is_public(version))
     {
         fprintf(stderr, "ValueError: Version - ");
-        _version_error_print(stderr, version);
+        _version_print(stderr, version, false);
         fprintf(stderr, " is already public.");
         exit(1);
     }
@@ -319,9 +314,15 @@ void version_publish(version_t *version)
 /**
  * @brief Release a given version. Increment the given version object's major release number.
  * @param version Version object to upgrade.
+ * @exception If the version's major property is equal to the maximum `uint8_t`, a `ValueError` is printed to `stderr` and the programme exits.
  */
 void version_release(version_t *version)
 {
+    if (version->major == UINT8_MAX)
+    {
+        fprintf(stderr, "ValueError: The major version has reached the maximum allowed by type.\n");
+        exit(1);
+    }
     version->major++;
     version_set_minor(version, 0);
     version_set_patch(version, 0);
@@ -330,9 +331,15 @@ void version_release(version_t *version)
 /**
  * @brief Update a given version. Increment the given version object's minor release number.
  * @param version Version object to update.
+ * @exception If the version's minor property is equal to the maximum `uint8_t`, a `ValueError` is printed to `stderr` and the programme exits.
  */
 void version_update(version_t *version)
 {
+    if (version->minor == UINT8_MAX)
+    {
+        fprintf(stderr, "ValueError: The minor version has reached the maximum allowed by type.\n");
+        exit(1);
+    }
     version->minor++;
     version_set_patch(version, 0);
 }
@@ -340,9 +347,15 @@ void version_update(version_t *version)
 /**
  * @brief Fix a given version. Increment the given version object's patch release number.
  * @param version Version object to patch.
+ * @exception If the version's patch property is equal to the maximum `uint8_t`, a `ValueError` is printed to `stderr` and the programme exits.
  */
 void version_fix(version_t *version)
 {
+    if (version->patch == UINT8_MAX)
+    {
+        fprintf(stderr, "ValueError: The patch version has reached the maximum allowed by type.\n");
+        exit(1);
+    }
     version->patch++;
 }
 
@@ -362,7 +375,7 @@ bool version_is_public(const version_t *version)
  * @param major Major release number to compare.
  * @returns False if the given version object's major version is not greater than or equal to the given major parametre, else true.
  */
-bool version_compare_major(const version_t *version, size_t major)
+bool version_compare_major(const version_t *version, uint8_t major)
 {
     return version->major >= major;
 }
@@ -373,7 +386,7 @@ bool version_compare_major(const version_t *version, size_t major)
  * @param minor Minor release number to compare.
  * @returns False if the given version object's minor version is not greater than or equal to the given minor parametre, else true.
  */
-bool version_compare_minor(const version_t *version, size_t minor)
+bool version_compare_minor(const version_t *version, uint8_t minor)
 {
     return version->minor >= minor;
 }
@@ -384,7 +397,7 @@ bool version_compare_minor(const version_t *version, size_t minor)
  * @param patch Patch release number to compare.
  * @returns False if the given version object's patch version is not greater than or equal to the given patch parametre, else true.
  */
-bool version_compare_patch(const version_t *version, size_t patch)
+bool version_compare_patch(const version_t *version, uint8_t patch)
 {
     return version->patch >= patch;
 }
@@ -395,7 +408,7 @@ bool version_compare_patch(const version_t *version, size_t patch)
  * @param other Version object to compare.
  * @returns False if all of one given version object's properties are not equal to each other, else true.
  */
-bool version_comapre(const version_t *version, const version_t *other)
+bool version_compare(const version_t *version, const version_t *other)
 {
     return (version_compare_major(version, other->major)) && (version_compare_minor(version, other->minor)) && (version_compare_patch(version, other->patch));
 }
@@ -407,23 +420,7 @@ bool version_comapre(const version_t *version, const version_t *other)
  */
 void version_print(FILE *stream, const version_t *version)
 {
-    if ((NULL == version->name) && (NULL == version->description))
-    {
-        fprintf(stream, "%d.%d.%d\n", (int)version->major, (int)version->minor, (int)version->patch);
-        return;
-    }
-    else if ((NULL == version->name) && (!(NULL == version->description)))
-    {
-        fprintf(stream, "%d.%d.%d - %s\n", (int)version->major, (int)version->minor, (int)version->patch, version->description);
-        return;
-    }
-    else if ((!(NULL == version->name)) && (NULL == version->description))
-    {
-        fprintf(stream, "%s: %d.%d.%d\n", version->name, (int)version->major, (int)version->minor, (int)version->patch);
-        return;
-
-    }
-    fprintf(stream, "%s: %d.%d.%d - %s\n", version->name, (int)version->major, (int)version->minor, (int)version->patch, version->description);
+    _version_print(stream, version, true);
 }
 
 #if defined(__cplusplus)
