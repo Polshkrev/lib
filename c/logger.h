@@ -139,6 +139,32 @@ extern "C" {
 static char __timestamp[FORMAT_BUFFER_SIZE] = {0};
 
 /**
+ * @brief Set the locale of the timezone information.
+ * @param locale Country code of the target locale.
+ */
+static void _set_locale(const char *locale)
+{
+    setlocale(LC_TIME, locale);
+}
+
+/**
+ * @brief Set a timestamp to be used in the logging format.
+ * @returns True if the timestamp can be set, else false.
+ */
+static bool __set_timestamp(void)
+{
+    struct tm date;
+    time_t current_time = time(NULL);
+    if (current_time == (time_t)-1) return false;
+#ifdef _WIN32
+    else if (localtime_s(&date, &current_time) != 0) return false;
+#else
+    else if (localtime_r(&current_time, &date) == NULL) return false;
+#endif
+    return strftime(__timestamp, FORMAT_BUFFER_SIZE, TIMESTAMP_FORMAT, &date) != 0;
+}
+
+/**
  * @brief Static mapping of logger levels to names.
  */
 static const char *const __logging_level_names[__total_levels] =
@@ -244,32 +270,6 @@ bool logger_full_setup(logger_t *logger, const char *filename)
 {
     if (!logger_add_console(logger)) return false;
     return logger_add_file(logger, filename);
-}
-
-/**
- * @brief Set the locale of the timezone information.
- * @param locale Country code of the target locale.
- */
-static void _set_locale(const char *locale)
-{
-    setlocale(LC_TIME, locale);
-}
-
-/**
- * @brief Set a timestamp to be used in the logging format.
- * @returns True if the timestamp can be set, else false.
- */
-static bool __set_timestamp(void)
-{
-    struct tm date;
-    time_t current_time = time(NULL);
-    if (current_time == (time_t)-1) return false;
-#ifdef _WIN32
-    else if (localtime_s(&date, &current_time) != 0) return false;
-#else
-    else if (localtime_r(&current_time, &date) == NULL) return false;
-#endif
-    return strftime(__timestamp, FORMAT_BUFFER_SIZE, TIMESTAMP_FORMAT, &date) != 0;
 }
 
 /**
