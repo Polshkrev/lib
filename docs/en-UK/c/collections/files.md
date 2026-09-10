@@ -2,8 +2,7 @@
 Temu file walker.
 
 In other words, a small dynamic array for storing file paths discovered within a directory on the file system.
-The array owns the memory allocated for each stored path, while the `root` itself is non-owning. The implementation only currently supports `Windows` and recursively walks the directory tree starting from the given root.
-By default, the array is initialized with a capacity of 256 entries. This can be changed by defining `FILES_CAPACITY` before including the implementation.
+The array owns the memory allocated for each stored path, while the `root` itself is non-owning. The implementation recursively walks the directory tree starting from the given root.
 
 ## Table of Contents
 1. [Usage](#usage)

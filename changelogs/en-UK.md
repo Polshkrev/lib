@@ -1,4 +1,24 @@
 # Changelog
+## v0.37.0 - 2026-09-11
+`Added`
+- CPP
+    - `version`
+        - Added all comparison operator overloads.
+
+`Changed`
+- C
+    - `version`
+        - The numeric version properties are now a `uint8_t` instead of a `size_t`.
+        - The `version_print` function is now more simple.
+        - Any function that increments any numeric property now does bounds checking; which means they can now exit with a `ValueError`.
+- CPP
+    - `version`
+        - `version_t` now inherits from `printable_t`.
+        - The numeric version properties are now a `uint8_t` instead of a `size_t`.
+        - The `to_string` function is now more simple.
+        - Any function that increments any numeric property now does bounds checking; which means they can now throw a `ValueError`. They are now no longer marked as `noexcept`
+        - The `name` method now returns a `view` into the name property.
+        - The `description` method now returns a `view` into the description property.
 ## v0.36.0 - 2026-09-10
 `Changed`
 - CPP
