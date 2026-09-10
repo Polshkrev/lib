@@ -13,7 +13,7 @@ extern "C" {
  */
 typedef struct
 {
-    char *root;
+    const char *root;
     char **files;
     size_t size;
     size_t capacity;
@@ -25,7 +25,7 @@ typedef struct
  * @returns A new dynamic array of files on the filesystem with a given root.
  * @exception If the array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-files_t files_init(char *root);
+files_t files_init(const char *root);
 
 /**
  * @brief Construct a new dynamic array of files with a given root and initial capacity.
@@ -34,7 +34,7 @@ files_t files_init(char *root);
  * @returns A new dynamic array of files on the filesystem with a given root and capacity.
  * @exception If the array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-files_t files_init_with_capacity(char *root, size_t capacity);
+files_t files_init_with_capacity(const char *root, size_t capacity);
 
 /**
  * @brief Append a new filepath to the array of files.
