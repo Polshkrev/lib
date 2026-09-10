@@ -6,7 +6,9 @@
 #endif // DIRECTORY_CAPACITY
 
 #define ENTRY_IMPLEMENTATION
-#include "entry.h" // entry_t, 
+#include "entry.h" // entry_t
+
+#include <stdbool.h> // bool
 
 /**
  * @brief Representation of a directory on the filesystem.
@@ -22,7 +24,7 @@ typedef struct
 /**
  * @brief Construct a new directory at a given root.
  * @param root Root of the directory.
- * @returns A pointer to a directory at a given root.
+ * @returns A directory at the given root.
  * @exception If the underlying entry array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 directory_t directory_init(path_t root);
@@ -30,7 +32,8 @@ directory_t directory_init(path_t root);
 /**
  * @brief Construct a new directory at a given root with a given initial capacity.
  * @param root Root of the directory.
- * @returns A pointer to a directory at a given root with a given capacity.
+ * @param capacity Initial capacity of the directory.
+ * @returns A directory at the given root with the given capacity.
  * @exception If the underlying entry array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 directory_t directory_init_with_capacity(path_t root, size_t capacity);
@@ -59,22 +62,28 @@ entry_t *directory_at(directory_t *directory, size_t index);
 void directory_resize(directory_t *directory);
 
 /**
- * @brief Resize a given directory by a given scaler.
+ * @brief Resize a given directory by an exponential factor.
  * @param directory Directory to resize.
- * @param scaler Scaler by which to resize the directory.
- * @exception If the directory can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
+ * @param scaler Exponential scaler by which to resize the directory. Values less than `2` cause no operation.
+ * @exception If the resulting capacity would overflow `size_t`, an `OverflowError` is printed to `stderr` and the programme exits after the given directory is deallocated.
+ * @exception If the directory can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given directory is deallocated.
  */
 void directory_resize_by(directory_t *directory, size_t scaler);
 
 /**
- * @brief Remove an `entry_t` from a given directory at a given index.
+ * @brief Remove from a given directory at a given index.
  * @param directory Directory from which to remove.
- * @param index Index at which to remove an `entry_t` within the directory.
+ * @param index Index at which to remove an `entry_t`.
  * @exception If the given index is outside of the bounds of the directory, an `IndexError` is printed to standard error and the programme exits.
- * @exception If the directory is empty, a `ValueError` is printed to standard error and the programme exits.
- * @exception If the directory can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 void directory_remove(directory_t *directory, size_t index);
+
+/**
+ * @brief Determine if the given directory is empty.
+ * @param directory Directory to evaluate.
+ * @returns True if the given directory is evaluated to be empty, else false.
+ */
+bool directory_empty(const directory_t *directory);
 
 /**
  * @brief Deallocate a directory.
@@ -92,7 +101,7 @@ void directory_delete(directory_t *directory);
 /**
  * @brief Construct a new directory at a given root.
  * @param root Root of the directory.
- * @returns A pointer to a directory at a given root.
+ * @returns A directory at the given root.
  * @exception If the underlying entry array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 directory_t directory_init(path_t root)
@@ -103,12 +112,14 @@ directory_t directory_init(path_t root)
 /**
  * @brief Construct a new directory at a given root with a given initial capacity.
  * @param root Root of the directory.
- * @returns A pointer to a directory at a given root with a given capacity.
+ * @param capacity Initial capacity of the directory.
+ * @returns A directory at the given root with the given capacity.
  * @exception If the underlying entry array can not be allocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 directory_t directory_init_with_capacity(path_t root, size_t capacity)
 {
-    entry_t *entries = (entry_t *)malloc(capacity * sizeof(entry_t));
+    size_t clamped_capacity = CLAMP(capacity, 1, SIZE_MAX);
+    entry_t *entries = (entry_t *)malloc(clamped_capacity * sizeof(entry_t));
     if (NULL == entries)
     {
         fprintf(stderr, "AllocationError: Can not allocate enough memory for the array of entries.\n");
@@ -117,7 +128,7 @@ directory_t directory_init_with_capacity(path_t root, size_t capacity)
     return (directory_t)
     {
         .root = root,
-        .capacity = capacity,
+        .capacity = clamped_capacity,
         .size = 0,
         .entries = entries
     };
@@ -166,18 +177,32 @@ void directory_resize(directory_t *directory)
 }
 
 /**
- * @brief Resize a given directory by a given scaler.
+ * @brief Resize a given directory by an exponential factor.
  * @param directory Directory to resize.
- * @param scaler Scaler by which to resize the directory.
- * @exception If the directory can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
+ * @param scaler Exponential scaler by which to resize the directory. Values less than `2` cause no operation.
+ * @exception If the resulting capacity would overflow `size_t`, an `OverflowError` is printed to `stderr` and the programme exits after the given directory is deallocated.
+ * @exception If the directory can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the given directory is deallocated.
  */
 void directory_resize_by(directory_t *directory, size_t scaler)
 {
+    if (scaler < 2) return;
+    else if (directory->capacity > __safe_builder_size_divide(SIZE_MAX, scaler))
+    {
+        fprintf(stderr, "OverflowError: The capacity has overflown its type.\n");
+        directory_delete(directory);
+        exit(1);
+    }
     directory->capacity *= scaler;
-    directory->entries = (entry_t *)realloc(directory->entries, directory->capacity);
+    if (directory->capacity > __safe_builder_size_divide(SIZE_MAX, sizeof(entry_t)))
+    {
+        fprintf(stderr, "OverflowError: The directory allocation size has overflown its type.\n");
+        directory_delete(directory);
+        exit(1);
+    }
+    directory->entries = (entry_t *)realloc(directory->entries, directory->capacity * sizeof(entry_t));
     if (NULL == directory->entries)
     {
-        fprintf(stderr, "AllocationError: Can not reallocate entries.\n");
+        fprintf(stderr, "AllocationError: Can not reallocate the directory.\n");
         directory_delete(directory);
         exit(1);
     }
@@ -186,10 +211,8 @@ void directory_resize_by(directory_t *directory, size_t scaler)
 /**
  * @brief Remove an `entry_t` from a given directory at a given index.
  * @param directory Directory from which to remove.
- * @param index Index at which to remove an `entry_t` within the directory.
+ * @param index Index at which to remove an `entry_t`.
  * @exception If the given index is outside of the bounds of the directory, an `IndexError` is printed to standard error and the programme exits.
- * @exception If the directory is empty, a `ValueError` is printed to standard error and the programme exits.
- * @exception If the directory can not be reallocated, an `AllocationError` is printed to standard error and the programme exits.
  */
 void directory_remove(directory_t *directory, size_t index)
 {
@@ -199,25 +222,25 @@ void directory_remove(directory_t *directory, size_t index)
         directory_delete(directory);
         exit(1);
     }
-    else if (directory->size == 0 || NULL == directory->entries)
+
+    string_builder_delete(&directory->entries[index].content);
+
+    for (size_t current = index; current + 1 < directory->size; current++)
     {
-        fprintf(stderr, "ValueError: Can not remove from an empty directory '%s'.\n", passtr(&directory->root));
-        directory_delete(directory);
-        exit(1);
+        directory->entries[current] = directory->entries[current + 1];
     }
-    for (size_t i = index; i < directory->size - 1; i++)
-    {
-        directory->entries[i] = directory->entries[i + 1];
-    }
+
     directory->size--;
-    entry_t *temporary = (entry_t *)realloc(directory->entries, directory->size * sizeof(entry_t));
-    if (NULL == temporary)
-    {
-        fprintf(stderr, "AllocationError: Can not reallocate the directory.\n");
-        directory_delete(directory);
-        exit(1);
-    }
-    directory->entries = temporary;
+}
+
+/**
+ * @brief Determine if the given directory is empty.
+ * @param directory Directory to evaluate.
+ * @returns True if the given directory is evaluated to be empty, else false.
+ */
+bool directory_empty(const directory_t *directory)
+{
+    return directory->size == 0 || directory->entries == NULL;
 }
 
 /**
