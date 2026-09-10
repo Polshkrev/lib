@@ -417,7 +417,10 @@ void string_builder_remove(string_builder_t *builder, size_t index)
         exit(1);
     }
 
-    for (size_t i = index; i < builder->size - 1; ++i) builder->items[i] = builder->items[i + 1];
+    for (size_t i = index; i < builder->size - 1; ++i)
+    {
+        builder->items[i] = builder->items[i + 1];
+    }
 
     --builder->size;
 }

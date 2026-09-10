@@ -1,4 +1,10 @@
 # Changelog
+## v0.36.0 - 2026-09-10
+`Changed`
+- CPP
+    - `collections`
+        - `array`
+            - The `array` type has been modified to be more robust. This should not change any overt behaviour.
 ## v0.35.0 - 2026-09-09
 `Added`
 - C
