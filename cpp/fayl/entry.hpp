@@ -6,7 +6,7 @@
 #include <string> // std::string
 
 #define PATH_IMPLEMENTATION
-#include "../path.hpp" // path_t
+#include "path.hpp" // path_t
 
 namespace polutils
 {

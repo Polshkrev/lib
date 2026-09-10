@@ -1,5 +1,19 @@
 # Changelog
-## v0.37.0 - 2026-09-11
+## v0.38.0 - 2026-09-10
+`Changed`
+- C
+    - The `directory` header has been moved to the `fayl` folder.
+    - The `entry` header has been moved to the `fayl` folder.
+    - The `files` header has been moved to the `fayl` folder.
+    - The `path` header has been moved to the `fayl` folder.
+- CPP
+    - The `entry` header has been moved to the `fayl` folder.
+    - The `path` header has been moved to the `fayl` folder.
+
+`Fixed`
+- C
+    - The `_set_locale` function has been moved so that `logger` now compiles.
+## v0.37.0 - 2026-09-10
 `Added`
 - CPP
     - `version`

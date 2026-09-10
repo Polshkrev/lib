@@ -6,10 +6,10 @@ extern "C" {
 #endif
 
 #define PATH_IMPLEMENTATION
-#include "../path.h" // path_t, passtr, path_exists
+#include "path.h" // path_t, passtr, path_exists
 
 #define STRING_BUILDER_IMPLEMENTATION
-#include "string_builder.h" // string_builder_t, string_builder_init, string_builder_empty, string_builder_data, string_builder_delete, string_builder_fit
+#include "../collections/string_builder.h" // string_builder_t, string_builder_init, string_builder_empty, string_builder_data, string_builder_delete, string_builder_fit
 
 /**
  * @brief Representation of a type of an entry.

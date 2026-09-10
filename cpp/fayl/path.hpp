@@ -3,7 +3,7 @@
 
 #include <cstddef> // size_t, ptrdiff_t
 
-#include "printable.hpp" // printable_t
+#include "../printable.hpp" // printable_t
 
 #include <string> // std::string
 
@@ -197,7 +197,7 @@ namespace polutils
 #endif
 
 #define EXCEPTIONS_IMPLEMENTATION
-#include "exceptions.hpp" // IOError, ValueError
+#include "../exceptions.hpp" // IOError, ValueError
 
 namespace
 {
