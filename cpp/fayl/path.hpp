@@ -1,6 +1,8 @@
 #ifndef PATH_HPP
 #define PATH_HPP
 
+#include "doc.hpp" // ! NAMESPACE DOCUMENTATION HEADER
+
 #include <cstddef> // size_t, ptrdiff_t
 
 #include "../printable.hpp" // printable_t
@@ -17,9 +19,6 @@
 
 namespace polutils
 {
-    /**
-     * @brief Provides types and functions for working with filesystem paths, files, and directories.
-     */
     namespace fayl
     {
         /**
