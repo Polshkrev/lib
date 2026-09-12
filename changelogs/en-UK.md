@@ -1,4 +1,14 @@
 # Changelog
+## v0.39.0 - 2026-09-12
+`Added`
+- CPP
+    - `printable`
+        - The `operator<<` overload has been added.
+        - The `std::FILE` overload for the `print` function has been added.
+        - The `std::ostream` overload for the `print` function has been added.
+        - The `println` function has been added.
+        - The `std::FILE` overload for the `println` function has been added.
+        - The `std::ostream` overload for the `println` function has been added.
 ## v0.38.0 - 2026-09-10
 `Changed`
 - C
