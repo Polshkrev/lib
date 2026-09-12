@@ -1,5 +1,6 @@
 #ifndef DOC_HPP_
 #define DOC_HPP_
+
 namespace polutils
 {
     /**
