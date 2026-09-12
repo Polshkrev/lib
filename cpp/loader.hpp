@@ -1,6 +1,8 @@
 #ifndef LOADER_HPP
 #define LOADER_HPP
 
+#include "doc.hpp" // ! NEEDED FOR NAMESPACE DOCUMENTATION
+
 #include <string> // std::string
 
 #ifdef _WIN32

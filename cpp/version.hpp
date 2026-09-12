@@ -1,6 +1,8 @@
 #ifndef VERSION_HPP
 #define VERSION_HPP
 
+#include "doc.hpp" // ! NEEDED FOR NAMESPACE DOCUMENTATION
+
 #include <cstdint> // std::uint8_t, std::uint16_t, UINT8_MAX
 #include <istream> // std::istream
 #include <ostream> // std::ostream
