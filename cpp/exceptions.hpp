@@ -1,6 +1,8 @@
 #ifndef EXCEPTIONS_HPP
 #define EXCEPTIONS_HPP
 
+#include "doc.hpp" // ! NEEDED FOR NAMESPACE DOCUMENTATION
+
 #define EXCEPTION_IMPLEMENTATION
 #include "exception.hpp" // Exception
 

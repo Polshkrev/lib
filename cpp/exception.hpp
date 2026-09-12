@@ -1,6 +1,8 @@
 #ifndef EXCEPTION_HPP
 #define EXCEPTION_HPP
 
+#include "doc.hpp" // ! NEEDED FOR NAMESPACE DOCUMENTATION
+
 #include <string> // string
 #include <ostream> // ostream
 

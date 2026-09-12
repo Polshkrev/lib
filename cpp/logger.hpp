@@ -1,6 +1,8 @@
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
+#include "doc.hpp" // ! NEEDED FOR NAMESPACE DOCUMENTATION
+
 #include <cstdio>   // std::FILE, std::fclose, std::fprintf, std::fopen, stdout
 #include <cstddef> // std::size_t
 
