@@ -45,6 +45,12 @@ namespace polutils
             void append(entry_t item) override;
 
             /**
+             * @brief Fill the directory with the entries contained at its root.
+             * @returns True if the entries contained at the root can be obtained, else false.
+             */
+            bool fill(void);
+
+            /**
              * @brief Obtain a mutable pointer to the `entry_t` stored at the given index.
              * @param index Index at which the entry is stored.
              * @exception If the given index is greater than or equal to the size of the array, an `IndexError` is thrown.
@@ -139,10 +145,20 @@ namespace polutils
 
 #include <cstddef> // std::size_t
 #include <cstdint> // SIZE_MAX
-#include <cstdlib> // std::malloc, std::realloc, std::free
+#include <cstring> // std::strcmp
+#include <new> // std::bad_alloc
 #include <utility> // std::move
 
 #include "../numeric.hpp" // CLAMP
+
+#ifdef _WIN32
+    #include <minwindef.h> // HANDLE
+    #include <handleapi.h> // INVALID_HANDLE_VALUE, FindClose
+    #include <fileapi.h> // FindFirstFile, FindNextFile, WIN32_FIND_DATA, FILE_ATTRIBUTE_DIRECTORY
+#elif defined(__linux__)
+    #include <dirent.h> // DIR, opendir, readdir, closedir
+    #include <sys/stat.h> // stat, struct stat, S_ISDIR
+#endif // _WIN32
 
 namespace
 {
@@ -150,6 +166,101 @@ namespace
      * @brief Initial directory capacity.
      */
     #define DIRECTORY_CAPACITY 256
+
+#ifdef _WIN32
+    /**
+     * @brief Fill a directory with the entries contained at the given path.
+     * @param directory Directory to which entries are appended.
+     * @param path Directory path from which to obtain entries.
+     * @returns True if the entries contained at the given path can be obtained, else false.
+     */
+    static bool _fill_windows(polutils::fayl::directory_t *directory, const polutils::fayl::path_t &path)
+    {
+        polutils::fayl::path_t search_path = path / "*";
+
+        WIN32_FIND_DATA data;
+
+        HANDLE find_handle = FindFirstFile(search_path.to_string(), &data);
+
+        if (INVALID_HANDLE_VALUE == find_handle) return false;
+
+        do
+        {
+            if (std::strcmp(data.cFileName, ".") == 0 || std::strcmp(data.cFileName, "..") == 0) continue;
+
+            polutils::fayl::path_t entry_path = path / data.cFileName;
+
+            if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+            {
+                directory->append(polutils::fayl::entry_t(entry_path, polutils::fayl::type_t::DIRECTORY));
+
+                if (!_fill_windows(directory, entry_path))
+                {
+                    FindClose(find_handle);
+                    return false;
+                }
+            }
+            else
+            {
+                directory->append(polutils::fayl::entry_t(entry_path, polutils::fayl::type_t::FILE));
+            }
+
+        } while (FindNextFile(find_handle, &data) != 0);
+
+        FindClose(find_handle);
+
+        return true;
+    }
+
+#elif defined(__linux__)
+    /**
+     * @brief Fill a directory with the entries contained at the given path.
+     * @param directory Directory to which entries are appended.
+     * @param path Directory path from which to obtain entries.
+     * @returns True if the entries contained at the given path can be obtained, else false.
+     */
+    static bool _fill_linux(directory_t *directory, const path_t &path)
+    {
+        DIR *directory_handle = opendir(path.to_string().c_str());
+
+        if (nullptr == directory_handle) return false;
+
+        struct dirent *entry;
+
+        while (nullptr != (entry = readdir(directory_handle)))
+        {
+            if (std::strcmp(entry->d_name, ".") == 0 || std::strcmp(entry->d_name, "..") == 0) continue;
+
+            path_t entry_path = path / entry->d_name;
+
+            struct stat information;
+
+            if (stat(entry_path.to_string().c_str(), &information) != 0)
+            {
+                closedir(directory_handle);
+                return false;
+            }
+            else if (S_ISDIR(information.st_mode))
+            {
+                directory->append(polutils::fayl::entry_t(entry_path, polutils::fayl::type_t::DIRECTORY));
+
+                if (!_fill_linux(directory, entry_path))
+                {
+                    closedir(directory_handle);
+                    return false;
+                }
+            }
+            else
+            {
+                directory->append(polutils::fayl::entry_t(entry_path, polutils::fayl::type_t::FILE));
+            }
+        }
+
+        closedir(directory_handle);
+
+        return true;
+    }
+#endif // _WIN32
 }
 
 namespace polutils
@@ -206,6 +317,19 @@ namespace polutils
                 _resize();
             }
             __entries[__size++] = std::move(item);
+        }
+
+        /**
+         * @brief Fill the directory with the entries contained at its root.
+         * @returns True if the entries contained at the root can be obtained, else false.
+         */
+        bool directory_t::fill(void)
+        {
+        #ifdef _WIN32
+            return _fill_windows(this, __root);
+        #elif defined(__linux__)
+            return _fill_linux(this, __root);
+        #endif
         }
 
         /**
@@ -304,8 +428,15 @@ namespace polutils
             {
                 throw Exception("OverflowError: The directory allocation size has overflown its type.");
             }
-
-            entry_t *new_entries = new entry_t[new_capacity];
+            entry_t *new_entries = nullptr;
+            try
+            {
+                new_entries = new entry_t[new_capacity];
+            }
+            catch(const std::bad_alloc &)
+            {
+                throw AllocationError("Can not reallocate a new array."); 
+            }
 
             for (std::size_t index = 0; index < __size; ++index)
             {
