@@ -1,6 +1,8 @@
 #ifndef ENTRY_HPP
 #define ENTRY_HPP
 
+#include "doc.hpp" // ! NAMESPACE DOCUMENTATION HEADER
+
 #include <cstddef> // std::size_t
 
 #include <string> // std::string
