@@ -1,9 +1,9 @@
 #ifndef DIRECTORY_H
 #define DIRECTORY_H
 
-#ifndef DIRECTORY_CAPACITY
-#define DIRECTORY_CAPACITY 256
-#endif // DIRECTORY_CAPACITY
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
 #define ENTRY_IMPLEMENTATION
 #include "entry.h" // entry_t
@@ -91,12 +91,27 @@ bool directory_empty(const directory_t *directory);
  */
 void directory_delete(directory_t *directory);
 
+#if defined(__cplusplus)
+}
+#endif
+
 #endif // DIRECTORY_H
 
 #ifdef DIRECTORY_IMPLEMENTATION
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #include <stdio.h> // fprintf, stderr
 #include <stdlib.h> // malloc, realloc, free, exit, NULL
+
+#ifndef DIRECTORY_CAPACITY
+/**
+ * @brief Initial directory capacity.
+ */
+#define DIRECTORY_CAPACITY 256
+#endif // DIRECTORY_CAPACITY
 
 /**
  * @brief Construct a new directory at a given root.
@@ -257,5 +272,9 @@ void directory_delete(directory_t *directory)
     free(directory->entries);
     directory->entries = NULL;
 }
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif // DIRECTORY_IMPLEMENTATION
