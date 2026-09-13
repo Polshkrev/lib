@@ -1,4 +1,18 @@
 # Changelog
+## v0.40.0 - 2026-09-12
+`Added`
+- CPP
+    - Added `MIN` macro.
+    - Added `MAX` macro.
+    - Added `CLAMP` macro.
+    - `directory`
+        - Added the `directory_t` type.
+
+`Changed`
+- C
+    - All documentation has been updated.
+- CPP
+    - All documentation has been updated.
 ## v0.39.0 - 2026-09-12
 `Added`
 - CPP
