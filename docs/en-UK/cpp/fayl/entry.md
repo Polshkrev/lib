@@ -3,11 +3,11 @@ A C++ representation of an entry on the file system. An entry can represent a fi
 
 ## Table Of Contents
 1. [Usage](#usage)
-   1. [Construction](#construction)
-   2. [Reading and Writing](#reading-and-writing)
-   3. [Moving and Copying](#moving-and-copying)
-   4. [Creation](#creation)
-   5. [Access](#access)
+    1. [Construction](#construction)
+    2. [Reading and Writing](#reading-and-writing)
+    3. [Moving and Copying](#moving-and-copying)
+    4. [Creation](#creation)
+    5. [Access](#access)
 2. [Types](#types)
 
 ## Usage

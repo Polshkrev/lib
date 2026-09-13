@@ -6,10 +6,10 @@ By default, the buffer has a capacity of 5 KiB. This can be changed by defining 
 
 ## Table of Contents
 1. [Usage](#usage)
-   1. [Allocation](#allocation)
-   2. [Strings](#strings)
-   3. [Checkpoints](#checkpoints)
-   4. [Reset](#reset)
+    1. [Allocation](#allocation)
+    2. [Strings](#strings)
+    3. [Checkpoints](#checkpoints)
+    4. [Reset](#reset)
 
 ## Usage
 The buffer is intended primarily for temporary allocations whose lifetime can be managed collectively rather than individually. Unlike normal heap allocation, there is no corresponding free operation for individual allocations.
