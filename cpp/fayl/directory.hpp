@@ -419,14 +419,14 @@ namespace polutils
             }
             else if (__capacity > (SIZE_MAX / scaler))
             {
-                throw Exception("OverflowError: The capacity has overflown its type.");
+                throw OverflowError("OverflowError: The capacity has overflown its type.");
             }
 
             std::size_t new_capacity = __capacity * scaler;
 
             if (new_capacity > (SIZE_MAX / sizeof(entry_t)))
             {
-                throw Exception("OverflowError: The directory allocation size has overflown its type.");
+                throw OverflowError("OverflowError: The directory allocation size has overflown its type.");
             }
             entry_t *new_entries = nullptr;
             try
