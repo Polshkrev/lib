@@ -5,7 +5,7 @@ description = "Library of single-file stb-like header files for c and c++."
 type = "library"
 
 [project.version]
-minor = 41
+minor = 42
 
 [license]
 type = "MIT"

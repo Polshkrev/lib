@@ -1,4 +1,24 @@
 # Changelog
+## v0.42.0 - 2026-09-13
+`Changed`
+- C
+    - `flag`
+        - All library functions have been made `const-correct`.
+        - The function `flag_uint64_range` now checks if the range has been set more than once and fails if this condition is true.
+        - All `scan` functions have been made more robust.
+        - The static buffer backing the flag parsing has been removed.
+        - The `help` flag now exits with a `success` error code rather than failure. This is more conceptually accurate.
+        - All includes have been updated.
+        - All documentation has been updated.
+
+- CPP
+    - `entry`
+        - Due to the fact constructing a default path contains the current directory, constructing a default entry now has the `DIRECTORY` type instead of `NONE`.
+        - All entry constructor overloads now assign the correct type at construction time.
+        - The `move` method now does existance checks and type checks. These checks can throw a respective exception.
+        - The `to_string` method now returns the `path` string rather than the string representation of the `content`.
+        - All documentation has been updated.
+        - All includes have been updated.
 ## v0.41.0 - 2026-09-13
 `Added`
 - CPP
