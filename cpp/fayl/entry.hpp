@@ -36,7 +36,7 @@ namespace polutils
         struct entry_t : public printable_t
         {
             /**
-             * @brief Construct a new entry.
+             * @brief Construct a new entry based on the current working directory.
              */
             entry_t(void);
 
@@ -216,7 +216,7 @@ namespace polutils
 
 #include <cstdio>    // std::remove, std::rename
 #include <fstream>   // std::ifstream, std::ofstream
-#include <iterator>  // std::istreambuf_iterator
+#include <utility> // std::move
 
 #ifdef _WIN32
     #include <fileapi.h> // GetFileAttributesEx, CopyFile
@@ -253,14 +253,40 @@ namespace
         }
     }
 
+    /**
+     * @brief Obtain the file type of the given path. If the path does not exist, it can not be analysed.
+     * @param path Path to analyse.
+     * @returns The file type of the given path.
+     */
+    polutils::fayl::type_t _get_file_type(const char *path)
+    {
+    #ifdef _WIN32
+        DWORD attribute = GetFileAttributes(path);
+        if (attribute == INVALID_FILE_ATTRIBUTES) return polutils::fayl::type_t::NONE;
+        else if (attribute & FILE_ATTRIBUTE_DIRECTORY) return polutils::fayl::type_t::DIRECTORY;
+        return polutils::fayl::type_t::FILE;
+    #else // _WIN32
+        struct stat statbuf;
+        if (lstat(path, &statbuf) < 0) return polutils::fayl::type_t::NONE;
+        else if (S_ISREG(statbuf.st_mode)) return polutils::fayl::type_t::FILE;
+        else if (S_ISDIR(statbuf.st_mode)) return polutils::fayl::type_t::DIRECTORY;
+        return polutils::fayl::type_t::NONE;
+    #endif // _WIN32
+    }
     
     #ifndef __IO_ENTRY_BUFFER_CAPACITY
     /**
-     * @brief Buffer capacaity of the io operations within the entry functions.
+     * @brief Buffer capacaity of the IO operations within the entry functions.
      */
     #define __IO_ENTRY_BUFFER_CAPACITY (10 * 1024)
     #endif // __IO_ENTRY_BUFFER_CAPACITY
     
+    /**
+     * @brief Copy a file from one path to another.
+     * @param source Path of the source file.
+     * @param destination Path of the destination file.
+     * @exception If the file can not be copied, an `IOError` is thrown.
+     */
     void copy_file(const char *source, const char *destination)
     {
     #ifdef _WIN32
@@ -343,15 +369,15 @@ namespace polutils
         }
 
         /**
-         * @brief Construct a new entry.
+         * @brief Construct a new entry based on the current working directory.
          */
-        entry_t::entry_t(void) : entry_t(path_t(), std::string(), type_t::NONE) {}
+        entry_t::entry_t(void) : entry_t(path_t(), std::string(), type_t::DIRECTORY) {}
 
         /**
          * @brief Construct a new entry with a given path value.
          * @param path Path to link to the entry.
          */       
-        entry_t::entry_t(const path_t &path) noexcept : entry_t(path, std::string(), type_t::NONE) {}
+        entry_t::entry_t(const path_t &path) noexcept : entry_t(path, std::string(), _get_file_type(path.to_string())) {}
 
         /**
          * @brief Construct an entry based on a given type.
@@ -484,13 +510,33 @@ namespace polutils
         }
 
         /**
-         * @brief Move a file on the filesystem to a given destination.
+         * @brief Move a file on the file system to a given destination.
          * @param destination Destination to which to move the entry.
+         * @exception If the source path does not exist on the file system, a `FileNotFoundError` is thrown.
+         * @exception If the destination path already exists on the file system, a `FileExistsError` is thrown.
+         * @exception If the entry is not a file, an `IOError` is thrown.
+         * @exception If the destination is of a directory, an `IOError` is thrown.
          * @exception If the file can not be moved, an `IOError` is thrown.
          */
         void entry_t::move(const entry_t &destination) const
         {
-            if (std::rename(__path.to_string(), destination.path().to_string()) != 0)
+            if (!__path.exists())
+            {
+                throw FileNotFoundError("'%s' does not exist.", __path.to_string());
+            }
+            else if (destination.path().exists())
+            {
+                throw FileExistsError("File '%s' already exists.", destination.path().to_string());
+            }
+            else if (!is(type_t::FILE))
+            {
+                throw IOError("Can not move a directory: '%s'.", __path.to_string());
+            }
+            else if (destination.is(type_t::DIRECTORY))
+            {
+                throw IOError("Can not move file '%s' to directory '%s'.", destination.path().to_string(), type_to_string(destination.type()));
+            }
+            else if (std::rename(__path.to_string(), destination.path().to_string()) != 0)
             {
                 throw IOError("Can not move file '%s' to '%s'.", __path.to_string(), destination.path().to_string());
             }
@@ -658,7 +704,7 @@ namespace polutils
          */
         const char *entry_t::to_string(void) const noexcept
         {
-            return __content.c_str();
+            return __path.to_string();
         }
     }
 }
