@@ -7,10 +7,10 @@ The library also provides basic UTF-8 support.
 
 ## Table of Contents
 1. [Usage](#usage)
-   1. [Construction](#construction)
-   2. [Modification](#modification)
-   3. [Access](#access)
-   4. [UTF-8](#utf-8)
+    1. [Construction](#construction)
+    2. [Modification](#modification)
+    3. [Access](#access)
+    4. [UTF-8](#utf-8)
 
 ## Usage
 To amplify the simplicity of this module, as of the time of writing, none of the functions defined fail.
