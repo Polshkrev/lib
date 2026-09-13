@@ -6,11 +6,11 @@ The array owns the memory allocated for each stored path, while the `root` itsel
 
 ## Table of Contents
 1. [Usage](#usage)
-   1. [Construction](#construction)
-   2. [Modification](#modification)
-   3. [Access](#access)
-   4. [Filling](#filling)
-   5. [Memory](#memory)
+    1. [Construction](#construction)
+    2. [Modification](#modification)
+    3. [Access](#access)
+    4. [Filling](#filling)
+    5. [Memory](#memory)
 
 ## Usage
 The intended use is to initialize an array with a root directory, fill it with the entries contained within that directory.

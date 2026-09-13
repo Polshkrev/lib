@@ -4,20 +4,23 @@
 Если вы хотите проверять, как использовать утилиты, содержащую только один заголовок, то, пожалуйста, прочтите [гид по stb](https://github.com/nothings/stb/blob/master/docs/stb_howto.txt).
 ## Оглавление
 1. [Использование](#использование)
-2. C
+2. [Список изменений](/changelogs/ru-RU.md)
+3. C
     1. [Версия](/docs/ru-RU/c/version.md)
     2. [Логгер](/docs/ru-RU/c/logger.md)
     3. [Флаг](/docs/ru-RU/c/flag.md)
     4. [Строка](/docs/ru-RU/c/string.md)
-    5. [Адрес](/docs/ru-RU/c/path.md)
-    6. [Загрузчик](/docs/ru-RU/c/loader.md)
-    7. Скопления
+    5. [Загрузчик](/docs/ru-RU/c/loader.md)
+    6. Скопления
         1. [Список букв](/docs/ru-RU/c/collections/string_builder.md)
         2. [Строка](/docs/ru-RU/c/collections/string.md)
         3. [Буфер](/docs/ru-RU/c/collections/buffer.md)
-        4. [Запись](/docs/ru-RU/c/collections/entry.md)
-        5. [Файлы](/docs/ru-RU/c/collections/files.md)
-3. CPP
+    7. Файл
+        1. [Адрес](/docs/ru-RU/c/fayl/path.md)
+        2. [Запись](/docs/ru-RU/c/fayl/entry.md)
+        3. [Файлы](/docs/ru-RU/c/fayl/files.md)
+        4. [Каталог](/docs/ru-RU/c/fayl/directory.md)
+4. CPP
     1. [Версия](/docs/ru-RU/cpp/version.md)
     2. [Ошибка](/docs/ru-RU/cpp/exception.md)
     3. [Логгер](/docs/ru-RU/cpp/logger.md)
@@ -30,8 +33,9 @@
             1. [Список](/docs/ru-RU/cpp/collections/array.md)
             2. [Динамический Список](/docs/ru-RU/cpp/collections/dynamic_array.md)
     6. Файл
-        1. [Адрес](/docs/ru-RU/cpp/path.md)
-        2. [Запись](/docs/ru-RU/cpp/collections/entry.md)
+        1. [Адрес](/docs/ru-RU/cpp/fayl/path.md)
+        2. [Запись](/docs/ru-RU/cpp/fayl/entry.md)
+        3. [Каталог](/docs/ru-RU/cpp/fayl/directory.md)
 ## Использование
 Простой способ использования этой утилиты, Во-первых скопировать каждый заголовочный файл в свой проект. Затем вы можете включить `lib.h` или `lib.hpp` в любое место вашего проекта на C или C++ соответственно.
 Чтобы включить конкретный файл утилиты в свой проект, используйте `include` и укажите его определение ```#define <LIBRARY_NAME>_IMPLEMENTATION```.

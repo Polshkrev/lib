@@ -7,7 +7,7 @@ This is a C port of the golang [Directory](https://github.com/Polshkrev/gopoluti
     2. [Functionality](#functionality)
 ### Usage
 ### Construction
-To construct a new entry, the `entry_init` constructor is defined that takes in a [path_t](/docs/en-UK/c/path.md), and returns a pointer to a new `entry_t` whose type is set to the `NONE_ENTRY_TYPE` enum and whose content is an empty initialized [string builder](/docs/en-UK/c/collections/string_builder.md).
+To construct a new entry, the `entry_init` constructor is defined that takes in a [path_t](/docs/en-UK/c/fayl/path.md), and returns a pointer to a new `entry_t` whose type is set to the `NONE_ENTRY_TYPE` enum and whose content is an empty initialized [string builder](/docs/en-UK/c/collections/string_builder.md).
 ### Functionality
 To create a file there are three methods defined: 
 - `entry_touch`: To create an entry of type `FILE_ENTRY_TYPE`.
