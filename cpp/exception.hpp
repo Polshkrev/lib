@@ -105,7 +105,7 @@ namespace polutils
     /**
      * @brief Default constructor for an exception.
      */
-    Exception::Exception() noexcept : Exception("An error has occurred.") {}
+    Exception::Exception(void) noexcept : Exception("An error has occurred.") {}
 
     /**
      * @brief Standard constructor for an exception.
