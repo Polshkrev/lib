@@ -1,4 +1,43 @@
 # Changelog
+## v0.41.0 - 2026-09-13
+`Added`
+- CPP
+    - Added a new `OverflowError`.
+    - Added a new `UnderflowError`.
+
+`Changed`
+- CPP
+    - `exception`
+        - `Exception` is now a `printable_t`.
+
+A new `Exception` hierarchy has been defined:
+```mermaid
+classDiagram
+class Exception {}
+class AllocationError {}
+class ValueError {}
+class IndexError {}
+class OutOfRangeError {}
+class UnderflowError {}
+class OverflowError {}
+class UnreachableError {}
+class FileNotFoundError {}
+class FileExistsError {}
+class IOError {}
+
+Exception <|-- AllocationError
+Exception <|-- ValueError
+Exception <|-- IndexError
+Exception <|-- UnreachableError
+Exception <|-- FileNotFoundError
+Exception <|-- FileExistsError
+Exception <|-- IOError
+
+ValueError <|-- UnderflowError
+ValueError <|-- OverflowError
+
+IndexError <|-- OutOfRangeError
+```
 ## v0.40.0 - 2026-09-12
 `Added`
 - CPP
