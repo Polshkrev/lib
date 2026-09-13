@@ -5,12 +5,13 @@
 extern "C" {
 #endif
 
-#include <stdio.h> // FILE, fprintf, snprintf, stdout, stderr
+#include <stdio.h> // FILE
 #include <stdbool.h> // bool
-#include <inttypes.h> // uintptr_t, uint64_t, size_t, PRIu64
+#include <stdint.h> // uintptr_t, uint64_t
+#include <stddef.h> // size_t
 
 /**
- * @brief Type representation of the "psuedo-union" type defined in the Flag struct.
+ * @brief Type representation of the "pseudo-union" type defined in the Flag struct.
  */
 typedef enum
 {
@@ -20,14 +21,15 @@ typedef enum
 } Flag_Type;
 
 /**
- * @brief Enum to represent the index in a "psuedo-union" array.
+ * @brief Enum to represent the index in a "pseudo-union" array.
  */
 typedef enum
 {
     DATA_VAL,
     DATA_DEF,
     DATA_MIN,
-    DATA_MAX
+    DATA_MAX,
+    __data_count,
 } Flag_Data;
 
 /**
@@ -36,20 +38,20 @@ typedef enum
 typedef struct
 {
     Flag_Type type;
-    char *name;
-    char *desc;
-    uintptr_t data[sizeof(Flag_Data)];
+    const char *name;
+    const char *desc;
+    uintptr_t data[__data_count];
 } Flag;
 
 /**
  * @brief Internal way to create a new flag.
  * @param type An enum representation of a type of flag.
  * @param name Name of the flag to be printed in a help message.
- * @param desc Description of the flag to be printed in the help message.
- * @returns A pointer to the address of the allocated flag.
- * @exception If the amount of allocated flags have exceeded the capacity, a `ValueError` is printed to `stderr` and the programme exits.
+ * @param desc Description of the flag to be printed in a help message.
+ * @returns A pointer to the newly created flag.
+ * @exception If the number of registered flags has exceeded the capacity, a `ValueError` is printed to `stderr` and the programme exits.
  */
-Flag *flag_new(Flag_Type type, char *name, char *desc);
+Flag *flag_new(Flag_Type type, const char *name, const char *desc);
 
 /**
  * @brief Construct a boolean flag.
@@ -58,7 +60,7 @@ Flag *flag_new(Flag_Type type, char *name, char *desc);
  * @param desc Description of the flag to be printed in the help message.
  * @returns A pointer to the boolean value of the provided flag.
  */
-bool *flag_bool(char *name, bool def, char *desc);
+bool *flag_bool(const char *name, bool def, const char *desc);
 
 /**
  * @brief Construct an unsigned 64-bit integer flag.
@@ -67,15 +69,16 @@ bool *flag_bool(char *name, bool def, char *desc);
  * @param desc Description of the flag to be printed in the help message.
  * @returns A pointer to the unsigned 64-bit integer value of the provided flag.
  */
-uint64_t *flag_uint64(char *name, uint64_t def, char *desc);
+uint64_t *flag_uint64(const char *name, uint64_t def, const char *desc);
 
 /**
- * @brief Set a range between a given minimum and maximum for a given integer flag.
- * @param flag A mutable pointer to the unsigned 64-bit flag to set the range.
- * @param min An unsinged 64-bit integer minimum to set.
- * @param max An unsinged 64-bit integer maximum to set.
- * @exception If the supplied value is greater than or equal to the maximum allowed by the type, a `ValueError` is printed and the programme exits.
- * @exception If the supplied value is less than or equal to the minimum allowed by the type, a `ValueError` is printed and the programme exits.
+ * @brief Set the minimum and maximum values for an integer flag.
+ * @param flag A mutable pointer to the unsigned 64-bit flag to modify.
+ * @param min The minimum value accepted by the flag.
+ * @param max The maximum value accepted by the flag.
+ * @exception If the supplied minimum is greater than the given maximum, a `ValueError` is printed to `stderr` and the programme exits.
+ * @exception If the supplied minimum is equal to the current minimum, a `ValueError` is printed to `stderr` and the programme exits.
+ * @exception If the supplied maximum is equal to the current maximum, a `ValueError` is printed to `stderr` and the programme exits.
  */
 void flag_uint64_range(uint64_t *flag, uint64_t min, uint64_t max);
 
@@ -86,12 +89,12 @@ void flag_uint64_range(uint64_t *flag, uint64_t min, uint64_t max);
  * @param desc Description of the flag to be printed in the help message.
  * @returns A pointer to the c-string value of the provided flag.
  */
-char **flag_string(char *name, char *def, char *desc);
+const char **flag_string(const char *name, const char *def, const char *desc);
 
 /**
  * @brief Print a help message to a given stream.
- * @param stream A pointer to an ouput stream where the ouptut message will be printed.
- * @param print_default A boolean flag to customize the printing of the default values of each flag. By default the value should be false.
+ * @param stream A pointer to an output stream where the output message will be printed.
+ * @param print_default A boolean flag to customise the printing of the default values of each flag. By default the value should be false.
  */
 void flag_print_help(FILE *stream, bool print_default);
 
@@ -104,7 +107,7 @@ void flag_set_programme_name(const char *name);
 /**
  * @brief Parse the flags provided to the programme at runtime. This function must be called for any of the flags to be parsed.
  * @param argc Argument count provided in `main`.
- * @param argv String array of runtime arguments provided in `main`.s
+ * @param argv String array of runtime arguments provided in `main`
  */
 void flag_parse(int argc, char **argv);
 
@@ -120,32 +123,31 @@ void flag_parse(int argc, char **argv);
 extern "C" {
 #endif
 
-#include <stdlib.h> // NULL, exit
-#include <string.h> // strcmp, strtoull
-#include <assert.h> // static_assert
-#include <errno.h> // errorno, ERANGE
-#include <limits.h> // ULLONG_MAX, UINT64_MAX
+#include <stdlib.h>  // NULL, exit, strtoull
+#include <string.h>  // strcmp
+#include <assert.h>  // static_assert
+#include <errno.h>   // errno, ERANGE
+#include <limits.h>  // ULLONG_MAX
+#include <inttypes.h> // PRIu64
 
+#ifndef FLAG_CAPACITY
 #define FLAG_CAPACITY 256
+#endif // FLAG_CAPACITY
 
-static const char *_PROGRAMME_NAME;
+static const char *_PROGRAMME_NAME = NULL;
 
 static Flag flags[FLAG_CAPACITY];
 static size_t flag_count = 0;
-
-#define FLAG_TMP_STR_CAPACITY 1024
-static char flag_tmp_str[FLAG_TMP_STR_CAPACITY];
-static size_t flag_tmp_str_size = 0;
 
 /**
  * @brief Internal way to create a new flag.
  * @param type An enum representation of a type of flag.
  * @param name Name of the flag to be printed in a help message.
- * @param desc Description of the flag to be printed in the help message.
- * @returns A pointer to the address of the allocated flag.
- * @exception If the amount of allocated flags have exceeded the capacity, a `ValueError` is printed to `stderr` and the programme exits.
+ * @param desc Description of the flag to be printed in a help message.
+ * @returns A pointer to the newly created flag.
+ * @exception If the number of registered flags has exceeded the capacity, a `ValueError` is printed to `stderr` and the programme exits.
  */
-Flag *flag_new(Flag_Type type, char *name, char *desc)
+Flag *flag_new(Flag_Type type, const char *name, const char *desc)
 {
     // make sure the count doesn't exceed the capacity
     if (flag_count >= FLAG_CAPACITY)
@@ -169,10 +171,10 @@ Flag *flag_new(Flag_Type type, char *name, char *desc)
  * @param desc Description of the flag to be printed in the help message.
  * @returns A pointer to the boolean value of the provided flag.
  */
-bool *flag_bool(char *name, bool def, char *desc)
+bool *flag_bool(const char *name, bool def, const char *desc)
 {
     Flag *flag = flag_new(FLAG_BOOL, name, desc);
-    *((bool*) &flag->data[DATA_DEF]) = def; // reinterpret the adress of the default value of the flag to the boolean address of the given default
+    *((bool*) &flag->data[DATA_DEF]) = def; // reinterpret the address of the default value of the flag to the boolean address of the given default
     *((bool*) &flag->data[DATA_VAL]) = def; // doing the same as above but for the data as default
     return (bool*) &flag->data[DATA_VAL]; // return the address as a boolean
 }
@@ -184,7 +186,7 @@ bool *flag_bool(char *name, bool def, char *desc)
  * @param desc Description of the flag to be printed in the help message.
  * @returns A pointer to the unsigned 64-bit integer value of the provided flag.
  */
-uint64_t *flag_uint64(char *name, uint64_t def, char *desc)
+uint64_t *flag_uint64(const char *name, uint64_t def, const char *desc)
 {
     Flag *flag = flag_new(FLAG_UINT64, name, desc);
     *((uint64_t*) &flag->data[DATA_DEF]) = def;
@@ -195,22 +197,28 @@ uint64_t *flag_uint64(char *name, uint64_t def, char *desc)
 }
 
 /**
- * @brief Set a range between a given minimum and maximum for a given integer flag.
- * @param flag A mutable pointer to the unsigned 64-bit flag to set the range.
- * @param min An unsinged 64-bit integer minimum to set.
- * @param max An unsinged 64-bit integer maximum to set.
- * @exception If the supplied value is greater than or equal to the maximum allowed by the type, a `ValueError` is printed and the programme exits.
- * @exception If the supplied value is less than or equal to the minimum allowed by the type, a `ValueError` is printed and the programme exits.
+ * @brief Set the minimum and maximum values for an integer flag.
+ * @param flag A mutable pointer to the unsigned 64-bit flag to modify.
+ * @param min The minimum value accepted by the flag.
+ * @param max The maximum value accepted by the flag.
+ * @exception If the supplied minimum is greater than the given maximum, a `ValueError` is printed to `stderr` and the programme exits.
+ * @exception If the supplied minimum is equal to the current minimum, a `ValueError` is printed to `stderr` and the programme exits.
+ * @exception If the supplied maximum is equal to the current maximum, a `ValueError` is printed to `stderr` and the programme exits.
  */
 void flag_uint64_range(uint64_t *flag, uint64_t min, uint64_t max)
 {
     static_assert(sizeof(uint64_t) == sizeof(uintptr_t), "This will only work if the size of uint64_t and uintptr_t is the same");
-    if (min == flag[DATA_MIN])
+    if (min > max)
+    {
+        fprintf(stderr, "ValueError: Minimum value of %"PRIu64" cannot be greater than maximum value of %"PRIu64".\n", min, max);
+        exit(1);
+    }
+    else if (min == flag[DATA_MIN])
     {
         fprintf(stderr, "ValueError: Supplied minimum value of \"%"PRIu64"\" cannot be the same as the assigned default of %"PRIu64".", min, flag[DATA_MIN]);
         exit(1);
     }
-    if (max == flag[DATA_MAX])
+    else if (max == flag[DATA_MAX])
     {
         fprintf(stderr, "ValueError: Supplied maximum value of \"%"PRIu64"\" cannot be the same as the assigned default of %"PRIu64".", max, flag[DATA_MAX]);
         exit(1);
@@ -226,22 +234,22 @@ void flag_uint64_range(uint64_t *flag, uint64_t min, uint64_t max)
  * @param desc Description of the flag to be printed in the help message.
  * @returns A pointer to the c-string value of the provided flag.
  */
-char **flag_string(char *name, char *def, char *desc)
+const char **flag_string(const char *name, const char *def, const char *desc)
 {
     Flag *flag = flag_new(FLAG_STR, name, desc);
-    *((char **) &flag->data[DATA_DEF]) = def;
-    *((char **) &flag->data[DATA_VAL]) = def;
-    return (char **) &flag->data[DATA_VAL];
+    *((const char **) &flag->data[DATA_DEF]) = def;
+    *((const char **) &flag->data[DATA_VAL]) = def;
+    return (const char **) &flag->data[DATA_VAL];
 }
 
 /**
- * @brief Shift each argument provided as parced at runtime.
- * @param argc A pointer to the arguments count provided in `main`. This parametre is decremented, thus its mutability.
+ * @brief Shift each argument provided as parsed at runtime.
+ * @param argc A pointer to the arguments count provided in `main`. This parameter is decremented, thus its mutability.
  * @param argv A pointer to a dynamic array of strings provided in `main`.
- * @returns A string representation of the parced argument.
+ * @returns A string representation of the parsed argument.
  * @exception If there are no arguments provided, a `RuntimeError` is printed and the programme exits.
  */
-static char *_flag_shift_args(int *argc, char ***argv)
+static const char *_flag_shift_args(int *argc, char ***argv)
 {
     if (*argc <= 0)
     {
@@ -249,13 +257,122 @@ static char *_flag_shift_args(int *argc, char ***argv)
         fprintf(stderr, "RuntimeError: No arguments have been provided.\n");
         exit(1);
     }
-    char *result = **argv;
-    *argv += 1; // Pointer arithmatic - since the array is stored as the pointer to the first element, we increment what the pointer is pointing to.
+    const char *result = **argv;
+    *argv += 1; // Pointer arithmetic - since the array is stored as the pointer to the first element, we increment what the pointer is pointing to.
     *argc -= 1;
     return result;
 }
 
-// TODO: I've tried to refactor this to look more clean. After I do my changes, everything breaks. I don't know. Fix this eventually.
+/**
+ * @brief Find a flag by its name.
+ * @param name Name of the flag to find.
+ * @returns A pointer to the matching flag, or NULL if no flag exists.
+ */
+static Flag *_flag_find(const char *name)
+{
+    for (size_t index = 0; index < flag_count; ++index)
+    {
+        if (!strcmp(flags[index].name, name))
+        {
+            return &flags[index];
+        }
+    }
+
+    return NULL;
+}
+
+/**
+ * @brief Parse the argument belonging to a string flag.
+ * @param flag A pointer to the string flag to modify.
+ * @param argc Argument count to consume from.
+ * @param argv Argument array to consume from.
+ */
+static void _flag_scan_string(Flag *flag, int *argc, char ***argv)
+{
+    if (*argc == 0)
+    {
+        fprintf(stderr, "RuntimeError: No argument provided for \"-%s\".\n", flag->name);
+        exit(1);
+    }
+
+    flag->data[DATA_VAL] = (uintptr_t)_flag_shift_args(argc, argv);
+}
+
+/**
+ * @brief Parse the argument belonging to an unsigned 64-bit flag.
+ * @param flag A pointer to the unsigned 64-bit flag to modify.
+ * @param argc Argument count provided in `main`.
+ * @param argv String array of runtime arguments provided in `main`.
+ */
+static void _flag_scan_uint64(Flag *flag, int *argc, char ***argv)
+{
+    if (*argc == 0)
+    {
+        fprintf(stderr, "RuntimeError: No argument provided for \"-%s\".\n", flag->name);
+        exit(1);
+    }
+
+    const char *argument = _flag_shift_args(argc, argv);
+
+    errno = 0;
+
+    char *endptr = NULL;
+
+    unsigned long long int result = strtoull(argument, &endptr, 10);
+
+    if (argument == endptr || *endptr != '\0')
+    {
+        fprintf(stderr, "RuntimeError: '%s' is not a valid number.\n", flag->name);
+        exit(1);
+    }
+    else if (result == ULLONG_MAX && errno == ERANGE)
+    {
+        fprintf(stderr, "OverflowError: '%s' is a 64 bit unsigned integer overflow.\n", flag->name);
+        exit(1);
+    }
+
+    uint64_t value = result;
+    uint64_t minimum = *(uint64_t *) &flag->data[DATA_MIN];
+    uint64_t maximum = *(uint64_t *) &flag->data[DATA_MAX];
+
+    if (!(minimum <= value && value <= maximum))
+    {
+        fprintf(stderr, "ValueError: The value provided for the argument " "\"-%s\" is outside of the [%"PRIu64"..%"PRIu64"] range.\n", flag->name, minimum, maximum);
+        exit(1);
+    }
+
+    *(uint64_t *) &flag->data[DATA_VAL] = value;
+}
+
+/**
+ * @brief Parse a flag according to its type.
+ * @param flag A pointer to the flag to parse.
+ * @param argc Argument count provided in `main`.
+ * @param argv String array of runtime arguments provided in `main`.
+ */
+static void _flag_scan_value(Flag *flag, int *argc, char ***argv)
+{
+    switch (flag->type)
+    {
+        case FLAG_BOOL:
+        {
+            *(bool *)&flag->data[DATA_VAL] = true;
+        } break;
+        case FLAG_STR:
+        {
+            _flag_scan_string(flag, argc, argv);
+        } break;
+        case FLAG_UINT64:
+        {
+            _flag_scan_uint64(flag, argc, argv);
+        } break;
+        default:
+        {
+            fprintf(stderr, "UnreachableError: Execution has reached an unreachable section.\n");
+            exit(1);
+        } break;
+    }
+}
 
 /**
  * @brief Internal implementation of the flag parsing.
@@ -265,160 +382,101 @@ static char *_flag_shift_args(int *argc, char ***argv)
 static void _flag_scan(int argc, char **argv)
 {
     _flag_shift_args(&argc, &argv);
+
     while (argc > 0)
     {
-        char *flag = _flag_shift_args(&argc, &argv);
-        if (!strcmp(flag, "-"))
+        const char *argument = _flag_shift_args(&argc, &argv);
+
+        if (!strcmp(argument, "-"))
         {
-            fprintf(stderr, "ValueError: Unknown Flag \"%s\".", flag);
+            fprintf(stderr, "ValueError: Unknown Flag \"%s\".\n", argument);
             exit(1);
         }
-        flag += 1;
-        for (size_t i = 0; i < flag_count; ++i)
+
+        argument += 1;
+
+        Flag *flag = _flag_find(argument);
+
+        if (flag == NULL)
         {
-            if (!strcmp(flags[i].name, flag))
-            {
-                switch (flags[i].type)
-                {
-                    case FLAG_BOOL:
-                    {
-                        *(bool *)&flags[i].data = true;
-                    } break;
-                    case FLAG_STR:
-                    {
-                        if (argc == 0){
-                            fprintf(stderr, "RuntimeError: No argument provided for \"-%s\".", flag);
-                            exit(1);
-                        }
-                        char *arg = _flag_shift_args(&argc, &argv);
-                        *(char**)&flags[i].data = arg;
-                    } break;
-                    case FLAG_UINT64:
-                    {
-                        if (argc == 0)
-                        {
-                            fprintf(stderr, "RuntimeError: No argument provided for \"-%s\".", flag);
-                            exit(1);
-                        }
-                        char *arg = _flag_shift_args(&argc, &argv);
-                        static_assert(sizeof(unsigned long long int) == sizeof(uint64_t), "The original author designed this for x86_64 machine with the compiler that expects unsigned long long int and uint64_t to be the same thing, so they could use strtoull() function to parse it. Please adjust this code for your case and maybe even send the patch to upstream to make it work on a wider range of environments.");
-                        char *endptr;
-                        unsigned long long int result = strtoull(arg, &endptr, 10);
-                        if (arg == endptr || strcmp(endptr, "\0"))
-                        {
-                            fprintf(stderr, "RuntimeError: '%s' is not a valid number.", flag);
-                            exit(1);
-                        };
-                        if (result == ULLONG_MAX && errno == ERANGE)
-                        {
-                            fprintf(stderr, "OverflowError: '%s' is a 64 bit unsigned integer overflow\n", flag);
-                            exit(1);
-                        }
-                        uint64_t val = result;
-                        uint64_t min = *(uint64_t*)&flags[i].data[DATA_MIN];
-                        uint64_t max = *(uint64_t*)&flags[i].data[DATA_MAX];
+            fprintf(stderr, "ValueError: Unknown Flag \"%s\".\n", argument);
+            exit(1);
+        }
 
-                        if (!(min <= val && val <= max)) {
-                            fprintf(stderr, "ValueError: The value provided for the argument \"-%s\" is outside of the [%"PRIu64"..%"PRIu64"] range\n", flag, min, max);
-                            exit(1);
-                        }
-                        *(uint64_t *)&flags[i].data = result;
-                    } break;
-                    default:
-                    {
-                        fprintf(stderr, "UnreachableError: Execution has reached an unreachable section.\n");
-                        exit(1);
-                    }
-                }
-            };
-        };
-    };
+        _flag_scan_value(flag, &argc, &argv);
+    }
 }
 
 /**
- * @brief Represent an unsigned 64-bit flag as a string.
- * @param data Pointer type to the internal data of the flag.
- * @returns The given data as a string.
- * @exception If the initial formatting of the data fails, a `ValueError` is printed to standard error and the programme exits.
- * @exception If the global array of flags is full, an `AllocationError` is printed to standard error and the programme exits.
+ * @brief Print the range of an unsigned 64-bit integer flag.
+ * @param stream A pointer to an output stream where the range will be printed.
+ * @param flag A pointer to the flag whose range will be printed.
  */
-static char *_uint64_to_string(uintptr_t data)
+static void _flag_print_range(FILE *stream, const Flag *flag)
 {
-    int n = snprintf(NULL, 0, "%"PRIu64, *(uint64_t*) &data);
-    // assert(n>=0);
-    if (n < 0)
+    if (flag->type != FLAG_UINT64) return;
+    uint64_t minimum = *(uint64_t *)&flag->data[DATA_MIN];
+    uint64_t maximum = *(uint64_t *)&flag->data[DATA_MAX];
+    fprintf(stream, "\n\t\trange: ");
+    if (minimum == 0 && maximum == UINT64_MAX)
     {
-        fprintf(stderr, "ValueError: Can not convert the given number to a string.\n");
-        exit(1);
+        fprintf(stream, "No range has been set.");
+        return;
     }
-    // assert(flag_tmp_str_size + n + 1 <= FLAG_TMP_STR_CAPACITY);
-    if (flag_tmp_str_size + n + 1 > FLAG_TMP_STR_CAPACITY)
-    {
-        fprintf(stderr, "AllocationError: There is not enough space to allocate a temporary string.\n");
-        exit(1);
-    }
-    int m = snprintf(flag_tmp_str + flag_tmp_str_size, FLAG_TMP_STR_CAPACITY - flag_tmp_str_size, "%"PRIu64, *(uint64_t*) &data);
-    // assert(n == m);
-    if (n != m)
-    {
-        fprintf(stderr, "Exception: Can not convert temporary buffer to string.\n");
-        exit(1);
-    }
-    char *result = flag_tmp_str + flag_tmp_str_size;
-    flag_tmp_str_size += n + 1;
-    return result;
+    fprintf(stream, "[%"PRIu64"..%"PRIu64"]", minimum, maximum);
 }
 
 /**
- * @brief Represent a given flag as a string.
- * @param type Type of the flag to be represented.
- * @param data Data of the flag to reperesent.
- * @returns A string representation of the given data based on the given type.
+ * @brief Print the default value of a flag.
+ * @param stream A pointer to an output stream where the default value will be printed.
+ * @param flag A pointer to the flag whose default value will be printed.
  */
-static char *_flag_show_data(Flag_Type type, uintptr_t data)
+static void _flag_print_default(FILE *stream, const Flag *flag)
 {
-    switch(type)
+    switch (flag->type)
     {
         case FLAG_BOOL:
-            return (*(bool*) &data) ? "true" : "false";
-        case FLAG_UINT64: {
-            return _uint64_to_string(data);
-        }
+        {
+            if (!strcmp(flag->name, "help")) return;
+            fprintf(stream, " (default: %s)", *(bool *)&flag->data[DATA_DEF] ? "true" : "false");
+        } break;
+        case FLAG_UINT64:
+        {
+            fprintf(stream, " (default: %"PRIu64")", *(uint64_t *)&flag->data[DATA_DEF]);
+        } break;
         case FLAG_STR:
-            return *(char**)&data;
-    };
-    fprintf(stderr, "UnreachableError: Execution has reached an unreachable section.\n");
-    exit(1);
+        {
+            const char **value = (const char **)&flag->data[DATA_DEF];
+            fprintf(stream, " (default: \"%s\")", *value);
+        } break;
+        default:
+        {
+            fprintf(stderr, "UnreachableError: Execution has reached an unreachable section.\n");
+            exit(1);
+        }
+    }
 }
 
 /**
  * @brief Print a help message to a given stream.
- * @param stream A pointer to an ouput stream where the ouptut message will be printed.
- * @param print_default A boolean flag to customize the printing of the default values of each flag. By default the value should be false.
+ * @param stream A pointer to an output stream where the output message will be printed.
+ * @param print_default A boolean flag to customise the printing of the default values of each flag. By default the value should be false.
  */
 void flag_print_help(FILE *stream, bool print_default)
 {
-    for (size_t i = 0; i < flag_count; ++i)
+    for (size_t index = 0; index < flag_count; ++index)
     {
-        fprintf(stream, "\t-%s\n", flags[i].name);
-        fprintf(stream, "\t\t%s", flags[i].desc);
-        if (!strcmp(flags[i].name, "help"))
+        fprintf(stream, "\n");
+        const Flag *flag = &flags[index];
+
+        fprintf(stream, "\t-%s\n\t\t%s", flag->name, flag->desc);
+
+        if (print_default)
         {
-            fprintf(stream, "\n");
+            _flag_print_default(stream, flag);
         }
-        else if (print_default)
-        {
-            fprintf(stream, " (Default: %s)\n", _flag_show_data(flags[i].type, flags[i].data[DATA_DEF]));
-        }
-        if (flags[i].type == FLAG_UINT64)
-        {
-            fprintf(stream, "\t\tMinimum: %s\n", _flag_show_data(flags[i].type, flags[i].data[DATA_MIN]));
-            fprintf(stream, "\t\tMaximum: %s\n", _flag_show_data(flags[i].type, flags[i].data[DATA_MAX]));
-        }
-        else {
-            fprintf(stream, "\n");
-        }
-        flag_tmp_str_size = 0;
+
+        _flag_print_range(stream, flag);
     }
 }
 
@@ -434,23 +492,24 @@ void flag_set_programme_name(const char *name)
 /**
  * @brief Parse the flags provided to the programme at runtime. This function must be called for any of the flags to be parsed.
  * @param argc Argument count provided in `main`.
- * @param argv String array of runtime arguments provided in `main`.s
+ * @param argv String array of runtime arguments provided in `main`
  */
 void flag_parse(int argc, char **argv)
 {
     char *programme = argv[0];
     bool *help = flag_bool("help", false, "Print this help to stdout and exit with 0.");
     _flag_scan(argc, argv);
-    if (*help) {
+    if (*help)
+    {
         // assert(argc >= 1);
         if (argc < 1)
         {
             fprintf(stderr, "ValueError: There is not enough arguments to parse.\n");
             exit(1);
         }
-        fprintf(stdout, "Usage: %s [OPTIONS]\nOPTIONS:\n", _PROGRAMME_NAME ? _PROGRAMME_NAME : programme);
+        fprintf(stdout, "Usage: %s [OPTIONS]\nOPTIONS:", _PROGRAMME_NAME ? _PROGRAMME_NAME : programme);
         flag_print_help(stdout, true);
-        exit(1);
+        exit(0);
     };
 }
 
