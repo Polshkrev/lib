@@ -129,6 +129,26 @@ namespace polutils
     };
 
     /**
+     * @brief Exception for any numeric overflow.
+     */
+    struct KeyError : public ValueError
+    {
+        /**
+         * @brief Construct an `KeyError` with a message.
+         * @param message Message to accompany the exception.
+         */
+        explicit KeyError(const std::string &message) noexcept;
+
+        /**
+         * @brief Construct an `KeyError` with a formatted message.
+         * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
+         * @param arguments Variadic formatting arguments.
+         */
+        template <typename... Arguments>
+        explicit KeyError(const std::string &format, const Arguments &...arguments);
+    };
+
+    /**
      * @brief Exception for any unreachable control flow traps.
      */
     struct UnreachableError : public Exception
@@ -333,6 +353,26 @@ namespace polutils
     ValueError::ValueError(const std::string &format, const Arguments &...arguments) : Exception(format, arguments...)
     {
         _assign_name("ValueError");
+    }
+
+    /**
+     * @brief Construct a `KeyError` with a message.
+     * @param message Message to accompany the exception.
+     */
+    KeyError::KeyError(const std::string &message) noexcept : ValueError(message)
+    {
+        _assign_name("KeyError");
+    }
+
+    /**
+     * @brief Construct an `KeyError` with a formatted message.
+     * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
+     * @param arguments Variadic formatting arguments.
+     */
+    template <typename... Arguments>
+    KeyError::KeyError(const std::string &format, const Arguments &...arguments) : ValueError(format, arguments...)
+    {
+        _assign_name("KeyError");
     }
 
     /**
