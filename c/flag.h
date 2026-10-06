@@ -111,6 +111,27 @@ void flag_set_programme_name(const char *name);
  */
 void flag_parse(int argc, char **argv);
 
+/**
+ * @brief Obtain a positional argument by its given index.
+ * @param index Index of the positional argument.
+ * @returns The positional argument stored at the given index.
+ * @returns If the given index is greater than or equal to the positional argument count, `NULL` is returned.
+ */
+const char *flag_arguments_at(size_t index);
+
+/**
+ * @brief Obtain the number of positional arguments provided to the programme.
+ * @returns The number of positional arguments.
+ */
+size_t flag_arguments_count(void);
+
+/**
+ * @brief Obtain the positional arguments provided to the programme.
+ * @returns An array of all the positional arguments provided to the programme.
+ * @returns If no positional arguments have been provided to the programme, `NULL` is returned.
+ */
+const char **flag_arguments(void);
+
 #if defined(__cplusplus)
 }
 #endif
@@ -136,8 +157,15 @@ extern "C" {
 
 static const char *_PROGRAMME_NAME = NULL;
 
-static Flag flags[FLAG_CAPACITY];
-static size_t flag_count = 0;
+static Flag __flags[FLAG_CAPACITY];
+static size_t __flag_count = 0;
+
+#ifndef FLAG_POSITIONAL_CAPACITY
+#define FLAG_POSITIONAL_CAPACITY 256
+#endif // FLAG_POSITIONAL_CAPACITY
+
+static const char *__positional_arguments[FLAG_POSITIONAL_CAPACITY + 1];
+static size_t __positional_argument_count = 0;
 
 /**
  * @brief Internal way to create a new flag.
@@ -150,13 +178,13 @@ static size_t flag_count = 0;
 Flag *flag_new(Flag_Type type, const char *name, const char *desc)
 {
     // make sure the count doesn't exceed the capacity
-    if (flag_count >= FLAG_CAPACITY)
+    if (__flag_count >= FLAG_CAPACITY)
     {
         fprintf(stderr, "ValueError: Amount of flags have exceeded capacity\n");
         exit(1);
     }
     // allocate a pointer on the stack to the address of the flag count after it's been incremented
-    Flag *flag = &flags[flag_count++];
+    Flag *flag = &__flags[__flag_count++];
     // set values
     flag->type = type;
     flag->name = name;
@@ -270,11 +298,11 @@ static const char *_flag_shift_args(int *argc, char ***argv)
  */
 static Flag *_flag_find(const char *name)
 {
-    for (size_t index = 0; index < flag_count; ++index)
+    for (size_t index = 0; index < __flag_count; ++index)
     {
-        if (!strcmp(flags[index].name, name))
+        if (!strcmp(__flags[index].name, name))
         {
-            return &flags[index];
+            return &__flags[index];
         }
     }
 
@@ -375,6 +403,23 @@ static void _flag_scan_value(Flag *flag, int *argc, char ***argv)
 }
 
 /**
+ * @brief Append a positional argument to the global array.
+ * @param argument Argument to append.
+ * @exception If the positonal argument count is greater than or equal to the positional capacity, a `ValueError` is printed to `stderr` and the programme exits.
+ */
+static void __flag_append_positional(const char *argument)
+{
+    if (__positional_argument_count >= FLAG_POSITIONAL_CAPACITY)
+    {
+        fprintf(stderr, "ValueError: Amount of positional arguments have exceeded capacity.\n");
+        exit(1);
+    }
+
+    __positional_arguments[__positional_argument_count++] = argument;
+    __positional_arguments[__positional_argument_count] = NULL;
+}
+
+/**
  * @brief Internal implementation of the flag parsing.
  * @param argc Argument count provided in `main`.
  * @param argv String array of runtime arguments provided in `main`.
@@ -386,20 +431,23 @@ static void _flag_scan(int argc, char **argv)
     while (argc > 0)
     {
         const char *argument = _flag_shift_args(&argc, &argv);
-
-        if (!strcmp(argument, "-"))
+        if (NULL == argument) continue;
+        else if (*argument != '-')
         {
-            fprintf(stderr, "ValueError: Unknown Flag \"%s\".\n", argument);
-            exit(1);
+            __flag_append_positional(argument);
+            continue;
+        }
+        else if ((*argument) + 1 == '\0')
+        {
+            __flag_append_positional(argument);
+            continue;
         }
 
-        argument += 1;
-
-        Flag *flag = _flag_find(argument);
+        Flag *flag = _flag_find(argument + 1);
 
         if (flag == NULL)
         {
-            fprintf(stderr, "ValueError: Unknown Flag \"%s\".\n", argument);
+            fprintf(stderr, "ValueError: Unknown Flag \"%s\".\n", argument + 1);
             exit(1);
         }
 
@@ -464,10 +512,10 @@ static void _flag_print_default(FILE *stream, const Flag *flag)
  */
 void flag_print_help(FILE *stream, bool print_default)
 {
-    for (size_t index = 0; index < flag_count; ++index)
+    for (size_t index = 0; index < __flag_count; ++index)
     {
         fprintf(stream, "\n");
-        const Flag *flag = &flags[index];
+        const Flag *flag = &__flags[index];
 
         fprintf(stream, "\t-%s\n\t\t%s", flag->name, flag->desc);
 
@@ -487,6 +535,41 @@ void flag_print_help(FILE *stream, bool print_default)
 void flag_set_programme_name(const char *name)
 {
     _PROGRAMME_NAME = name;
+}
+
+/**
+ * @brief Obtain a positional argument by its given index.
+ * @param index Index of the positional argument.
+ * @returns The positional argument stored at the given index.
+ * @returns If the given index is greater than or equal to the positional argument count, `NULL` is returned.
+ */
+const char *flag_arguments_at(size_t index)
+{
+    if (index >= __positional_argument_count)
+    {
+        return NULL;
+    }
+
+    return __positional_arguments[index];
+}
+
+/**
+ * @brief Obtain the number of positional arguments provided to the programme.
+ * @returns The number of positional arguments.
+ */
+size_t flag_arguments_count(void)
+{
+    return __positional_argument_count;
+}
+
+/**
+ * @brief Obtain the positional arguments provided to the programme.
+ * @returns An array of all the positional arguments provided to the programme.
+ * @returns If no positional arguments have been provided to the programme, `NULL` is returned.
+ */
+const char **flag_arguments(void)
+{
+    return __positional_arguments;
 }
 
 /**
