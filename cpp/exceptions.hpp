@@ -3,7 +3,6 @@
 
 #include "doc.hpp" // ! NEEDED FOR NAMESPACE DOCUMENTATION
 
-#define EXCEPTION_IMPLEMENTATION
 #include "exception.hpp" // Exception
 
 namespace polutils
@@ -18,7 +17,7 @@ namespace polutils
          * @param message Message to accompany the exception.
          */
         explicit AllocationError(const std::string &message) noexcept;
-
+        
         /**
          * @brief Construct an `AllocationError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
@@ -38,7 +37,7 @@ namespace polutils
          * @param message Message to accompany the exception.
          */
         explicit ValueError(const std::string &message) noexcept;
-
+        
         /**
          * @brief Construct an `ValueError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
@@ -47,7 +46,7 @@ namespace polutils
         template <typename... Arguments>
         explicit ValueError(const std::string &format, const Arguments &...arguments);
     };
-
+    
     /**
      * @brief Exception for any indexed access.
      */
@@ -58,7 +57,7 @@ namespace polutils
          * @param message Message to accompany the exception.
          */
         explicit IndexError(const std::string &message) noexcept;
-
+        
         /**
          * @brief Construct an `IndexError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
@@ -67,7 +66,7 @@ namespace polutils
         template <typename... Arguments>
         explicit IndexError(const std::string &format, const Arguments &...arguments);
     };
-
+    
     /**
      * @brief Exception for any indexed access outside of the allotted range.
      */
@@ -78,7 +77,7 @@ namespace polutils
          * @param message Message to accompany the exception.
          */
         explicit OutOfRangeError(const std::string &message) noexcept;
-
+        
         /**
          * @brief Construct an `OutOfRangeError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
@@ -87,7 +86,7 @@ namespace polutils
         template <typename... Arguments>
         explicit OutOfRangeError(const std::string &format, const Arguments &...arguments);
     };
-
+    
     /**
      * @brief Exception for any numeric underflow.
      */
@@ -107,7 +106,7 @@ namespace polutils
         template <typename... Arguments>
         explicit UnderflowError(const std::string &format, const Arguments &...arguments);
     };
-
+    
     /**
      * @brief Exception for any numeric overflow.
      */
@@ -118,7 +117,7 @@ namespace polutils
          * @param message Message to accompany the exception.
          */
         explicit OverflowError(const std::string &message) noexcept;
-
+        
         /**
          * @brief Construct an `OverflowError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
@@ -127,7 +126,7 @@ namespace polutils
         template <typename... Arguments>
         explicit OverflowError(const std::string &format, const Arguments &...arguments);
     };
-
+    
     /**
      * @brief Exception for any numeric overflow.
      */
@@ -158,7 +157,7 @@ namespace polutils
          * @param message Message to accompany the exception.
          */
         explicit UnreachableError(const std::string &message) noexcept;
-
+        
         /**
          * @brief Construct an `UnreachableError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
@@ -167,7 +166,7 @@ namespace polutils
         template <typename... Arguments>
         explicit UnreachableError(const std::string &format, const Arguments &...arguments);
     };
-
+    
     /**
      * @brief Exception for when a file can not be found on the filesystem.
      */
@@ -178,7 +177,7 @@ namespace polutils
          * @param message Message to accompany the exception.
          */
         explicit FileNotFoundError(const std::string &message) noexcept;
-
+        
         /**
          * @brief Construct an `FileNotFoundError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
@@ -187,7 +186,7 @@ namespace polutils
         template <typename... Arguments>
         explicit FileNotFoundError(const std::string &format, const Arguments &...arguments);
     };
-
+    
     /**
      * @brief Exception for when a file already exists on the filesystem.
      */
@@ -198,7 +197,7 @@ namespace polutils
          * @param message Message to accompany the exception.
          */
         explicit FileExistsError(const std::string &message) noexcept;
-
+        
         /**
          * @brief Construct an `FileExistsError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
@@ -207,7 +206,7 @@ namespace polutils
         template <typename... Arguments>
         explicit FileExistsError(const std::string &format, const Arguments &...arguments);
     };
-
+    
     /**
      * @brief Exception for any miscellaneous I/O exceptions.
      */
@@ -218,7 +217,7 @@ namespace polutils
          * @param message Message to accompany the exception.
          */
         explicit IOError(const std::string &message) noexcept;
-
+        
         /**
          * @brief Construct an `IOError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
@@ -232,6 +231,9 @@ namespace polutils
 #endif // EXCEPTIONS_HPP
 
 #ifdef EXCEPTIONS_IMPLEMENTATION
+
+#define EXCEPTION_IMPLEMENTATION
+#include "exception.hpp" // Exception
 
 namespace polutils
 {
