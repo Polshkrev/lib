@@ -331,6 +331,7 @@ static bool _get_entries_windows(files_t *files, const char *path)
 
         if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
         {
+            files_append(files, full_path);
             if (!_get_entries_windows(files, full_path))
             {
                 FindClose(find);
