@@ -1,4 +1,15 @@
 # Changelog
+## v0.43.0 - 2026-10-05
+`Added`
+- C
+    - `flag`
+        - Added positional argument suport.
+        - Added the `flag_arguments_at` function.
+        - Added the `flag_arguments_count` function.
+        - Added the `flag_arguments` function.
+- CPP
+    - `exceptions`
+        - Added the `KeyError` exception.
 ## v0.42.0 - 2026-09-13
 `Changed`
 - C
