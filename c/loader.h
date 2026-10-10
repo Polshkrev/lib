@@ -8,7 +8,7 @@ extern "C" {
 #include <stdlib.h> // NULL
 #include <stdbool.h> // bool
 
-#include "attributes.h"
+#include "attributes.h" // NODISCARD
 
 #ifdef _WIN32
     #include <minwindef.h> // HANDLE, DWORD, FARPROC
@@ -159,7 +159,6 @@ NODISCARD static char *__library_error_message_windows(DWORD error)
         }
         else if (sprintf(win32_error_message, "Invalid windows error code (0x%lX)", error) <= 0) return NULL;
         return win32_error_message;
-
     }
     while (error_message_size > 1 && isspace(win32_error_message[error_message_size - 1])) { win32_error_message[--error_message_size] = '\0'; }
     return win32_error_message;
@@ -184,7 +183,7 @@ NODISCARD const char *library_error(void)
  * @param library Handle to the library to which to deallocate.
  * @returns True if the given library handle was successfully deallocated, else false.
  */
-NODISCARD bool library_close(library_t library)
+bool library_close(library_t library)
 {
     if (NULL == library) return false;
 #ifdef _WIN32
