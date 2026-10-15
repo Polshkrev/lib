@@ -10,7 +10,7 @@ extern "C" {
 #include <stdint.h>  // uint8_t, SIZE_MAX
 
 /**
- * @brief Typedef for a single character within a string.
+ * @brief Type of a single character within a string.
  */
 typedef unsigned char char_t;
 
@@ -81,7 +81,7 @@ size_t string_utf8_length(const string_t *string);
 /**
  * @brief Determine whether the given string contains valid utf-8.
  * @param string String to validate.
- * @returns True if the string contains valid utf-8.
+ * @returns True if the string contains valid utf-8, else false.
  */
 bool string_is_valid_utf8(const string_t *string);
 
@@ -112,7 +112,7 @@ string_t string_trim(const string_t *string);
  * @param delimiter A character by which to split the string.
  * @returns A string where the data is set to the first chunk of string before the given delimiter.
  */
-string_t string_chop_by_delimiter(string_t *string, char delimiter);
+string_t string_chop_by_delimiter(string_t *string, char_t delimiter);
 
 /**
  * @brief Find the first occurrence of a given character within a given string.
@@ -129,6 +129,16 @@ size_t string_find_first_of(const string_t *string, char_t character);
  * @returns The index of the given character within the string. If the character is not found within the string, `STRING_NOT_FOUND` is returned.
  */
 size_t string_find_last_of(const string_t *string, char_t character);
+
+/**
+ * @brief Find the start of a given needle within the given haystack.
+ * @param haystack Full string to search.
+ * @param needle Substring for which to look within the given haystack.
+ * @returns The index within the haystack at which occurs the needle.
+ * @returns If the given needle is not found within the given haystack, the `STRING_NOT_FOUND` value is returned.
+ * @note For `utf-8` strings, the function returns the index within the count. To obtain the index of the `codepoint`, subtract the return value of the function from the length of the haystack. I.e `haystack.count - index`.
+ */
+size_t string_find(const string_t *haystack, const string_t *needle);
 
 /**
  * @brief Determine whether a given string starts with a given expected string.
@@ -157,14 +167,14 @@ bool string_equals(const string_t *original, const string_t *operand);
 /**
  * @brief Determine if the the given string is empty.
  * @param string String to evaluate.
- * @returns True if the given string has a count of zero.
+ * @returns True if the given string has a count of zero, else false.
  */
 bool string_is_empty(const string_t *string);
 
 /**
  * @brief Determine if the given string represents a null string.
  * @param string String to evaluate.
- * @returns True if the given string has null data and a count of zero.
+ * @returns True if the given string has null data and a count of zero, else false.
  */
 bool string_is_null(const string_t *string);
 
@@ -299,7 +309,7 @@ size_t string_utf8_length(const string_t *string)
 /**
  * @brief Determine whether the given string contains valid utf-8.
  * @param string String to validate.
- * @returns True if the string contains valid utf-8.
+ * @returns True if the string contains valid utf-8, else false.
  */
 bool string_is_valid_utf8(const string_t *string)
 {
@@ -376,7 +386,7 @@ string_t string_trim(const string_t *string)
  * @param delimiter A character by which to split the string.
  * @returns A string where the data is set to the first chunk of string before the given delimiter.
  */
-string_t string_chop_by_delimiter(string_t *string, char delimiter)
+string_t string_chop_by_delimiter(string_t *string, char_t delimiter)
 {
     size_t index = 0;
     while (index < string->count && string->data[index] != delimiter)
@@ -440,6 +450,31 @@ size_t string_find_last_of(const string_t *string, char_t character)
 }
 
 /**
+ * @brief Find the start of a given needle within the given haystack.
+ * @param haystack Full string to search.
+ * @param needle Substring for which to look within the given haystack.
+ * @returns The index within the haystack at which occurs the needle.
+ * @returns If the given needle is not found within the given haystack, the `STRING_NOT_FOUND` value is returned.
+ * @note For `utf-8` strings, the function returns the index within the count. To obtain the index of the `codepoint`, subtract the return value of the function from the length of the haystack. I.e @code haystack.count - index @code
+ */
+size_t string_find(const string_t *haystack, const string_t *needle)
+{
+    if (string_is_empty(needle)) return 0;
+    else if (needle->count > haystack->count) return STRING_NOT_FOUND;
+    
+    size_t last_index = haystack->count - needle->count + 1;
+
+    for (size_t index = 0; index < last_index; ++index)
+    {
+        if (memcmp(haystack->data + index, needle->data, needle->count) == 0)
+        {
+            return index;
+        }
+    }
+    return STRING_NOT_FOUND;
+}
+
+/**
  * @brief Determine whether a given string starts with a given expected string.
  * @param string A pointer to the string that contains the given string.
  * @param expected The expected prefix to check against.
@@ -499,7 +534,7 @@ bool string_equals(const string_t *original, const string_t *operand)
 /**
  * @brief Determine if the the given string is empty.
  * @param string String to evaluate.
- * @returns True if the given string has a count of zero.
+ * @returns True if the given string has a count of zero, else false.
  */
 bool string_is_empty(const string_t *string)
 {
@@ -509,7 +544,7 @@ bool string_is_empty(const string_t *string)
 /**
  * @brief Determine if the given string represents a null string.
  * @param string String to evaluate.
- * @returns True if the given string has null data and a count of zero.
+ * @returns True if the given string has null data and a count of zero, else false.
  */
 bool string_is_null(const string_t *string)
 {
