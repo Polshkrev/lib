@@ -62,6 +62,18 @@ string_builder_t string_builder_init(void);
 string_builder_t string_builder_with_capacity(size_t capacity);
 
 /**
+ * @brief Construct a new string builder from a string view.
+ * @param view View into the string data.
+ * @param null Sentinal value to determine if the return value is returned with a trailing `null` byte.
+ * @returns A string builder of the data from the given string view.
+ * @exception If the underlying array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
+ * @exception If the given view is `NULL`, an `IllegalParameterError` is printed to `stderr` and the programme exits.
+ * @note If the given `null` sentinal value is passed in as `true`, the resulting builder will have an internal `size` and `capacity` `equal` to the `size` of the given `view` `plus one`.
+ * @note If the given `null` sentinal value is passed in as `false`, the resulting builder will have an internal `size` and `capacity` `equal` to the `size` of the given `view`.
+ */
+string_builder_t string_builder_from(const string_t *view, bool null);
+
+/**
  * @brief Append a character to the buffer of characters. If the buffer is full, the buffer is resized by an exponential factor of two.
  * @param builder Buffer of characters to which to append.
  * @param item Item to append to the buffer.
@@ -102,7 +114,7 @@ char *string_builder_at(const string_builder_t *builder, size_t index);
  * @param builder Builder within which to search.
  * @param character Character for which to search.
  * @returns The index within the builder where the given character is stored.
- * @returns If the character can not be found, negative one is returned.
+ * @returns If the character `can not` be found, `negative one` is returned.
  */
 ptrdiff_t string_builder_find(const string_builder_t *builder, char character);
 
@@ -236,6 +248,26 @@ string_builder_t string_builder_with_capacity(size_t capacity)
 }
 
 /**
+ * @brief Construct a new string builder from a string view.
+ * @param view View into the string data.
+ * @param null Sentinal value to determine if the return value is returned with a trailing `null` byte.
+ * @returns A string builder of the data from the given string view.
+ * @exception If the underlying array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
+ * @exception If the given view is `NULL`, an `IllegalParameterError` is printed to `stderr` and the programme exits.
+ * @note If the given `null` sentinal value is passed in as `true`, the resulting builder will have an internal `size` and `capacity` `equal` to the `size` of the given `view` `plus one`.
+ * @note If the given `null` sentinal value is passed in as `false`, the resulting builder will have an internal `size` and `capacity` `equal` to the `size` of the given `view`.
+ */
+string_builder_t string_builder_from(const string_t *view, bool null)
+{
+    size_t capacity = null ? CLAMP(view->count, view->count + 1, SIZE_MAX) : CLAMP(view->count, view->count, SIZE_MAX);
+    string_builder_t result = string_builder_with_capacity(capacity);
+    if (string_is_empty(view)) return result;
+    string_builder_append_data(&result, view->data, view->count);
+    if (null) string_builder_append(&result, '\0');
+    return result;
+}
+
+/**
  * @brief Append a character to the buffer of characters. If the buffer is full, the buffer is resized by an exponential factor of two.
  * @param builder Buffer of characters to which to append.
  * @param item Item to append to the buffer.
@@ -311,7 +343,7 @@ char *string_builder_at(const string_builder_t *builder, size_t index)
  * @param builder Builder within which to search.
  * @param character Character for which to search.
  * @returns The index within the builder where the given character is stored.
- * @returns If the character can not be found, negative one is returned.
+ * @returns If the character `can not` be found, `negative one` is returned.
  */
 ptrdiff_t string_builder_find(const string_builder_t *builder, char character)
 {
