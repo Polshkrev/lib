@@ -10,6 +10,8 @@ extern "C" {
 #include <stdbool.h> // bool
 #include <stdio.h> // FILE, stderr, fprintf
 
+#include "attributes.h" // NODISCARD
+
 /**
  * @brief Representation of a semantic-versioning object.
  */
@@ -26,7 +28,7 @@ typedef struct
  * @brief Construct a new version object. Each of the version properties are set to zero and the name is set to NULL.
  * @returns A new version object.
  */
-version_t version_init(void);
+NODISCARD version_t version_init(void);
 
 /**
  * @brief Construct a new version object from a given major, minor, and patch numbers.
@@ -35,14 +37,14 @@ version_t version_init(void);
  * @param patch Patch fix number.
  * @returns A new version object with each of the properties set to the given parameters.
  */
-version_t version_convert(uint8_t major, uint8_t minor, uint8_t patch);
+NODISCARD version_t version_convert(uint8_t major, uint8_t minor, uint8_t patch);
 
 /**
  * @brief Construct a new version object with a given name.
  * @param name Constant string to pass to the version object.
  * @returns A new version with the given name and each of its release properties set to zero.
  */
-version_t version_init_with_name(const char *name);
+NODISCARD version_t version_init_with_name(const char *name);
 
 /**
  * @brief Construct a version object using only the string properties.
@@ -50,7 +52,7 @@ version_t version_init_with_name(const char *name);
  * @param description Description, or changlog, of a version object.
  * @returns A new version with its string realted properties set as the given arguments and its numeric properties set to zero.
  */
-version_t version_init_strings(const char *name, const char *description);
+NODISCARD version_t version_init_strings(const char *name, const char *description);
 
 /**
  * @brief Full initialize a version object.
@@ -61,7 +63,7 @@ version_t version_init_strings(const char *name, const char *description);
  * @param patch Patch fix number.
  * @returns A new version initialized with all its properties set to the given parameters.
  */
-version_t version_init_full(const char *name, const char *description, uint8_t major, uint8_t minor, uint8_t patch);
+NODISCARD version_t version_init_full(const char *name, const char *description, uint8_t major, uint8_t minor, uint8_t patch);
 
 /**
  * @brief Set the major value of a version object.
@@ -117,7 +119,7 @@ void version_fix(version_t *version);
  * @param version Version object to check.
  * @returns False if the given version object's major release number is less than one, else true.
  */
-bool version_is_public(const version_t *version);
+NODISCARD bool version_is_public(const version_t *version);
 
 /**
  * @brief Compare the major release of a given version object.
@@ -125,7 +127,7 @@ bool version_is_public(const version_t *version);
  * @param major Major release number to compare.
  * @returns False if the given version object's major version is not equal to the given major parametre, else true.
  */
-bool version_compare_major(const version_t *version, uint8_t major);
+NODISCARD bool version_compare_major(const version_t *version, uint8_t major);
 
 /**
  * @brief Compare the minor release of a given version object.
@@ -133,7 +135,7 @@ bool version_compare_major(const version_t *version, uint8_t major);
  * @param minor Minor release number to compare.
  * @returns False if the given version object's minor version is not equal to the given minor parametre, else true.
  */
-bool version_compare_minor(const version_t *version, uint8_t minor);
+NODISCARD bool version_compare_minor(const version_t *version, uint8_t minor);
 
 /**
  * @brief Compare the patch release of a given version object.
@@ -141,7 +143,7 @@ bool version_compare_minor(const version_t *version, uint8_t minor);
  * @param patch Patch release number to compare.
  * @returns False if the given version object's patch version is not equal to the given patch parametre, else true.
  */
-bool version_compare_patch(const version_t *version, uint8_t patch);
+NODISCARD bool version_compare_patch(const version_t *version, uint8_t patch);
 
 /**
  * @brief Compare one given version object to another.
@@ -149,7 +151,7 @@ bool version_compare_patch(const version_t *version, uint8_t patch);
  * @param other Version object to compare.
  * @returns False if all of one given version object's properties are not equal to each other, else true.
  */
-bool version_compare(const version_t *version, const version_t *other);
+NODISCARD bool version_compare(const version_t *version, const version_t *other);
 
 /**
  * @brief Print a given version in a given output stream. If the version's name is not given or NULL, then the name is not printed.
@@ -177,7 +179,7 @@ extern "C" {
  * @brief Construct a new version object. Each of the version properties are set to zero and the name is set to NULL.
  * @returns A new version object.
  */
-version_t version_init(void)
+NODISCARD version_t version_init(void)
 {
     return version_init_full(NULL, NULL, 0, 0, 0);
 }
@@ -189,7 +191,7 @@ version_t version_init(void)
  * @param patch Patch fix number.
  * @returns A new version object with each of the properties set to the given parameters.
  */
-version_t version_convert(uint8_t major, uint8_t minor, uint8_t patch)
+NODISCARD version_t version_convert(uint8_t major, uint8_t minor, uint8_t patch)
 {
     return version_init_full(NULL, NULL, major, minor, patch);
 }
@@ -199,7 +201,7 @@ version_t version_convert(uint8_t major, uint8_t minor, uint8_t patch)
  * @param name Constant string to pass to the version object.
  * @returns A new version with the given name and each of its release properties set to zero.
  */
-version_t version_init_with_name(const char *name)
+NODISCARD version_t version_init_with_name(const char *name)
 {
     return version_init_full(name, NULL, 0, 0, 0);
 }
@@ -210,7 +212,7 @@ version_t version_init_with_name(const char *name)
  * @param description Description, or changlog, of a version object.
  * @returns A new version with its string realted properties set as the given arguments and its numeric properties set to zero.
  */
-version_t version_init_strings(const char *name, const char *description)
+NODISCARD version_t version_init_strings(const char *name, const char *description)
 {
     return version_init_full(name, description, 0, 0, 0);
 }
@@ -224,7 +226,7 @@ version_t version_init_strings(const char *name, const char *description)
  * @param patch Patch fix number.
  * @returns A new version initialized with all its properties set to the given parameters.
  */
-version_t version_init_full(const char *name, const char *description, uint8_t major, uint8_t minor, uint8_t patch)
+NODISCARD version_t version_init_full(const char *name, const char *description, uint8_t major, uint8_t minor, uint8_t patch)
 {
     return (version_t)
     {
@@ -364,7 +366,7 @@ void version_fix(version_t *version)
  * @param version Version object to check.
  * @returns False if the given version object's major release number is less than one, else true.
  */
-bool version_is_public(const version_t *version)
+NODISCARD bool version_is_public(const version_t *version)
 {
     return version_compare_major(version, 1);
 }
@@ -375,7 +377,7 @@ bool version_is_public(const version_t *version)
  * @param major Major release number to compare.
  * @returns False if the given version object's major version is not greater than or equal to the given major parametre, else true.
  */
-bool version_compare_major(const version_t *version, uint8_t major)
+NODISCARD bool version_compare_major(const version_t *version, uint8_t major)
 {
     return version->major >= major;
 }
@@ -386,7 +388,7 @@ bool version_compare_major(const version_t *version, uint8_t major)
  * @param minor Minor release number to compare.
  * @returns False if the given version object's minor version is not greater than or equal to the given minor parametre, else true.
  */
-bool version_compare_minor(const version_t *version, uint8_t minor)
+NODISCARD bool version_compare_minor(const version_t *version, uint8_t minor)
 {
     return version->minor >= minor;
 }
@@ -397,7 +399,7 @@ bool version_compare_minor(const version_t *version, uint8_t minor)
  * @param patch Patch release number to compare.
  * @returns False if the given version object's patch version is not greater than or equal to the given patch parametre, else true.
  */
-bool version_compare_patch(const version_t *version, uint8_t patch)
+NODISCARD bool version_compare_patch(const version_t *version, uint8_t patch)
 {
     return version->patch >= patch;
 }
@@ -408,7 +410,7 @@ bool version_compare_patch(const version_t *version, uint8_t patch)
  * @param other Version object to compare.
  * @returns False if all of one given version object's properties are not equal to each other, else true.
  */
-bool version_compare(const version_t *version, const version_t *other)
+NODISCARD bool version_compare(const version_t *version, const version_t *other)
 {
     return (version_compare_major(version, other->major)) && (version_compare_minor(version, other->minor)) && (version_compare_patch(version, other->patch));
 }
