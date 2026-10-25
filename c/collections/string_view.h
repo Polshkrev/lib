@@ -291,7 +291,7 @@ size_t string_utf8_length(const string_t *string)
 
     while (index < string->count)
     {
-        uint8_t character = (uint8_t) string->data[index];
+        uint8_t character = (uint8_t)string->data[index];
         size_t sequence_length = __bytes_for_utf8[character];
 
         if ((sequence_length == 0) || (!__string_utf8_sequence_is_valid(string->data + index, string->count - index, sequence_length)))
@@ -317,7 +317,7 @@ bool string_is_valid_utf8(const string_t *string)
 
     while (index < string->count)
     {
-        uint8_t character = (uint8_t) string->data[index];
+        uint8_t character = (uint8_t)string->data[index];
         size_t sequence_length = __bytes_for_utf8[character];
 
         if ((sequence_length == 0) || (!__string_utf8_sequence_is_valid(string->data + index, string->count - index, sequence_length))) return false;
@@ -416,10 +416,7 @@ size_t string_find_first_of(const string_t *string, char_t character)
 {
     for (size_t index = 0; index < string->count; index++)
     {
-        if ((unsigned char) string->data[index] == (unsigned char) character)
-        {
-            return index;
-        }
+        if ((char_t)string->data[index] == character) return index;
     }
     return STRING_NOT_FOUND;
 }
@@ -432,20 +429,12 @@ size_t string_find_first_of(const string_t *string, char_t character)
  */
 size_t string_find_last_of(const string_t *string, char_t character)
 {
-    if (string->count == 0)
-    {
-        return STRING_NOT_FOUND;
-    }
-
+    if (string->count == 0) return STRING_NOT_FOUND;
     for (size_t index = string->count; index > 0; index--)
     {
-        if ((unsigned char) string->data[index - 1] != (unsigned char) character)
-        {
-            continue;
-        }
+        if ((char_t)string->data[index - 1] != character) continue;
         return index - 1;
     }
-
     return STRING_NOT_FOUND;
 }
 
@@ -548,7 +537,7 @@ bool string_is_empty(const string_t *string)
  */
 bool string_is_null(const string_t *string)
 {
-    return string->data == NULL && string->count == 0;
+    return string->data == NULL && string_is_empty(string);
 }
 
 #if defined(__cplusplus)
