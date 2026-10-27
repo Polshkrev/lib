@@ -11,6 +11,8 @@ extern "C" {
 #define STRING_VIEW_IMPLEMENTATION
 #include "./string_view.h" // string_t, string_new
 
+#include "../attributes.h" // NODISCARD
+
 /**
  * @brief A dynamic buffer of characters.
  */
@@ -26,7 +28,7 @@ typedef struct
  * @returns A new dynamic buffer of characters.
  * @exception If the underlying array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-string_builder_t string_builder_init(void);
+NODISCARD string_builder_t string_builder_init(void);
 
 /**
  * @brief Construct a new dynamic buffer of characters with a given capacity.
@@ -34,7 +36,7 @@ string_builder_t string_builder_init(void);
  * @returns A new dynamic buffer of characters with a given initial capacity.
  * @exception If the underlying array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-string_builder_t string_builder_with_capacity(size_t capacity);
+NODISCARD string_builder_t string_builder_with_capacity(size_t capacity);
 
 /**
  * @brief Construct a new string builder from a string view.
@@ -46,7 +48,7 @@ string_builder_t string_builder_with_capacity(size_t capacity);
  * @note If the given `null` sentinal value is passed in as `true`, the resulting builder will have an internal `size` and `capacity` `equal` to the `size` of the given `view` `plus one`.
  * @note If the given `null` sentinal value is passed in as `false`, the resulting builder will have an internal `size` and `capacity` `equal` to the `size` of the given `view`.
  */
-string_builder_t string_builder_from(const string_t *view, bool null);
+NODISCARD string_builder_t string_builder_from(const string_t *view, bool null);
 
 /**
  * @brief Append a character to the buffer of characters. If the buffer is full, the buffer is resized by an exponential factor of two.
@@ -82,7 +84,7 @@ void string_builder_extend(string_builder_t *builder, const char *items);
  * @returns A pointer to the data within the given buffer at the given index.
  * @exception If the given index is greater than or equal to the size of the buffer, an `IndexError` is printed to `stderr` and the programme exits.
  */
-char *string_builder_at(const string_builder_t *builder, size_t index);
+NODISCARD char *string_builder_at(const string_builder_t *builder, size_t index);
 
 /**
  * @brief Find a specified character within the builder.
@@ -91,14 +93,14 @@ char *string_builder_at(const string_builder_t *builder, size_t index);
  * @returns The index within the builder where the given character is stored.
  * @returns If the character `can not` be found, `negative one` is returned.
  */
-ptrdiff_t string_builder_find(const string_builder_t *builder, char character);
+NODISCARD ptrdiff_t string_builder_find(const string_builder_t *builder, char character);
 
 /**
  * @brief Obtain the items within the builder.
  * @param builder Builder from which to obtain the items.
  * @returns The underlying items within the builder without appending a null byte.
  */
-char *string_builder_items(const string_builder_t *builder);
+NODISCARD char *string_builder_items(const string_builder_t *builder);
 
 /**
  * @brief Obtain a null-terminated c-string consisting of the items within the buffer.
@@ -106,7 +108,7 @@ char *string_builder_items(const string_builder_t *builder);
  * @returns A null-terminated c-string consisting of the data within the array.
  * @exception If the builder can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the builder is deallocated.
  */
-const char *string_builder_data(string_builder_t *builder);
+NODISCARD const char *string_builder_data(string_builder_t *builder);
 
 /**
  * @brief Fit the capacity of the builder to its size.
@@ -128,7 +130,7 @@ void string_builder_combine(string_builder_t *destination, const string_builder_
  * @param builder Buffer from which to obtain the view.
  * @returns A view into the string builder.
  */
-string_t sbtosv(const string_builder_t *builder);
+NODISCARD string_t sbtosv(const string_builder_t *builder);
 
 /**
  * @brief Remove an element from the buffer at a given index.
@@ -160,7 +162,7 @@ void string_builder_resize_by(string_builder_t *builder, size_t scaler);
  * @param builder Buffer which is evaluated.
  * @returns If the buffer is evaluated to be empty, `true` is returned, else `false`.
  */
-bool string_builder_empty(const string_builder_t *builder);
+NODISCARD bool string_builder_empty(const string_builder_t *builder);
 
 /**
  * @brief Deallocate the buffer.
@@ -196,7 +198,7 @@ extern "C" {
  * @returns A new dynamic buffer of characters.
  * @exception If the underlying array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-string_builder_t string_builder_init(void)
+NODISCARD string_builder_t string_builder_init(void)
 {
     return string_builder_with_capacity(STRING_BUILDER_INITIAL_CAPACITY);
 }
@@ -207,7 +209,7 @@ string_builder_t string_builder_init(void)
  * @returns A new dynamic buffer of characters with a given initial capacity.
  * @exception If the underlying array can not be allocated, an `AllocationError` is printed to `stderr` and the programme exits.
  */
-string_builder_t string_builder_with_capacity(size_t capacity)
+NODISCARD string_builder_t string_builder_with_capacity(size_t capacity)
 {
     size_t clamped_capacity = NUMERIC_CLAMP(capacity, 1, SIZE_MAX);
     char *items = (char *)malloc(clamped_capacity * sizeof(char));
@@ -234,7 +236,7 @@ string_builder_t string_builder_with_capacity(size_t capacity)
  * @note If the given `null` sentinal value is passed in as `true`, the resulting builder will have an internal `size` and `capacity` `equal` to the `size` of the given `view` `plus one`.
  * @note If the given `null` sentinal value is passed in as `false`, the resulting builder will have an internal `size` and `capacity` `equal` to the `size` of the given `view`.
  */
-string_builder_t string_builder_from(const string_t *view, bool null)
+NODISCARD string_builder_t string_builder_from(const string_t *view, bool null)
 {
     size_t capacity = null ? NUMERIC_CLAMP(view->count, view->count + 1, SIZE_MAX) : NUMERIC_CLAMP(view->count, view->count, SIZE_MAX);
     string_builder_t result = string_builder_with_capacity(capacity);
@@ -301,7 +303,7 @@ void string_builder_extend(string_builder_t *builder, const char *items)
  * @returns A pointer to the data within the given buffer at the given index.
  * @exception If the given index is greater than or equal to the size of the buffer, an `IndexError` is printed to `stderr` and the programme exits.
  */
-char *string_builder_at(const string_builder_t *builder, size_t index)
+NODISCARD char *string_builder_at(const string_builder_t *builder, size_t index)
 {
     if (index >= builder->size) return NULL;
     return &builder->items[index];
@@ -314,7 +316,7 @@ char *string_builder_at(const string_builder_t *builder, size_t index)
  * @returns The index within the builder where the given character is stored.
  * @returns If the character `can not` be found, `negative one` is returned.
  */
-ptrdiff_t string_builder_find(const string_builder_t *builder, char character)
+NODISCARD ptrdiff_t string_builder_find(const string_builder_t *builder, char character)
 {
     for (size_t i = 0; i < builder->size; ++i)
     {
@@ -329,7 +331,7 @@ ptrdiff_t string_builder_find(const string_builder_t *builder, char character)
  * @param builder Builder from which to obtain the items.
  * @returns The underlying items within the builder without appending a null byte.
  */
-char *string_builder_items(const string_builder_t *builder)
+NODISCARD char *string_builder_items(const string_builder_t *builder)
 {
     return builder->items;
 }
@@ -340,7 +342,7 @@ char *string_builder_items(const string_builder_t *builder)
  * @returns A null-terminated c-string consisting of the data within the array.
  * @exception If the builder can not be reallocated, an `AllocationError` is printed to `stderr` and the programme exits after the builder is deallocated.
  */
-const char *string_builder_data(string_builder_t *builder)
+NODISCARD const char *string_builder_data(string_builder_t *builder)
 {
     if (builder->size >= builder->capacity)
     {
@@ -391,7 +393,7 @@ void string_builder_combine(string_builder_t *destination, const string_builder_
  * @param builder Buffer from which to obtain the view.
  * @returns A view into the string builder.
  */
-string_t sbtosv(const string_builder_t *builder)
+NODISCARD string_t sbtosv(const string_builder_t *builder)
 {
     return string_new(builder->items, builder->size);
 }
@@ -443,7 +445,7 @@ void string_builder_resize(string_builder_t *builder)
  * @returns The quotient of the given sizes.
  * @exception If the given divisor is zero, a `ZeroDivisionError` is printed to `stderr` and the programme exits.
  */
-static size_t __safe_builder_size_divide(size_t dividend, size_t divisor)
+NODISCARD static size_t __safe_builder_size_divide(size_t dividend, size_t divisor)
 {
     if (divisor == 0)
     {
@@ -484,7 +486,7 @@ void string_builder_resize_by(string_builder_t *builder, size_t scaler)
  * @param builder Buffer which is evaluated.
  * @returns If the buffer is evaluated to be empty, `true` is returned, else `false`.
  */
-bool string_builder_empty(const string_builder_t *builder)
+NODISCARD bool string_builder_empty(const string_builder_t *builder)
 {
     return builder->size == 0;
 }
