@@ -4,6 +4,8 @@
 #include <stdbool.h> // bool
 #include <stddef.h> // size_t, NULL
 
+#include "../attributes.h" // NODISCARD
+
 /**
  * @brief Allocate a given size of memory on the heap.
  * @param size Size of the memory to allocate.
@@ -11,7 +13,7 @@
  * @returns A `virtually-allocateed` `page-aligned` region of memory of the given size.
  * @retval If the memory region can `not` be allocated, `NULL` is returned.
  */
-void *heap_allocate(size_t size, bool write);
+NODISCARD void *heap_allocate(size_t size, bool write);
 
 /**
  * @brief Reallocate a given region of `heap-backed` memory.
@@ -25,7 +27,7 @@ void *heap_allocate(size_t size, bool write);
  * @retval If the given `new size` is `zero`, the given region of memory is `deallocated`, and `NULL` is returned.
  * @retval If the `original` memory can not be reallocated, `NULL` is returned.
  */
-bool heap_reallocate(void *memory, size_t old_size, size_t new_size, bool write);
+NODISCARD bool heap_reallocate(void *memory, size_t old_size, size_t new_size, bool write);
 
 /**
  * @brief Free a given region of `heap-backed` memory.
@@ -61,7 +63,7 @@ bool heap_free(void *memory, size_t size);
  * @returns A `virtually-allocateed` `page-aligned` region of memory of the given size.
  * @retval If the memory region can `not` be allocated, `NULL` is returned.
  */
-void *heap_allocate(size_t size, bool write)
+NODISCARD void *heap_allocate(size_t size, bool write)
 {
     if (size == 0) return NULL;
 #ifdef _WIN32
@@ -87,7 +89,7 @@ void *heap_allocate(size_t size, bool write)
  * @retval If the given `new size` is `zero`, the given region of memory is `deallocated`, and `NULL` is returned.
  * @retval If the `original` memory can not be reallocated, `NULL` is returned.
  */
-bool heap_reallocate(void *memory, size_t old_size, size_t new_size, bool write)
+NODISCARD bool heap_reallocate(void *memory, size_t old_size, size_t new_size, bool write)
 {
 #ifdef _WIN32
     if (0 == new_size)

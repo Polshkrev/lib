@@ -7,6 +7,8 @@
 #define FILE_IMPLEMENTATION
 #include "file.h"
 
+#include "../attributes.h" // NODISCARD
+
 /**
  * @brief Finite list of possible backings of the allocated memory.
  */
@@ -28,7 +30,7 @@ typedef enum
  * @retval If the given `backing` is `FILE_BACKING`, a pointer to a `mapping` of the given `file` is returned.
  * @note If the given `backing` is `FILE_BACKING`, the `caller` of this function is responsible for `closing` the given `file`.
  */
-void *memory_allocate(size_t size, backing_t backing, descriptor_t file, bool write);
+NODISCARD void *memory_allocate(size_t size, backing_t backing, descriptor_t file, bool write);
 
 /**
  * @brief Free a given region of memory.
@@ -54,18 +56,18 @@ bool memory_free(void *memory, size_t size, backing_t backing);
  * @retval If the given `backing` is `FILE_BACKING`, a pointer to a `mapping` of the given `file` is returned.
  * @note If the given `backing` is `FILE_BACKING`, the `caller` of this function is responsible for `closing` the given `file`.
  */
-void *memory_allocate(size_t size, backing_t backing, descriptor_t file, bool write)
+NODISCARD void *memory_allocate(size_t size, backing_t backing, descriptor_t file, bool write)
 {
     switch (backing)
     {
         case HEAP_BACKING:
         {
-            (void)file;
+            UNUSED(file);
             return heap_allocate(size, write);
         } break;
         case FILE_BACKING:
         {
-            (void)size;
+            UNUSED(size);
             return file_allocate(file, write);
         } break;
         default:
