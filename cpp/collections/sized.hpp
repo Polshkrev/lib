@@ -1,6 +1,8 @@
 #ifndef SIZED_HPP
 #define SIZED_HPP
 
+#include "doc.hpp" // ! NAMESPACE DOCUMENTATION HEADER
+
 #include <cstddef> // std::size_t
 
 namespace polutils
