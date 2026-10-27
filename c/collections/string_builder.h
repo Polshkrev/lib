@@ -8,31 +8,6 @@ extern "C" {
 #include <stddef.h> // size_t
 #include <stdbool.h> // bool
 
-/**
- * @brief Determine the minimum value between two given numbers.
- * @param a First value to check.
- * @param b Second value to check.
- * @returns `a` if `a` is less than `b`, else `b`.
- */
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-
-/**
- * @brief Determine the maximum value between two given numbers.
- * @param a First value to check.
- * @param b Second value to check.
- * @returns `a` if `a` is more than `b`, else `b`.
- */
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-
-/**
- * @brief Clamp a given value to a given minimum or maximum value.
- * @param value Value to clamp.
- * @param minimum Minimum value to check.
- * @param maximum Maximum value to check.
- * @returns The given value clamped to either the minimum or maximum.
- */
-#define CLAMP(value, minimum, maximum) (MIN(MAX((value), (minimum)), (maximum)))
-
 #define STRING_VIEW_IMPLEMENTATION
 #include "./string_view.h" // string_t, string_new
 
@@ -211,8 +186,10 @@ extern "C" {
 #include <stdint.h> // SIZE_MAX
 
 #ifndef STRING_BUILDER_INITIAL_CAPACITY
-#define STRING_BUILDER_INITIAL_CAPACITY 256
+    #define STRING_BUILDER_INITIAL_CAPACITY 256
 #endif // STRING_BUILDER_INITIAL_CAPACITY
+
+#include "../numeric.h" // NUMERIC_CLAMP
 
 /**
  * @brief Construct a new dynamic buffer of characters.
@@ -232,7 +209,7 @@ string_builder_t string_builder_init(void)
  */
 string_builder_t string_builder_with_capacity(size_t capacity)
 {
-    size_t clamped_capacity = CLAMP(capacity, 1, SIZE_MAX);
+    size_t clamped_capacity = NUMERIC_CLAMP(capacity, 1, SIZE_MAX);
     char *items = (char *)malloc(clamped_capacity * sizeof(char));
     if (NULL == items)
     {
@@ -313,11 +290,7 @@ void string_builder_append_data(string_builder_t *builder, const char *items, si
  */
 void string_builder_extend(string_builder_t *builder, const char *items)
 {
-    if (NULL == items)
-    {
-        fprintf(stderr, "IllegalParameterError: items can not be NULL.\n");
-        exit(1);
-    }
+    if (NULL == items) return;
     string_builder_append_data(builder, items, strlen(items));
 }
 
@@ -330,11 +303,7 @@ void string_builder_extend(string_builder_t *builder, const char *items)
  */
 char *string_builder_at(const string_builder_t *builder, size_t index)
 {
-    if (index >= builder->size)
-    {
-        fprintf(stderr, "IndexError: Can not access array of size %zu at index %zu.\n", builder->size, index);
-        exit(1);
-    }
+    if (index >= builder->size) return NULL;
     return &builder->items[index];
 }
 
