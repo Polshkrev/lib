@@ -5,6 +5,8 @@
 
 #include <string> // std::string
 
+#include "../c/attributes.h" // NODISCARD
+
 #ifdef _WIN32
     #include <minwindef.h> // HANDLE, DWORD, FARPROC
 #endif // _WIN32
@@ -40,7 +42,7 @@ namespace polutils
      * @returns A handle to a dynamically linked library.
      * @returns If the library can not be loaded, `nullptr` is returned.
      */
-    library_t library_load(const std::string &path);
+    NODISCARD library_t library_load(const std::string &path);
 
     /**
      * @brief Load a function from a given library handle with a given name.
@@ -49,13 +51,13 @@ namespace polutils
      * @returns A handle to the function found within the given library handle.
      * @returns If the library can not be loaded, `nullptr` is returned.
      */
-    function_t library_function(library_t library, const std::string &name);
+    NODISCARD function_t library_function(library_t library, const std::string &name);
 
     /**
      * @brief Obtain the — platform specific — error message when encurring a failure state.
      * @returns A string representation of a platform specific error.
      */
-    const char *library_error(void);
+    NODISCARD const char *library_error(void);
 
     /**
      * @brief Deallocate the given library handle.
@@ -70,7 +72,6 @@ namespace polutils
 #ifdef LOADER_IMPLEMENTATION
 
 #ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
     #include <libloaderapi.h> // LoadLibrary, GetProcAddress, FreeLibrary
     #include <fileapi.h> // GetFileAttributes, INVALID_FILE_ATTRIBUTES
     #include <windef.h> // ! NEEDED FOR WINBASE.H
@@ -89,7 +90,7 @@ namespace
      * @param path Path to evaluate.
      * @returns True if the path is evaluated to exist on the filesystem, else false.
      */
-    static bool _path_exists(const char *path)
+    NODISCARD static bool _path_exists(const char *path)
     {
     #ifdef _WIN32
         DWORD attributes = GetFileAttributes(path);
@@ -101,16 +102,16 @@ namespace
     }
 
 #ifdef _WIN32
-#ifndef WIN32_ERROR_MESSAGE_SIZE
-    #define WIN32_ERROR_MESSAGE_SIZE (4 * 1024)
-#endif // WIN32_ERROR_MESSAGE_SIZE
+    #ifndef WIN32_ERROR_MESSAGE_SIZE
+        #define WIN32_ERROR_MESSAGE_SIZE (4 * 1024)
+    #endif // WIN32_ERROR_MESSAGE_SIZE
 
     /**
      * @brief Format a windows error code as a string.
      * @param error Error code to format.
      * @returns The given error code formatted as a string.
      */
-    static char *__win32_error_message(DWORD error)
+    NODISCARD static char *__win32_error_message(DWORD error)
     {
         static char win32_error_message[WIN32_ERROR_MESSAGE_SIZE] = {0};
         DWORD error_message_size = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error, LANG_USER_DEFAULT, win32_error_message, WIN32_ERROR_MESSAGE_SIZE, NULL);
@@ -139,7 +140,7 @@ namespace polutils
      * @returns A handle to a dynamically linked library.
      * @returns If the library can not be loaded, `nullptr` is returned.
      */
-    library_t library_load(const std::string &path)
+    NODISCARD library_t library_load(const std::string &path)
     {
         if (!_path_exists(path.c_str())) return nullptr;
     #ifdef _WIN32
@@ -155,7 +156,7 @@ namespace polutils
      * @param name Name of the function to find.
      * @returns If the function can not be loaded, `nullptr` is returned.
      */
-    function_t library_function(library_t library, const std::string &name)
+    NODISCARD function_t library_function(library_t library, const std::string &name)
     {
     #ifdef _WIN32
         return GetProcAddress(library, name.c_str());
@@ -168,7 +169,7 @@ namespace polutils
      * @brief Obtain the — platform specific — error message when encurring a failure state.
      * @returns A string representation of a platform specific error.
      */
-    const char *library_error(void)
+    NODISCARD const char *library_error(void)
     {
     #ifndef _WIN32
         return dlerror();

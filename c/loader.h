@@ -8,6 +8,8 @@ extern "C" {
 #include <stdlib.h> // NULL
 #include <stdbool.h> // bool
 
+#include "attributes.h" // NODISCARD
+
 #ifdef _WIN32
     #include <minwindef.h> // HANDLE, DWORD, FARPROC
     /**
@@ -35,7 +37,7 @@ extern "C" {
  * @returns A handle to dynamically linked library.
  * @returns If the given path does not exist on the file system, `NULL` is returned.
  */
-library_t library_load(const char *path);
+NODISCARD library_t library_load(const char *path);
 
 /**
  * @brief Load a function from a given library handle with a given name.
@@ -44,13 +46,13 @@ library_t library_load(const char *path);
  * @returns A handle to the function found within the given library handle.
  * @returns If the function can not be loaded, `NULL` is returned.
  */
-function_t library_function(library_t library, const char *name);
+NODISCARD function_t library_function(library_t library, const char *name);
 
 /**
  * @brief Obtain the — platform specific — error message when encurring a failure state.
  * @returns A string representation of a platform specific error.
  */
-const char *library_error(void);
+NODISCARD const char *library_error(void);
 
 /**
  * @brief Deallocate the given library handle.
@@ -91,7 +93,7 @@ extern "C" {
  * @param path Path to evaluate.
  * @returns True if the path is evaluated to exist on the filesystem, else false.
  */
-static bool _path_exists(const char *path)
+NODISCARD static bool _path_exists(const char *path)
 {
 #ifdef _WIN32
     DWORD attributes = GetFileAttributes(path);
@@ -108,7 +110,7 @@ static bool _path_exists(const char *path)
  * @returns A handle to dynamically linked library.
  * @returns If the given path does not exist on the file system, `NULL` is returned.
  */
-library_t library_load(const char *path)
+NODISCARD library_t library_load(const char *path)
 {
     if (!_path_exists(path)) return NULL;
 #ifdef _WIN32
@@ -125,7 +127,7 @@ library_t library_load(const char *path)
  * @returns A handle to the function found within the given library handle.
  * @returns If the function can not be loaded, `NULL` is returned.
  */
-function_t library_function(library_t library, const char *name)
+NODISCARD function_t library_function(library_t library, const char *name)
 {
 #ifdef _WIN32
     return GetProcAddress(library, name);
@@ -144,7 +146,7 @@ function_t library_function(library_t library, const char *name)
  * @param error Error code to format.
  * @returns The given error code formatted as a string.
  */
-static char *__library_error_message_windows(DWORD error)
+NODISCARD static char *__library_error_message_windows(DWORD error)
 {
     static char win32_error_message[WIN32_LIBRARY_ERROR_MESSAGE_SIZE] = {0};
     DWORD error_message_size = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error, LANG_USER_DEFAULT, win32_error_message, WIN32_LIBRARY_ERROR_MESSAGE_SIZE, NULL);
@@ -157,7 +159,6 @@ static char *__library_error_message_windows(DWORD error)
         }
         else if (sprintf(win32_error_message, "Invalid windows error code (0x%lX)", error) <= 0) return NULL;
         return win32_error_message;
-
     }
     while (error_message_size > 1 && isspace(win32_error_message[error_message_size - 1])) { win32_error_message[--error_message_size] = '\0'; }
     return win32_error_message;
@@ -168,7 +169,7 @@ static char *__library_error_message_windows(DWORD error)
  * @brief Obtain the — platform specific — error message when encurring a failure state.
  * @returns A string representation of a platform specific error.
  */
-const char *library_error(void)
+NODISCARD const char *library_error(void)
 {
 #ifndef _WIN32
     return dlerror();

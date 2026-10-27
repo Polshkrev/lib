@@ -10,6 +10,8 @@ extern "C" {
 #include <stdint.h> // uintptr_t, uint64_t
 #include <stddef.h> // size_t
 
+#include "attributes.h" // NODISCARD
+
 /**
  * @brief Type representation of the "pseudo-union" type defined in the Flag struct.
  */
@@ -51,7 +53,7 @@ typedef struct
  * @returns A pointer to the newly created flag.
  * @exception If the number of registered flags has exceeded the capacity, a `ValueError` is printed to `stderr` and the programme exits.
  */
-Flag *flag_new(Flag_Type type, const char *name, const char *desc);
+NODISCARD Flag *flag_new(Flag_Type type, const char *name, const char *desc);
 
 /**
  * @brief Construct a boolean flag.
@@ -60,7 +62,7 @@ Flag *flag_new(Flag_Type type, const char *name, const char *desc);
  * @param desc Description of the flag to be printed in the help message.
  * @returns A pointer to the boolean value of the provided flag.
  */
-bool *flag_bool(const char *name, bool def, const char *desc);
+NODISCARD bool *flag_bool(const char *name, bool def, const char *desc);
 
 /**
  * @brief Construct an unsigned 64-bit integer flag.
@@ -69,7 +71,7 @@ bool *flag_bool(const char *name, bool def, const char *desc);
  * @param desc Description of the flag to be printed in the help message.
  * @returns A pointer to the unsigned 64-bit integer value of the provided flag.
  */
-uint64_t *flag_uint64(const char *name, uint64_t def, const char *desc);
+NODISCARD uint64_t *flag_uint64(const char *name, uint64_t def, const char *desc);
 
 /**
  * @brief Set the minimum and maximum values for an integer flag.
@@ -89,7 +91,7 @@ void flag_uint64_range(uint64_t *flag, uint64_t min, uint64_t max);
  * @param desc Description of the flag to be printed in the help message.
  * @returns A pointer to the c-string value of the provided flag.
  */
-const char **flag_string(const char *name, const char *def, const char *desc);
+NODISCARD const char **flag_string(const char *name, const char *def, const char *desc);
 
 /**
  * @brief Print a help message to a given stream.
@@ -117,20 +119,20 @@ void flag_parse(int argc, char **argv);
  * @returns The positional argument stored at the given index.
  * @returns If the given index is greater than or equal to the positional argument count, `NULL` is returned.
  */
-const char *flag_arguments_at(size_t index);
+NODISCARD const char *flag_arguments_at(size_t index);
 
 /**
  * @brief Obtain the number of positional arguments provided to the programme.
  * @returns The number of positional arguments.
  */
-size_t flag_arguments_count(void);
+NODISCARD size_t flag_arguments_count(void);
 
 /**
  * @brief Obtain the positional arguments provided to the programme.
  * @returns An array of all the positional arguments provided to the programme.
  * @returns If no positional arguments have been provided to the programme, `NULL` is returned.
  */
-const char **flag_arguments(void);
+NODISCARD const char **flag_arguments(void);
 
 #if defined(__cplusplus)
 }
@@ -175,7 +177,7 @@ static size_t __positional_argument_count = 0;
  * @returns A pointer to the newly created flag.
  * @exception If the number of registered flags has exceeded the capacity, a `ValueError` is printed to `stderr` and the programme exits.
  */
-Flag *flag_new(Flag_Type type, const char *name, const char *desc)
+NODISCARD Flag *flag_new(Flag_Type type, const char *name, const char *desc)
 {
     // make sure the count doesn't exceed the capacity
     if (__flag_count >= FLAG_CAPACITY)
@@ -199,7 +201,7 @@ Flag *flag_new(Flag_Type type, const char *name, const char *desc)
  * @param desc Description of the flag to be printed in the help message.
  * @returns A pointer to the boolean value of the provided flag.
  */
-bool *flag_bool(const char *name, bool def, const char *desc)
+NODISCARD bool *flag_bool(const char *name, bool def, const char *desc)
 {
     Flag *flag = flag_new(FLAG_BOOL, name, desc);
     *((bool*) &flag->data[DATA_DEF]) = def; // reinterpret the address of the default value of the flag to the boolean address of the given default
@@ -214,7 +216,7 @@ bool *flag_bool(const char *name, bool def, const char *desc)
  * @param desc Description of the flag to be printed in the help message.
  * @returns A pointer to the unsigned 64-bit integer value of the provided flag.
  */
-uint64_t *flag_uint64(const char *name, uint64_t def, const char *desc)
+NODISCARD uint64_t *flag_uint64(const char *name, uint64_t def, const char *desc)
 {
     Flag *flag = flag_new(FLAG_UINT64, name, desc);
     *((uint64_t*) &flag->data[DATA_DEF]) = def;
@@ -233,7 +235,7 @@ uint64_t *flag_uint64(const char *name, uint64_t def, const char *desc)
  * @exception If the supplied minimum is equal to the current minimum, a `ValueError` is printed to `stderr` and the programme exits.
  * @exception If the supplied maximum is equal to the current maximum, a `ValueError` is printed to `stderr` and the programme exits.
  */
-void flag_uint64_range(uint64_t *flag, uint64_t min, uint64_t max)
+NODISCARD void flag_uint64_range(uint64_t *flag, uint64_t min, uint64_t max)
 {
     static_assert(sizeof(uint64_t) == sizeof(uintptr_t), "This will only work if the size of uint64_t and uintptr_t is the same");
     if (min > max)
@@ -262,7 +264,7 @@ void flag_uint64_range(uint64_t *flag, uint64_t min, uint64_t max)
  * @param desc Description of the flag to be printed in the help message.
  * @returns A pointer to the c-string value of the provided flag.
  */
-const char **flag_string(const char *name, const char *def, const char *desc)
+NODISCARD const char **flag_string(const char *name, const char *def, const char *desc)
 {
     Flag *flag = flag_new(FLAG_STR, name, desc);
     *((const char **) &flag->data[DATA_DEF]) = def;
@@ -296,7 +298,7 @@ static const char *_flag_shift_args(int *argc, char ***argv)
  * @param name Name of the flag to find.
  * @returns A pointer to the matching flag, or NULL if no flag exists.
  */
-static Flag *_flag_find(const char *name)
+NODISCARD static Flag *_flag_find(const char *name)
 {
     for (size_t index = 0; index < __flag_count; ++index)
     {
@@ -543,7 +545,7 @@ void flag_set_programme_name(const char *name)
  * @returns The positional argument stored at the given index.
  * @returns If the given index is greater than or equal to the positional argument count, `NULL` is returned.
  */
-const char *flag_arguments_at(size_t index)
+NODISCARD const char *flag_arguments_at(size_t index)
 {
     if (index >= __positional_argument_count)
     {
@@ -557,7 +559,7 @@ const char *flag_arguments_at(size_t index)
  * @brief Obtain the number of positional arguments provided to the programme.
  * @returns The number of positional arguments.
  */
-size_t flag_arguments_count(void)
+NODISCARD size_t flag_arguments_count(void)
 {
     return __positional_argument_count;
 }
@@ -567,7 +569,7 @@ size_t flag_arguments_count(void)
  * @returns An array of all the positional arguments provided to the programme.
  * @returns If no positional arguments have been provided to the programme, `NULL` is returned.
  */
-const char **flag_arguments(void)
+NODISCARD const char **flag_arguments(void)
 {
     return __positional_arguments;
 }

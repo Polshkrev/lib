@@ -8,6 +8,8 @@ extern "C" {
 #include <stdbool.h> // bool
 #include <stdio.h> // FILE, size_t, stderr, fprintf, fopen, fclose
 
+#include "attributes.h" // NODISCARD
+
 #define AVAILABLE_OUTPUTS 2
 
 /**
@@ -39,7 +41,7 @@ typedef struct
  * @param level LoggingLevel to represent as a string.
  * @returns If the given logging level is not valid, the function returns `NULL`; else a string representation of the given level is returned.
  */
-const char *lltostr(LoggingLevel level);
+NODISCARD const char *lltostr(LoggingLevel level);
 
 /**
  * @brief Construct a new logger given a name and a logging level.
@@ -48,7 +50,7 @@ const char *lltostr(LoggingLevel level);
  * @returns A new logger.
  * @returns If the logger can not be allocated, `NULL` is returned.
  */
-logger_t *logger_init(const char *name, LoggingLevel level);
+NODISCARD logger_t *logger_init(const char *name, LoggingLevel level);
 
 /**
  * @brief Set the minimum allowable logging level.
@@ -117,6 +119,8 @@ extern "C" {
 #include <time.h> // time_t, struct tm, strftime
 #include <locale.h> // setlocale, LC_TIME
 
+#include "memory/heap.h" // heap_allocate, heap_free
+
 #ifndef LOCALE
 #define LOCALE "en_US.UTF-8"
 #endif // LOCALE
@@ -181,7 +185,7 @@ static const char *const __logging_level_names[__total_levels] =
  * @param level Given level to evaluate.
  * @returns True if the given level is evaluated to be valid, else false.
  */
-static bool __is_valid_level(LoggingLevel level)
+NODISCARD static bool __is_valid_level(LoggingLevel level)
 {
     return level >= LOG_DEBUG && level <= LOG_CRITICAL;
 }
@@ -191,7 +195,7 @@ static bool __is_valid_level(LoggingLevel level)
  * @param level LoggingLevel to represent as a string.
  * @returns If the given logging level is not valid, the function returns `NULL`; else a string representation of the given level is returned.
  */
-const char *lltostr(LoggingLevel level)
+NODISCARD const char *lltostr(LoggingLevel level)
 {
     if (!__is_valid_level(level)) return "NONE";
     return __logging_level_names[level];
@@ -204,9 +208,9 @@ const char *lltostr(LoggingLevel level)
  * @returns A new logger.
  * @returns If the logger can not be allocated, `NULL` is returned.
  */
-logger_t *logger_init(const char *name, LoggingLevel level)
+NODISCARD logger_t *logger_init(const char *name, LoggingLevel level)
 {
-    logger_t *logger = (logger_t *)malloc(sizeof(logger_t));
+    logger_t *logger = (logger_t *)heap_allocate(sizeof(logger_t), true);
     if (NULL == logger) return NULL;
     logger->name = name;
     logger_set_level(logger, level);
@@ -309,7 +313,7 @@ void logger_log(const logger_t *logger, const char *message, LoggingLevel level)
  * @param stream Output file stream to check against i/o output.
  * @returns A boolean of whether a given file is composed of an i/o stream (e.g.) `stdout`, `stdin`, and `stderr`.
  */
-static bool is_file(const FILE *stream)
+NODISCARD static bool is_file(const FILE *stream)
 {
     bool found = false;
     FILE *streams[3] = {stdout, stdin, stderr};
@@ -344,7 +348,7 @@ void logger_delete(logger_t **logger)
 {
     if (!(*logger)) return;
     logger_close(*logger);
-    free(*logger);
+    heap_free(*logger, sizeof(logger_t));
     *logger = NULL;
 }
 

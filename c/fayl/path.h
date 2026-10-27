@@ -8,6 +8,8 @@ extern "C" {
 #include <stdbool.h> // bool
 #include <stddef.h> // size_t, ptrdiff_t
 
+#include "../attributes.h" // NODISCARD
+
 #ifdef _WIN32
     #include <minwindef.h> // MAX_PATH
     #define PATH_MAXIMUM MAX_PATH
@@ -29,7 +31,7 @@ typedef struct
  * @brief Initialise a new path.
  * @returns A new path storing the current working directory.
  */
-path_t path_init(void);
+NODISCARD path_t path_init(void);
 
 /**
  * @brief Initialise a new path from a given raw value.
@@ -37,14 +39,14 @@ path_t path_init(void);
  * @returns A new path storing the given raw parameter.
  * @exception If the path can not be constructed, a `ValueError` is printed to `stderr` and the programme exits.
  */
-path_t path_from(const char *raw);
+NODISCARD path_t path_from(const char *raw);
 
 /**
  * @brief Determine if the given path exists on the filesystem.
  * @param path Path to evaluate.
  * @returns True if the path exists on the filesystem, else false.
  */
-bool path_exists(const path_t *path);
+NODISCARD bool path_exists(const path_t *path);
 
 /**
  * @brief Obtain the absolute value of the given path.
@@ -52,14 +54,14 @@ bool path_exists(const path_t *path);
  * @returns A new path storing the absolute value of the given path parameter.
  * @exception If the absolute path value can not be obtained, an `IOError` is printed to `stderr` and the programme exits.
  */
-path_t pasb(const path_t *path);
+NODISCARD path_t pasb(const path_t *path);
 
 /**
  * @brief Obtain the string representation of the given path value.
  * @param path Path from which to represent as a string.
  * @returns A string representation of the given path value.
  */
-const char *passtr(const path_t *path);
+NODISCARD const char *passtr(const path_t *path);
 
 /**
  * @brief Append a path to another.
@@ -68,7 +70,7 @@ const char *passtr(const path_t *path);
  * @returns A new path constructed of the given source appended to the given destination.
  * @exception If the path can not be appended, a `ValueError` is printed to `stderr` and the programme exits.
  */
-path_t path_append(const path_t *destination, const path_t *source);
+NODISCARD path_t path_append(const path_t *destination, const path_t *source);
 
 /**
  * @brief Append a given c-string to a given path.
@@ -77,7 +79,7 @@ path_t path_append(const path_t *destination, const path_t *source);
  * @returns A new path constructed of the given source and the given destination.
  * @exception If the path can not be appended, a `ValueError` is printed to `stderr` and the programme exits.
  */
-path_t path_append_as(const path_t *destination, const char *source);
+NODISCARD path_t path_append_as(const path_t *destination, const char *source);
 
 /**
  * @brief Append a given path to a given string.
@@ -86,7 +88,7 @@ path_t path_append_as(const path_t *destination, const char *source);
  * @returns A new path constructed of the given source and the given destination.
  * @exception If the path can not be appended, a `ValueError` is printed to `stderr` and the programme exits.
  */
-path_t path_append_to(const char *destination, const path_t *source);
+NODISCARD path_t path_append_to(const char *destination, const path_t *source);
 
 /**
  * @brief Obtain the parent directory of the given path.
@@ -94,7 +96,7 @@ path_t path_append_to(const char *destination, const path_t *source);
  * @returns A new path constructed from the parent directory of the given path.
  * @exception If the parent path can be obtained, a `ValueError` is printed to `stderr` and the programme exits.
  */
-path_t path_get_parent(const path_t *path);
+NODISCARD path_t path_get_parent(const path_t *path);
 
 /**
  * @brief Obtain the root of the filesystem.
@@ -103,7 +105,7 @@ path_t path_get_parent(const path_t *path);
  * @exception If the absolute path can not be obtained, an `IOError` is printed to `stderr` and the programme exits.
  * @exception If the root path can not be obtained, a `ValueError` is printed to `stderr` and the programme exits.
  */
-path_t path_get_root(const path_t *path);
+NODISCARD path_t path_get_root(const path_t *path);
 
 /**
  * @brief Obtain the filename of the given path.
@@ -111,14 +113,14 @@ path_t path_get_root(const path_t *path);
  * @returns The filename of the given path.
  * @exception If the filename can not be obtained, a `ValueError` is printed to `stderr` and the programme exits.
  */
-path_t path_filename(const path_t *path);
+NODISCARD path_t path_filename(const path_t *path);
 
 /**
  * @brief Obtain the extension of the given path.
  * @param path Path from which to obtain the file extension.
  * @returns The extension of the given path.
  */
-const char *path_extension(const path_t *path);
+NODISCARD const char *path_extension(const path_t *path);
 
 #if defined(__cplusplus)
 }
@@ -173,7 +175,7 @@ extern "C" {
  * @param error Error code to format.
  * @returns The given error code formatted as a string.
  */
-static char *__path_error_message_windows(DWORD error)
+NODISCARD static char *__path_error_message_windows(DWORD error)
 {
     static char win32_error_message[WIN32_PATH_ERROR_MESSAGE_SIZE] = {0};
     DWORD error_message_size = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error, LANG_USER_DEFAULT, win32_error_message, WIN32_PATH_ERROR_MESSAGE_SIZE, NULL);
@@ -197,7 +199,7 @@ static char *__path_error_message_windows(DWORD error)
  * @brief Initialise a new path.
  * @returns A new path storing the current working directory.
  */
-path_t path_init(void)
+NODISCARD path_t path_init(void)
 {
 #ifdef _WIN32
     if (GetConsoleOutputCP() != CP_UTF8) SetConsoleOutputCP(CP_UTF8);
@@ -237,7 +239,7 @@ path_t path_init(void)
  * @exception If the given parts can not be written to a path, a `ValueError` is printed to `stderr` and the programme exits.
  * @exception If the amount written to the path is not equal to the given size, a `ValueError` is printed to `stderr` and the programme exits.
  */
-static path_t __path_with_size(const char *raw, size_t size)
+NODISCARD static path_t __path_with_size(const char *raw, size_t size)
 {
     path_t result = {0};
     if (size >= sizeof(result.raw))
@@ -273,7 +275,7 @@ static path_t __path_with_size(const char *raw, size_t size)
  * @exception If the given parts can not be written to a path, a `ValueError` is printed to `stderr` and the programme exits.
  * @exception If the amount written to the path is not equal to the given size, a `ValueError` is printed to `stderr` and the programme exits.
  */
-static path_t __path_with_prefix(const char *raw, size_t size)
+NODISCARD static path_t __path_with_prefix(const char *raw, size_t size)
 {
     path_t result = {0};
 
@@ -307,7 +309,7 @@ static path_t __path_with_prefix(const char *raw, size_t size)
  * @returns A new path storing the given raw parameter.
  * @exception If the path can not be constructed, a `ValueError` is printed to `stderr` and the programme exits.
  */
-path_t path_from(const char *raw)
+NODISCARD path_t path_from(const char *raw)
 {
 #ifdef _WIN32
     if (GetConsoleOutputCP() != CP_UTF8) SetConsoleOutputCP(CP_UTF8);
@@ -321,7 +323,7 @@ path_t path_from(const char *raw)
  * @param path Path to evaluate.
  * @returns True if the path exists on the filesystem, else false.
  */
-bool path_exists(const path_t *path)
+NODISCARD bool path_exists(const path_t *path)
 {
 #ifdef _WIN32
     DWORD attributes = GetFileAttributes(passtr(path));
@@ -338,7 +340,7 @@ bool path_exists(const path_t *path)
  * @returns A new path storing the absolute value of the given path parameter.
  * @exception If the absolute path value can not be obtained, an `IOError` is printed to `stderr` and the programme exits.
  */
-path_t pasb(const path_t *path)
+NODISCARD path_t pasb(const path_t *path)
 {
     path_t output = {0};
 #ifdef _WIN32
@@ -370,7 +372,7 @@ path_t pasb(const path_t *path)
  * @param path Path from which to represent as a string.
  * @returns A string representation of the given path value.
  */
-const char *passtr(const path_t *path)
+NODISCARD const char *passtr(const path_t *path)
 {
     return path->raw;
 }
@@ -382,7 +384,7 @@ const char *passtr(const path_t *path)
  * @returns A new path constructed of the given source appended to the given destination.
  * @exception If the path can not be appended, a `ValueError` is printed to `stderr` and the programme exits.
  */
-path_t path_append(const path_t *destination, const path_t *source)
+NODISCARD path_t path_append(const path_t *destination, const path_t *source)
 {
     size_t count = destination->count + 1 + source->count;
 
@@ -416,7 +418,7 @@ path_t path_append(const path_t *destination, const path_t *source)
  * @returns A new path constructed of the given source and the given destination.
  * @exception If the path can not be appended, a `ValueError` is printed to `stderr` and the programme exits.
  */
-path_t path_append_as(const path_t *destination, const char *source)
+NODISCARD path_t path_append_as(const path_t *destination, const char *source)
 {
     path_t source_path = path_from(source);
     return path_append(destination, &source_path);
@@ -429,7 +431,7 @@ path_t path_append_as(const path_t *destination, const char *source)
  * @returns A new path constructed of the given source and the given destination.
  * @exception If the path can not be appended, a `ValueError` is printed to `stderr` and the programme exits.
  */
-path_t path_append_to(const char *destination, const path_t *source)
+NODISCARD path_t path_append_to(const char *destination, const path_t *source)
 {
     path_t destination_path = path_from(destination);
     return path_append(&destination_path, source);
@@ -442,7 +444,7 @@ path_t path_append_to(const char *destination, const path_t *source)
  * @returns The index of the last occurrence of the given character.
  * @returns If the given character does not occur within the string, `-1` is returned.
  */
-static ptrdiff_t __find_last_character(const char *string, char character)
+NODISCARD static ptrdiff_t __find_last_character(const char *string, char character)
 {
     size_t count = strlen(string);
 
@@ -462,7 +464,7 @@ static ptrdiff_t __find_last_character(const char *string, char character)
  * @returns The index of the first occurrence of the given character.
  * @returns If the given character does not occur within the string, `-1` is returned.
  */
-static ptrdiff_t __find_first_character(const char *string, char character)
+NODISCARD static ptrdiff_t __find_first_character(const char *string, char character)
 {
     size_t count = strlen(string);
 
@@ -481,7 +483,7 @@ static ptrdiff_t __find_first_character(const char *string, char character)
  * @returns A new path constructed from the parent directory of the given path.
  * @exception If the parent path can not be obtained, a `ValueError` is printed to `stderr` and the programme exits.
  */
-path_t path_get_parent(const path_t *path)
+NODISCARD path_t path_get_parent(const path_t *path)
 {
     ptrdiff_t separator = __find_last_character(path->raw, PATH_SEPARATOR);
 
@@ -498,7 +500,7 @@ path_t path_get_parent(const path_t *path)
  * @exception If the absolute path can not be obtained, an `IOError` is printed to `stderr` and the programme exits.
  * @exception If the root path can not be obtained, a `ValueError` is printed to `stderr` and the programme exits.
  */
-path_t path_get_root(const path_t *path)
+NODISCARD path_t path_get_root(const path_t *path)
 {
 #ifdef _WIN32
     path_t absolute = pasb(path);
@@ -517,7 +519,7 @@ path_t path_get_root(const path_t *path)
  * @returns The filename of the given path.
  * @exception If the filename can not be obtained, a `ValueError` is printed to `stderr` and the programme exits.
  */
-path_t path_filename(const path_t *path)
+NODISCARD path_t path_filename(const path_t *path)
 {
     ptrdiff_t separator = __find_last_character(path->raw, PATH_SEPARATOR);
     const char *filename = path->raw;
@@ -536,7 +538,7 @@ path_t path_filename(const path_t *path)
  * @param path Path from which to obtain the file extension.
  * @returns The extension of the given path.
  */
-const char *path_extension(const path_t *path)
+NODISCARD const char *path_extension(const path_t *path)
 {
     ptrdiff_t separator = __find_last_character(path->raw, PATH_SEPARATOR);
     const char *filename = path->raw;
