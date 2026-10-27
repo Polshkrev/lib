@@ -1,5 +1,5 @@
 # Changelog
-## v0.44.0 - 2026-10-27
+## v0.43.0 - 2026-10-27
 `Added`
 - C
     - `memory`
@@ -26,7 +26,14 @@
         - Added the `NUMERIC_MIN` macro.
         - Added the `NUMERIC_MAX` macro.
         - Added the `NUMERIC_CLAMP` macro.
+    - `flag`
+        - Added positional argument suport.
+        - Added the `flag_arguments_at` function.
+        - Added the `flag_arguments_count` function.
+        - Added the `flag_arguments` function.
 - CPP
+    - `exceptions`
+        - Added the `KeyError` exception.
     - `collections`
         - Added the `doc.hpp` header file.
 
@@ -46,17 +53,6 @@
 `Removed`
 - CPP
     - Due to the macros defined within the header file being not `c++` specific, the `numeric.hpp` header file.
-## v0.43.0 - 2026-10-05
-`Added`
-- C
-    - `flag`
-        - Added positional argument suport.
-        - Added the `flag_arguments_at` function.
-        - Added the `flag_arguments_count` function.
-        - Added the `flag_arguments` function.
-- CPP
-    - `exceptions`
-        - Added the `KeyError` exception.
 ## v0.42.0 - 2026-09-13
 `Changed`
 - C
