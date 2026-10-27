@@ -236,7 +236,7 @@ string_builder_t string_builder_with_capacity(size_t capacity)
  */
 string_builder_t string_builder_from(const string_t *view, bool null)
 {
-    size_t capacity = null ? CLAMP(view->count, view->count + 1, SIZE_MAX) : CLAMP(view->count, view->count, SIZE_MAX);
+    size_t capacity = null ? NUMERIC_CLAMP(view->count, view->count + 1, SIZE_MAX) : NUMERIC_CLAMP(view->count, view->count, SIZE_MAX);
     string_builder_t result = string_builder_with_capacity(capacity);
     if (string_is_empty(view)) return result;
     string_builder_append_data(&result, view->data, view->count);
