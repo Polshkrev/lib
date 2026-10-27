@@ -1,4 +1,51 @@
 # Changelog
+## v0.44.0 - 2026-10-27
+`Added`
+- C
+    - `memory`
+        - Added the `heap` memory allocator.
+        - Added the `file` memory allocator.
+        - Added the `memory` allocator abstraction.
+    - `attributes`
+        - Added the `ATTRIBUTE` macro.
+        - Added the `DEPRECATED` macro.
+        - Added the `UNUSED` macro.
+        - Added the `TODO` macro.
+        - Added the `TODO_FUNCTION` macro.
+        - Added the `UNREACHABLE` macro.
+        - Added the `PACKED` macro.
+        - Added the `PACKED_BEGIN` macro.
+        - Added the `PACKED_END` macro.
+        - Added the `NORETURN` macro.
+    - `collections`
+        - `string_builder`
+            - Added the `string_builder_from` function.
+        - `string_view`
+            - Added the `string_find` function.
+    - `numeric`
+        - Added the `NUMERIC_MIN` macro.
+        - Added the `NUMERIC_MAX` macro.
+        - Added the `NUMERIC_CLAMP` macro.
+- CPP
+    - `collections`
+        - Added the `doc.hpp` header file.
+
+`Changed`
+- C
+    - `logger`
+        - The logger now uses the `heap` allocater rather than `malloc/free`.
+    - `collections`
+        - `string_builder`
+            - `string_builder_extend` no longer crashes if the given `items` is `NULL`. Instead, the function simply returns without changing the structure.
+            - `string_builder_at` no longer crashes if the given `index` is outside of the structures bounds. Instead, the function simply returns `NULL`.
+            - All documentation has been updated.
+        - `string_view`
+            - `string_chop_by_delimeter` now accepts a `char_t` instead of a `char`.
+            - All documentation has been updated.
+
+`Removed`
+- CPP
+    - Due to the macros defined within the header file being not `c++` specific, the `numeric.hpp` header file.
 ## v0.43.0 - 2026-10-05
 `Added`
 - C
