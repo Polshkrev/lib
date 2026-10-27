@@ -8,7 +8,7 @@ extern "C" {
 #include <stdbool.h> // bool
 #include <stddef.h> // size_t, ptrdiff_t
 
-#include "attributes.h" // NODISCARD
+#include "../attributes.h" // NODISCARD
 
 #ifdef _WIN32
     #include <minwindef.h> // MAX_PATH

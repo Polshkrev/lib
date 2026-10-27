@@ -133,7 +133,7 @@ directory_t directory_init(path_t root)
  */
 directory_t directory_init_with_capacity(path_t root, size_t capacity)
 {
-    size_t clamped_capacity = CLAMP(capacity, 1, SIZE_MAX);
+    size_t clamped_capacity = NUMERIC_CLAMP(capacity, 1, SIZE_MAX);
     entry_t *entries = (entry_t *)malloc(clamped_capacity * sizeof(entry_t));
     if (NULL == entries)
     {
