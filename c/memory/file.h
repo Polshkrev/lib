@@ -4,6 +4,8 @@
 #include <stdbool.h> // bool
 #include <stddef.h> // size_t, NULL
 
+#include "../attributes.h" // NODISCARD
+
 #ifdef _WIN32
     #include <handleapi.h> // HANDLE
 
@@ -36,7 +38,7 @@
  * @retval If the given file descriptor can `not` be mapped, `NULL` is returned.
  * @note The caller of this function is responsible for closing the given descriptor.
  */
-void *file_allocate(descriptor_t file, bool write);
+NODISCARD void *file_allocate(descriptor_t file, bool write);
 
 /**
  * @brief Free a given region of `file-backed` memory.
@@ -52,14 +54,14 @@ bool file_free(void *memory, size_t size);
  * @param write Sentinel value of writability for the targeted file.
  * @returns A `descriptor` to the file with the given filename.
  */
-descriptor_t file_handle(const char *filename, bool write);
+NODISCARD descriptor_t file_handle(const char *filename, bool write);
 
 /**
  * @brief Obtain the size of the given file descriptor.
  * @param file Descriptor of the file whose size will be determined.
  * @returns The size of the given file descriptor.
  */
-size_t file_size(descriptor_t file);
+NODISCARD size_t file_size(descriptor_t file);
 
 #endif // FILE_H_
 
@@ -87,7 +89,7 @@ size_t file_size(descriptor_t file);
  * @param write Sentinel value of writability for the targeted file.
  * @returns A `descriptor` to the file with the given filename.
  */
-descriptor_t file_handle(const char *filename, bool write)
+NODISCARD descriptor_t file_handle(const char *filename, bool write)
 {
 #ifdef _WIN32
     DWORD access = write ? GENERIC_READ | GENERIC_WRITE : GENERIC_READ;
@@ -104,7 +106,7 @@ descriptor_t file_handle(const char *filename, bool write)
  * @param file Descriptor of the file whose size will be determined.
  * @returns The size of the given file descriptor.
  */
-size_t file_size(descriptor_t file)
+NODISCARD size_t file_size(descriptor_t file)
 {
 #ifdef _WIN32
     DWORD size = GetFileSize(file, 0);
@@ -126,7 +128,7 @@ size_t file_size(descriptor_t file)
  * @retval If the given file descriptor can `not` be mapped, `NULL` is returned.
  * @note The caller of this function is responsible for closing the given descriptor.
  */
-void *file_allocate(descriptor_t file, bool write)
+NODISCARD void *file_allocate(descriptor_t file, bool write)
 {
     if (INVALID_DESCRIPTOR == file) return NULL;
 #ifdef _WIN32
@@ -160,7 +162,7 @@ bool file_free(void *memory, size_t size)
 {
     if (NULL == memory || NULL == memory) return true;
 #ifdef _WIN32
-    (void)size;
+    UNUSED(size);
     return UnmapViewOfFile(memory) != 0;
 #else
     return mumap(memory, size) == 0;
