@@ -1,8 +1,6 @@
 #ifndef NUMERIC_H_
 #define NUMERIC_H_
 
-#include "doc.hpp" // ! NEEDED FOR NAMESPACE DOCUMENTATION
-
 /**
  * @brief Determine the minimum value between two given numbers.
  * @param a First value to check.
