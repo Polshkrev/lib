@@ -720,32 +720,6 @@ namespace polutils
 
         return left.patch() >= right.patch();
     }
-
-    /**
-     * @brief Parse a given string representation of a version.
-     * @param value String representation of a version.
-     * @exception If any of the stream operations fail, a `ValueError` is thrown.
-     */
-    version_t parse(const std::string &value)
-    {
-        std::stringstream stream(value);
-
-        std::uint16_t major;
-        std::uint16_t minor;
-        std::uint16_t patch;
-
-        char separator;
-
-        if (!(stream >> major)) throw ValueError("Invalid version.");
-        else if (!(stream >> separator) || separator != '.') throw ValueError("Invalid version.");
-        else if (!(stream >> minor)) throw ValueError("Invalid version.");
-        else if (!(stream >> separator) || separator != '.') throw ValueError("Invalid version.");
-        else if (!(stream >> patch)) throw ValueError("Invalid version.");
-        else if (major > UINT8_MAX || minor > UINT8_MAX || patch > UINT8_MAX) throw ValueError("Version component exceeds UINT8_MAX.");
-        else if (stream.peek() != std::char_traits<char>::eof()) throw ValueError("Invalid version.");
-
-        return version_t(static_cast<std::uint8_t>(major), static_cast<std::uint8_t>(minor), static_cast<std::uint8_t>(patch));
-    }
 }
 
 #endif // VERSION_IMPLEMENTATION
