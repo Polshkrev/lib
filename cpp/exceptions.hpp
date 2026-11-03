@@ -13,12 +13,6 @@ namespace polutils
     struct AllocationError : public Exception
     {
         /**
-         * @brief Construct an `AllocationError` with a message.
-         * @param message Message to accompany the exception.
-         */
-        explicit AllocationError(const std::string &message) noexcept;
-        
-        /**
          * @brief Construct an `AllocationError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
          * @param arguments Variadic formatting arguments.
@@ -32,12 +26,6 @@ namespace polutils
      */
     struct ValueError : public Exception
     {
-        /**
-         * @brief Construct a `ValueError` with a message.
-         * @param message Message to accompany the exception.
-         */
-        explicit ValueError(const std::string &message) noexcept;
-        
         /**
          * @brief Construct an `ValueError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
@@ -53,12 +41,6 @@ namespace polutils
     struct IndexError : public Exception
     {
         /**
-         * @brief Construct an `IndexError` with a message.
-         * @param message Message to accompany the exception.
-         */
-        explicit IndexError(const std::string &message) noexcept;
-        
-        /**
          * @brief Construct an `IndexError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
          * @param arguments Variadic formatting arguments.
@@ -72,12 +54,6 @@ namespace polutils
      */
     struct OutOfRangeError : public IndexError
     {
-        /**
-         * @brief Construct an `OutOfRangeError` with a message.
-         * @param message Message to accompany the exception.
-         */
-        explicit OutOfRangeError(const std::string &message) noexcept;
-        
         /**
          * @brief Construct an `OutOfRangeError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
@@ -93,12 +69,6 @@ namespace polutils
     struct UnderflowError : public ValueError
     {
         /**
-         * @brief Construct an `UnderflowError` with a message.
-         * @param message Message to accompany the exception.
-         */
-        explicit UnderflowError(const std::string &message) noexcept;
-
-        /**
          * @brief Construct an `UnderflowError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
          * @param arguments Variadic formatting arguments.
@@ -112,12 +82,6 @@ namespace polutils
      */
     struct OverflowError : public ValueError
     {
-        /**
-         * @brief Construct an `OverflowError` with a message.
-         * @param message Message to accompany the exception.
-         */
-        explicit OverflowError(const std::string &message) noexcept;
-        
         /**
          * @brief Construct an `OverflowError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
@@ -133,12 +97,6 @@ namespace polutils
     struct KeyError : public ValueError
     {
         /**
-         * @brief Construct an `KeyError` with a message.
-         * @param message Message to accompany the exception.
-         */
-        explicit KeyError(const std::string &message) noexcept;
-
-        /**
          * @brief Construct an `KeyError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
          * @param arguments Variadic formatting arguments.
@@ -152,12 +110,6 @@ namespace polutils
      */
     struct UnreachableError : public Exception
     {
-        /**
-         * @brief Construct an `UnreachableError` with a message.
-         * @param message Message to accompany the exception.
-         */
-        explicit UnreachableError(const std::string &message) noexcept;
-        
         /**
          * @brief Construct an `UnreachableError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
@@ -173,12 +125,6 @@ namespace polutils
     struct FileNotFoundError : public Exception
     {
         /**
-         * @brief Construct a `FileNotFoundError` with a message.
-         * @param message Message to accompany the exception.
-         */
-        explicit FileNotFoundError(const std::string &message) noexcept;
-        
-        /**
          * @brief Construct an `FileNotFoundError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
          * @param arguments Variadic formatting arguments.
@@ -193,12 +139,6 @@ namespace polutils
     struct FileExistsError : public Exception
     {
         /**
-         * @brief Construct a `FileExistsError` with a message.
-         * @param message Message to accompany the exception.
-         */
-        explicit FileExistsError(const std::string &message) noexcept;
-        
-        /**
          * @brief Construct an `FileExistsError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
          * @param arguments Variadic formatting arguments.
@@ -212,12 +152,6 @@ namespace polutils
      */
     struct IOError : public Exception
     {
-        /**
-         * @brief Construct an `IOError` with a message.
-         * @param message Message to accompany the exception.
-         */
-        explicit IOError(const std::string &message) noexcept;
-        
         /**
          * @brief Construct an `IOError` with a formatted message.
          * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
@@ -238,15 +172,6 @@ namespace polutils
 namespace polutils
 {
     /**
-     * @brief Construct an `AllocationError` with a message.
-     * @param message Message to accompany the exception.
-     */
-    AllocationError::AllocationError(const std::string &message) noexcept : Exception(message)
-    {
-        _assign_name("AllocationError");
-    }
-
-    /**
      * @brief Construct an `AllocationError` with a formatted message.
      * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
      * @param arguments Variadic formatting arguments.
@@ -255,15 +180,6 @@ namespace polutils
     AllocationError::AllocationError(const std::string &format, const Arguments &...arguments) : Exception(format, arguments...)
     {
         _assign_name("AllocationError");
-    }
-
-    /**
-     * @brief Construct an `OutOfRangeError` with a message.
-     * @param message Message to accompany the exception.
-     */
-    OutOfRangeError::OutOfRangeError(const std::string &message) noexcept : IndexError(message)
-    {
-        _assign_name("OutOfRangeError");
     }
 
     /**
@@ -278,15 +194,6 @@ namespace polutils
     }
 
     /**
-     * @brief Construct an `IndexError` with a message.
-     * @param message Message to accompany the exception.
-     */
-    IndexError::IndexError(const std::string &message) noexcept : Exception(message)
-    {
-        _assign_name("IndexError");
-    }
-
-    /**
      * @brief Construct an `IndexError` with a formatted message.
      * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
      * @param arguments Variadic formatting arguments.
@@ -295,15 +202,6 @@ namespace polutils
     IndexError::IndexError(const std::string &format, const Arguments &...arguments) : Exception(format, arguments...)
     {
         _assign_name("IndexError");
-    }
-
-    /**
-     * @brief Construct an `OverflowError` with a message.
-     * @param message Message to accompany the exception.
-     */
-    OverflowError::OverflowError(const std::string &message) noexcept : ValueError(message)
-    {
-        _assign_name("OverflowError");
     }
 
     /**
@@ -318,15 +216,6 @@ namespace polutils
     }
 
     /**
-     * @brief Construct an `UnderflowError` with a message.
-     * @param message Message to accompany the exception.
-     */
-    UnderflowError::UnderflowError(const std::string &message) noexcept : ValueError(message)
-    {
-        _assign_name("UnderflowError");
-    }
-
-    /**
      * @brief Construct an `UnderflowError` with a formatted message.
      * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
      * @param arguments Variadic formatting arguments.
@@ -335,15 +224,6 @@ namespace polutils
     UnderflowError::UnderflowError(const std::string &format, const Arguments &...arguments) : Exception(format, arguments...)
     {
         _assign_name("UnderflowError");
-    }
-
-    /**
-     * @brief Construct a `ValueError` with a message.
-     * @param message Message to accompany the exception.
-     */
-    ValueError::ValueError(const std::string &message) noexcept : Exception(message)
-    {
-        _assign_name("ValueError");
     }
 
     /**
@@ -358,15 +238,6 @@ namespace polutils
     }
 
     /**
-     * @brief Construct a `KeyError` with a message.
-     * @param message Message to accompany the exception.
-     */
-    KeyError::KeyError(const std::string &message) noexcept : ValueError(message)
-    {
-        _assign_name("KeyError");
-    }
-
-    /**
      * @brief Construct an `KeyError` with a formatted message.
      * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
      * @param arguments Variadic formatting arguments.
@@ -375,15 +246,6 @@ namespace polutils
     KeyError::KeyError(const std::string &format, const Arguments &...arguments) : ValueError(format, arguments...)
     {
         _assign_name("KeyError");
-    }
-
-    /**
-     * @brief Construct an `UnreachableError` with a message.
-     * @param message Message to accompany the exception.
-     */
-    UnreachableError::UnreachableError(const std::string &message) noexcept : Exception(message)
-    {
-        _assign_name("UnreachableError");
     }
 
     /**
@@ -398,15 +260,6 @@ namespace polutils
     }
 
     /**
-     * @brief Construct a `FileNotFoundError` with a message.
-     * @param message Message to accompany the exception.
-     */
-    FileNotFoundError::FileNotFoundError(const std::string &message) noexcept : Exception(message)
-    {
-        _assign_name("FileNotFoundError");
-    }
-
-    /**
      * @brief Construct an `FileNotFoundError` with a formatted message.
      * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
      * @param arguments Variadic formatting arguments.
@@ -418,15 +271,6 @@ namespace polutils
     }
 
     /**
-     * @brief Construct a `FileExistsError` with a message.
-     * @param message Message to accompany the exception.
-     */
-    FileExistsError::FileExistsError(const std::string &message) noexcept : Exception(message)
-    {
-        _assign_name("FileExistsError");
-    }
-
-    /**
      * @brief Construct an `FileExistsError` with a formatted message.
      * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
      * @param arguments Variadic formatting arguments.
@@ -435,15 +279,6 @@ namespace polutils
     FileExistsError::FileExistsError(const std::string &format, const Arguments &...arguments) : Exception(format, arguments...)
     {
         _assign_name("FileExistsError");
-    }
-
-    /**
-     * @brief Construct an `IOError` with a message.
-     * @param message Message to accompany the exception.
-     */
-    IOError::IOError(const std::string &message) noexcept : Exception(message)
-    {
-        _assign_name("IOError");
     }
 
     /**
