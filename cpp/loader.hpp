@@ -5,7 +5,7 @@
 
 #include <string> // std::string
 
-#include "../c/attributes.h" // NODISCARD
+#include "../c/attributes.h" // NODISCARD, DEPRECATED
 
 #ifdef _WIN32
     #include <minwindef.h> // HANDLE, DWORD, FARPROC
@@ -16,19 +16,23 @@ namespace polutils
     #ifdef _WIN32
         /**
          * @brief Platform specific type to standardize a loaded library.
+         * @deprecated Due to the `c` version being less of a hassle to use, this is deprecated.
          */
         using library_t = HMODULE;
         /**
          * @brief Platform specific type to standardize a loaded function.
+         * @deprecated Due to the `c` version being less of a hassle to use, this is deprecated.
          */
         using function_t = FARPROC;
     #else
         /**
          * @brief Platform specific type to standardize a loaded library.
+         * @deprecated Due to the `c` version being less of a hassle to use, this is deprecated.
          */
         using library_t = void *;
         /**
          * @brief Platform specific type to standardize a loaded function.
+         * @deprecated Due to the `c` version being less of a hassle to use, this is deprecated.
          */
         using function_t = void *;
     #endif // _WIN32
@@ -41,7 +45,9 @@ namespace polutils
      * @param path Path where the dynamically linked library is located on the filesystem.
      * @returns A handle to a dynamically linked library.
      * @returns If the library can not be loaded, `nullptr` is returned.
+     * @deprecated Due to the `c` version being less of a hassle to use, this is deprecated.
      */
+    DEPRECATED("Use `loader.h` instead.")
     NODISCARD library_t library_load(const std::string &path);
 
     /**
@@ -50,20 +56,26 @@ namespace polutils
      * @param name Name of the function to find.
      * @returns A handle to the function found within the given library handle.
      * @returns If the library can not be loaded, `nullptr` is returned.
+     * @deprecated Due to the `c` version being less of a hassle to use, this is deprecated.
      */
+    DEPRECATED("Use `loader.h` instead.")
     NODISCARD function_t library_function(library_t library, const std::string &name);
 
     /**
      * @brief Obtain the — platform specific — error message when encurring a failure state.
      * @returns A string representation of a platform specific error.
+     * @deprecated Due to the `c` version being less of a hassle to use, this is deprecated.
      */
+    DEPRECATED("Use `loader.h` instead.")
     NODISCARD const char *library_error(void);
 
     /**
      * @brief Deallocate the given library handle.
      * @param library Handle to the library to which to deallocate.
      * @returns True if the given library handle was successfully deallocated, else false.
+     * @deprecated Due to the `c` version being less of a hassle to use, this is deprecated.
      */
+    DEPRECATED("Use `loader.h` instead.")
     bool library_close(library_t library);
 }
 
@@ -89,7 +101,9 @@ namespace
      * @brief Determine if the given path exists on the filesystem.
      * @param path Path to evaluate.
      * @returns True if the path is evaluated to exist on the filesystem, else false.
+     * @deprecated Due to the `c` version being less of a hassle to use, this is deprecated.
      */
+    DEPRECATED("Use `loader.h` instead.")
     NODISCARD static bool _path_exists(const char *path)
     {
     #ifdef _WIN32
@@ -110,7 +124,9 @@ namespace
      * @brief Format a windows error code as a string.
      * @param error Error code to format.
      * @returns The given error code formatted as a string.
+     * @deprecated Due to the `c` version being less of a hassle to use, this is deprecated.
      */
+    DEPRECATED("Use `loader.h` instead.")
     NODISCARD static char *__win32_error_message(DWORD error)
     {
         static char win32_error_message[WIN32_ERROR_MESSAGE_SIZE] = {0};
@@ -139,7 +155,9 @@ namespace polutils
      * @param path Path where the dynamically linked library is located on the filesystem.
      * @returns A handle to a dynamically linked library.
      * @returns If the library can not be loaded, `nullptr` is returned.
+     * @deprecated Due to the `c` version being less of a hassle to use, this is deprecated.
      */
+    DEPRECATED("Use `loader.h` instead.")
     NODISCARD library_t library_load(const std::string &path)
     {
         if (!_path_exists(path.c_str())) return nullptr;
@@ -155,7 +173,9 @@ namespace polutils
      * @param library Handle to the library containing the function.
      * @param name Name of the function to find.
      * @returns If the function can not be loaded, `nullptr` is returned.
+     * @deprecated Due to the `c` version being less of a hassle to use, this is deprecated.
      */
+    DEPRECATED("Use `loader.h` instead.")
     NODISCARD function_t library_function(library_t library, const std::string &name)
     {
     #ifdef _WIN32
@@ -168,7 +188,9 @@ namespace polutils
     /**
      * @brief Obtain the — platform specific — error message when encurring a failure state.
      * @returns A string representation of a platform specific error.
+     * @deprecated Due to the `c` version being less of a hassle to use, this is deprecated.
      */
+    DEPRECATED("Use `loader.h` instead.")
     NODISCARD const char *library_error(void)
     {
     #ifndef _WIN32
@@ -182,7 +204,9 @@ namespace polutils
      * @brief Deallocate the given library handle.
      * @param library Handle to the library to which to deallocate.
      * @returns True if the given library handle was successfully deallocated, else false.
+     * @deprecated Due to the `c` version being less of a hassle to use, this is deprecated.
      */
+    DEPRECATED("Use `loader.h` instead.")
     bool library_close(library_t library)
     {
     #ifdef _WIN32
