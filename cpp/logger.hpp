@@ -10,6 +10,8 @@
 #include <string> // std::string
 #include <array> // std::array
 
+#include "../c/attributes.h" // NODISCARD
+
 namespace
 {
     /**
@@ -39,7 +41,7 @@ namespace polutils
          * @param level LoggingLevel to represent as a string.
          * @returns A string representation of the given level is returned.
          */
-        constexpr const char *lltostr(level_t level) noexcept;
+        NODISCARD constexpr const char *lltostr(level_t level) noexcept;
 
         /**
          * @brief A logger.
@@ -68,13 +70,13 @@ namespace polutils
                  * @brief Obtain the name of the logger.
                  * @returns A non-owning view into the name of the logger.
                  */
-                const std::string &name(void) const noexcept;
+                NODISCARD const std::string &name(void) const noexcept;
 
                 /**
                  * @brief Obtain the logging level of the logger.
                  * @returns The level of the logger.
                  */
-                level_t level(void) const noexcept;
+                NODISCARD level_t level(void) const noexcept;
 
                 /**
                  * @brief Set the name of the logger.
@@ -188,7 +190,7 @@ namespace
      * @brief Set a timestamp to be used in the logging format.
      * @returns True if the timestamp can be set, else false.
      */
-    bool _set_timestamp(void)
+    NODISCARD bool _set_timestamp(void)
     {
         struct tm date;
         time_t current_time = time(NULL);
@@ -206,7 +208,7 @@ namespace
      * @param stream Output file stream to check against i/o output.
      * @returns A boolean of whether a given file is composed of an i/o stream (e.g.) stdout, stdin, and stderr.
      */
-    bool _is_file(const std::FILE *stream)
+    NODISCARD bool _is_file(const std::FILE *stream)
     {
         bool found = false;
         std::FILE *streams[3] = {stdout, stdin, stderr};
@@ -228,7 +230,7 @@ namespace polutils
          * @param level LoggingLevel to represent as a string.
          * @returns A string representation of the given level is returned.
          */
-        constexpr const char *lltostr(level_t level) noexcept
+        NODISCARD constexpr const char *lltostr(level_t level) noexcept
         {
             switch (level)
             {
@@ -270,7 +272,7 @@ namespace polutils
          * @brief Obtain the name of the logger.
          * @returns A non-owning view into the name of the logger.
          */
-        const std::string &logger_t::name(void) const noexcept
+        NODISCARD const std::string &logger_t::name(void) const noexcept
         {
             return _name;
         }
@@ -279,7 +281,7 @@ namespace polutils
          * @brief Obtain the logging level of the logger.
          * @returns The level of the logger.
          */
-        level_t logger_t::level(void) const noexcept
+        NODISCARD level_t logger_t::level(void) const noexcept
         {
             return _level;
         }
