@@ -9,6 +9,8 @@
 
 #include "printable.hpp" // printable_t
 
+#include "../c/attributes.h" // NODISCARD
+
 namespace polutils
 {
     /**
@@ -65,13 +67,13 @@ namespace polutils
              * @brief Obtain a string representation of the exception.
              * @returns A string representation of the exception.
              */
-            const char *to_string(void) const noexcept override;
+            NODISCARD const char *to_string(void) const noexcept override;
 
             /**
              * @brief Overload to interface with the parent exception class.
              * @return A const c string.
              */
-            const char *what(void) const noexcept override;
+            NODISCARD const char *what(void) const noexcept override;
 
             /**
              * @brief Default destructor of the exception.
@@ -140,7 +142,7 @@ namespace polutils
      * @brief Obtain a string representation of the exception.
      * @returns A string representation of the exception.
      */
-    const char *Exception::to_string(void) const noexcept
+    NODISCARD const char *Exception::to_string(void) const noexcept
     {
         return what();
     }
@@ -149,7 +151,7 @@ namespace polutils
      * @brief Overload to interface with the parent exception class.
      * @return A const c string.
      */
-    const char *Exception::what(void) const noexcept
+    NODISCARD const char *Exception::what(void) const noexcept
     {
         return (__repr).c_str();
     }
