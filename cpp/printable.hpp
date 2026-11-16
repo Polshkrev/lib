@@ -7,6 +7,8 @@
 
 #include <ostream> // std::ostream
 
+#include "../c/attributes.h" // NODISCARD
+
 namespace polutils
 {
     /**
@@ -18,7 +20,7 @@ namespace polutils
          * @brief Convert a custom type into a string to be printed.
          * @returns A c-string to be printed.
          */
-        virtual const char *to_string(void) const noexcept = 0;
+        NODISCARD virtual const char *to_string(void) const noexcept = 0;
 
         /**
          * @brief Default destructor.
