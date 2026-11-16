@@ -10,6 +10,8 @@
 
 #include "printable.hpp" // printable_t
 
+#include "../c/attributes.h" // NODISCARD
+
 namespace polutils
 {
     /**
@@ -66,31 +68,31 @@ namespace polutils
          * @brief Obtain the major value of the version.
          * @returns The major value of the version.
          */
-        std::uint8_t major(void) const noexcept;
+        NODISCARD std::uint8_t major(void) const noexcept;
 
         /**
          * @brief Obtain the minor value of the version.
          * @returns The minor value of the version.
          */
-        std::uint8_t minor(void) const noexcept;
+        NODISCARD std::uint8_t minor(void) const noexcept;
 
         /**
          * @brief Obtain the patch value of the version.
          * @returns The patch value of the version.
          */
-        std::uint8_t patch(void) const noexcept;
+        NODISCARD std::uint8_t patch(void) const noexcept;
         
         /**
          * @brief Obtain the name value of the version.
          * @returns The name value of the version.
          */
-        const std::string &name(void) const noexcept;
+        NODISCARD const std::string &name(void) const noexcept;
 
         /**
          * @brief Obtain the description value of the version.
          * @returns The description value of the version.
          */
-        const std::string &description(void) const noexcept;
+        NODISCARD const std::string &description(void) const noexcept;
 
         /**
          * @brief Set the major value of the version.
@@ -151,47 +153,47 @@ namespace polutils
          * @param major Major release number to compare.
          * @returns False if the given version object's major version is not greater than or equal to the given major parametre, else true.
          */
-        bool compare_major(std::uint8_t major) const noexcept;
+        NODISCARD bool compare_major(std::uint8_t major) const noexcept;
 
         /**
          * @brief Compare the minor release of a given version object.
          * @param minor Minor release number to compare.
          * @returns False if the given version object's minor version is not greater than or equal to the given minor parametre, else true.
          */
-        bool compare_minor(std::uint8_t minor) const noexcept;
+        NODISCARD bool compare_minor(std::uint8_t minor) const noexcept;
 
         /**
          * @brief Compare the patch release of a given version object.
          * @param patch Patch release number to compare.
          * @returns False if the given version object's patch version is not greater than or equal to the given patch parametre, else true.
          */
-        bool compare_patch(std::uint8_t patch) const noexcept;
+        NODISCARD bool compare_patch(std::uint8_t patch) const noexcept;
 
         /**
          * @brief Compare one given version object to another.
          * @param version Version object to compare.
          * @returns False if all of one given version object's properties are not greater than or equal to each other, else true.
          */
-        bool compare(const version_t &version) const noexcept;
+        NODISCARD bool compare(const version_t &version) const noexcept;
 
         /**
          * @brief Determine if the version is public.
          * @returns True if the version's major value is greater than or equal to one, else false.
          */
-        bool is_public(void) const noexcept;
+        NODISCARD bool is_public(void) const noexcept;
 
         /**
          * @brief Obtain a string representation of the version object.
          * @returns A string representing a semantic version.
          */
-        const char *to_string(void) const noexcept override;
+        NODISCARD const char *to_string(void) const noexcept override;
 
         protected:
             /**
              * @brief Obtain a string representation of the version object.
              * @returns A string representing a semantic version.
              */
-            std::string _string(void) const noexcept;
+            NODISCARD std::string _string(void) const noexcept;
 
         private:
             /**
@@ -238,7 +240,7 @@ namespace polutils
      * @param right Operand to compare.
      * @returns True if the given left version is equal to the right.
      */
-    bool operator==(const version_t &left, const version_t &right) noexcept;
+    NODISCARD bool operator==(const version_t &left, const version_t &right) noexcept;
 
     /**
      * @brief Determine if two versions are not equal to each other.
@@ -246,7 +248,7 @@ namespace polutils
      * @param right Operand to compare.
      * @returns True if the given left version is not equal to the right.
      */
-    bool operator!=(const version_t &left, const version_t &right) noexcept;
+    NODISCARD bool operator!=(const version_t &left, const version_t &right) noexcept;
 
     /**
      * @brief Determine if two versions are less than each other.
@@ -254,7 +256,7 @@ namespace polutils
      * @param right Operand to compare.
      * @returns True if the given left version is less than the right.
      */
-    bool operator<(const version_t &left, const version_t &right) noexcept;
+    NODISCARD bool operator<(const version_t &left, const version_t &right) noexcept;
 
     /**
      * @brief Determine if two versions are less than or equal to each other.
@@ -262,7 +264,7 @@ namespace polutils
      * @param right Operand to compare.
      * @returns True if the given left version is less than or equal to the right.
      */
-    bool operator<=(const version_t &left, const version_t &right) noexcept;
+    NODISCARD bool operator<=(const version_t &left, const version_t &right) noexcept;
 
     /**
      * @brief Determine if two versions are greater than each other.
@@ -270,7 +272,7 @@ namespace polutils
      * @param right Operand to compare.
      * @returns True if the given left version is greater than the right.
      */
-    bool operator>(const version_t &left, const version_t &right) noexcept;
+    NODISCARD bool operator>(const version_t &left, const version_t &right) noexcept;
 
     /**
      * @brief Determine if two versions are greater than or equal each other.
@@ -278,7 +280,7 @@ namespace polutils
      * @param right Operand to compare.
      * @returns True if the given left version is greater than or equal to the right.
      */
-    bool operator>=(const version_t &left, const version_t &right) noexcept;
+    NODISCARD bool operator>=(const version_t &left, const version_t &right) noexcept;
 
 }
 
@@ -371,7 +373,7 @@ namespace polutils
      * @brief Obtain the major value of the version.
      * @returns The major value of the version.
      */
-    std::uint8_t version_t::major(void) const noexcept
+    NODISCARD std::uint8_t version_t::major(void) const noexcept
     {
         return __major;
     }
@@ -380,7 +382,7 @@ namespace polutils
      * @brief Obtain the minor value of the version.
      * @returns The minor value of the version.
      */
-    std::uint8_t version_t::minor(void) const noexcept
+    NODISCARD std::uint8_t version_t::minor(void) const noexcept
     {
         return __minor;
     }
@@ -389,7 +391,7 @@ namespace polutils
      * @brief Obtain the patch value of the version.
      * @returns The patch value of the version.
      */
-    std::uint8_t version_t::patch(void) const noexcept
+    NODISCARD std::uint8_t version_t::patch(void) const noexcept
     {
         return __patch;
     }
@@ -398,7 +400,7 @@ namespace polutils
      * @brief Obtain the name value of the version.
      * @returns The name value of the version.
      */
-    const std::string &version_t::name(void) const noexcept
+    NODISCARD const std::string &version_t::name(void) const noexcept
     {
         return __name;
     }
@@ -407,7 +409,7 @@ namespace polutils
      * @brief Obtain the description value of the version.
      * @returns The description value of the version.
      */
-    const std::string &version_t::description(void) const noexcept
+    NODISCARD const std::string &version_t::description(void) const noexcept
     {
         return __description;
     }
@@ -519,7 +521,7 @@ namespace polutils
      * @param major Major release number to compare.
      * @returns False if the given version object's major version is not greater than or equal to the given major parametre, else true.
      */
-    bool version_t::compare_major(std::uint8_t major) const noexcept
+    NODISCARD bool version_t::compare_major(std::uint8_t major) const noexcept
     {
         return __major >= major;
     }
@@ -529,7 +531,7 @@ namespace polutils
      * @param minor Minor release number to compare.
      * @returns False if the given version object's minor version is not greater than or equal to the given minor parametre, else true.
      */
-    bool version_t::compare_minor(std::uint8_t minor) const noexcept
+    NODISCARD bool version_t::compare_minor(std::uint8_t minor) const noexcept
     {
         return __minor >= minor;
     }
@@ -539,7 +541,7 @@ namespace polutils
      * @param patch Patch release number to compare.
      * @returns False if the given version object's patch version is not greater than or equal to the given patch parametre, else true.
      */
-    bool version_t::compare_patch(std::uint8_t patch) const noexcept
+    NODISCARD bool version_t::compare_patch(std::uint8_t patch) const noexcept
     {
         return __patch >= patch;
     }
@@ -549,7 +551,7 @@ namespace polutils
      * @param version Version object to compare.
      * @returns False if all of one given version object's properties are not greater than or equal to each other, else true.
      */
-    bool version_t::compare(const version_t &version) const noexcept
+    NODISCARD bool version_t::compare(const version_t &version) const noexcept
     {
         return *this >= version;
     }
@@ -558,7 +560,7 @@ namespace polutils
      * @brief Determine if the version is public.
      * @returns True if the version's major value is greater than or equal to one, else false.
      */
-    bool version_t::is_public(void) const noexcept
+    NODISCARD bool version_t::is_public(void) const noexcept
     {
         return compare_major(1);
     }
@@ -567,7 +569,7 @@ namespace polutils
      * @brief Obtain a string representation of the version object.
      * @returns A string representing a semantic version.
      */
-    std::string version_t::_string(void) const noexcept
+    NODISCARD std::string version_t::_string(void) const noexcept
     {
         std::stringstream result = std::stringstream();
         _version_print(result, *this, false);
@@ -578,7 +580,7 @@ namespace polutils
      * @brief Obtain a string representation of the version object.
      * @returns A string representing a semantic version.
      */
-    const char *version_t::to_string(void) const noexcept
+    NODISCARD const char *version_t::to_string(void) const noexcept
     {
         std::string string = _string();
         return string.c_str();
@@ -608,24 +610,19 @@ namespace polutils
         unsigned int minor;
         unsigned int patch;
         char separator;
-
         if (!(stream >> major)) return stream;
-
         else if (!(stream >> separator) || separator != '.')
         {
             stream.setstate(std::ios::failbit);
             return stream;
         }
-
         else if (!(stream >> minor)) return stream;
-
         else if (!(stream >> separator) || separator != '.')
         {
             stream.setstate(std::ios::failbit);
             return stream;
         }
         else if (!(stream >> patch)) return stream;
-
         else if (major > UINT8_MAX || minor > UINT8_MAX || patch > UINT8_MAX)
         {
             stream.setstate(std::ios::failbit);
@@ -645,7 +642,7 @@ namespace polutils
      * @param right Operand to compare.
      * @returns True if the given left version is equal to the right.
      */
-    bool operator==(const version_t &left, const version_t &right) noexcept
+    NODISCARD bool operator==(const version_t &left, const version_t &right) noexcept
     {
         return left.major() == right.major() && left.minor() == right.minor() && left.patch() == right.patch();
     }
@@ -656,7 +653,7 @@ namespace polutils
      * @param right Operand to compare.
      * @returns True if the given left version is not equal to the right.
      */
-    bool operator!=(const version_t &left, const version_t &right) noexcept
+    NODISCARD bool operator!=(const version_t &left, const version_t &right) noexcept
     {
         return !(left == right);
     }
@@ -667,12 +664,10 @@ namespace polutils
      * @param right Operand to compare.
      * @returns True if the given left version is less than the right.
      */
-    bool operator<(const version_t &left, const version_t &right) noexcept
+    NODISCARD bool operator<(const version_t &left, const version_t &right) noexcept
     {
         if (left.major() != right.major()) return left.major() < right.major();
-
         else if (left.minor() != right.minor()) return left.minor() < right.minor();
-
         return left.patch() < right.patch();
     }
 
@@ -682,12 +677,10 @@ namespace polutils
      * @param right Operand to compare.
      * @returns True if the given left version is less than or equal to the right.
      */
-    bool operator<=(const version_t &left, const version_t &right) noexcept
+    NODISCARD bool operator<=(const version_t &left, const version_t &right) noexcept
     {
         if (left.major() != right.major()) return left.major() <= right.major();
-
         else if (left.minor() != right.minor()) return left.minor() <= right.minor();
-
         return left.patch() <= right.patch();
     }
 
@@ -697,7 +690,7 @@ namespace polutils
      * @param right Operand to compare.
      * @returns True if the given left version is greater than the right.
      */
-    bool operator>(const version_t &left, const version_t &right) noexcept
+    NODISCARD bool operator>(const version_t &left, const version_t &right) noexcept
     {
         if (left.major() != right.major()) return left.major() > right.major();
 
@@ -712,7 +705,7 @@ namespace polutils
      * @param right Operand to compare.
      * @returns True if the given left version is greater than or equal to the right.
      */
-    bool operator>=(const version_t &left, const version_t &right) noexcept
+    NODISCARD bool operator>=(const version_t &left, const version_t &right) noexcept
     {
         if (left.major() != right.major()) return left.major() >= right.major();
 
