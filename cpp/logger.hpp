@@ -5,9 +5,12 @@
 
 #include <cstdio>   // std::FILE, std::fclose, std::fprintf, std::fopen, stdout
 #include <cstddef> // std::size_t
+#include <cstdint> // std::uint8_t
 
 #include <string> // std::string
 #include <array> // std::array
+
+#include "../c/attributes.h" // NODISCARD
 
 namespace
 {
@@ -24,7 +27,7 @@ namespace polutils
         /**
          * @brief Severity of a logging message.
          */
-        enum class level_t
+        enum class level_t : std::uint8_t
         {
             DEBUG,
             INFO,
@@ -38,7 +41,7 @@ namespace polutils
          * @param level LoggingLevel to represent as a string.
          * @returns A string representation of the given level is returned.
          */
-        const char *lltostr(level_t level) noexcept;
+        NODISCARD constexpr const char *lltostr(level_t level) noexcept;
 
         /**
          * @brief A logger.
@@ -67,13 +70,13 @@ namespace polutils
                  * @brief Obtain the name of the logger.
                  * @returns A non-owning view into the name of the logger.
                  */
-                const std::string &name(void) const noexcept;
+                NODISCARD const std::string &name(void) const noexcept;
 
                 /**
                  * @brief Obtain the logging level of the logger.
                  * @returns The level of the logger.
                  */
-                level_t level(void) const noexcept;
+                NODISCARD level_t level(void) const noexcept;
 
                 /**
                  * @brief Set the name of the logger.
@@ -146,6 +149,8 @@ namespace polutils
 #include <ctime>    // std::time_t, std::tm, std::time, std::localtime_r, std::strftime
 #include <clocale>  // std::setlocale, LC_TIME
 
+#include <algorithm>
+
 namespace
 {
     /**
@@ -185,7 +190,7 @@ namespace
      * @brief Set a timestamp to be used in the logging format.
      * @returns True if the timestamp can be set, else false.
      */
-    bool _set_timestamp(void)
+    NODISCARD bool _set_timestamp(void)
     {
         struct tm date;
         time_t current_time = time(NULL);
@@ -203,7 +208,7 @@ namespace
      * @param stream Output file stream to check against i/o output.
      * @returns A boolean of whether a given file is composed of an i/o stream (e.g.) stdout, stdin, and stderr.
      */
-    bool _is_file(const std::FILE *stream)
+    NODISCARD bool _is_file(const std::FILE *stream)
     {
         bool found = false;
         std::FILE *streams[3] = {stdout, stdin, stderr};
@@ -225,7 +230,7 @@ namespace polutils
          * @param level LoggingLevel to represent as a string.
          * @returns A string representation of the given level is returned.
          */
-        const char *lltostr(level_t level) noexcept
+        NODISCARD constexpr const char *lltostr(level_t level) noexcept
         {
             switch (level)
             {
@@ -267,7 +272,7 @@ namespace polutils
          * @brief Obtain the name of the logger.
          * @returns A non-owning view into the name of the logger.
          */
-        const std::string &logger_t::name(void) const noexcept
+        NODISCARD const std::string &logger_t::name(void) const noexcept
         {
             return _name;
         }
@@ -276,7 +281,7 @@ namespace polutils
          * @brief Obtain the logging level of the logger.
          * @returns The level of the logger.
          */
-        level_t logger_t::level(void) const noexcept
+        NODISCARD level_t logger_t::level(void) const noexcept
         {
             return _level;
         }
@@ -354,14 +359,14 @@ namespace polutils
         {
             if (level < _level) return;
             bool timestamp_result = _set_timestamp();
-            for (std::size_t output_num = 0; output_num < __output_count; ++output_num)
+            for (std::size_t index = 0; index < __output_count; ++index)
             {
                 if (!timestamp_result)
                 {
-                    std::fprintf(__outputs[output_num], "%s[%s] - %s\n", _name.c_str(), lltostr(level), message.c_str());
+                    std::fprintf(__outputs[index], "%s[%s] - %s\n", _name.c_str(), lltostr(level), message.c_str());
                     continue;
                 }
-                std::fprintf(__outputs[output_num], "%s:%s[%s] - %s\n", __timestamp, _name.c_str(), lltostr(level), message.c_str());
+                std::fprintf(__outputs[index], "%s:%s[%s] - %s\n", __timestamp, _name.c_str(), lltostr(level), message.c_str());
             }
         }
 
@@ -371,13 +376,13 @@ namespace polutils
          */
         void logger_t::close(void) noexcept
         {
-            for (size_t output_num = 0; output_num < __outputs.size(); ++output_num)
+            for (std::size_t index = 0; index < __output_count; ++index)
             {
-                std::FILE *current_output = __outputs[output_num];
-                if (!current_output) continue;
-                else if (!_is_file(current_output)) continue;
-                fclose(current_output);
-                __outputs[output_num] = nullptr;
+                std::FILE *current = __outputs[index];
+                if (!current) continue;
+                else if (!_is_file(current)) continue;
+                std::fclose(current);
+                current = nullptr;
                 __output_count--;
             }
         }

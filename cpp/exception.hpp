@@ -9,6 +9,8 @@
 
 #include "printable.hpp" // printable_t
 
+#include "../c/attributes.h" // NODISCARD
+
 namespace polutils
 {
     /**
@@ -55,12 +57,6 @@ namespace polutils
 
             /**
              * @brief Standard constructor for an exception.
-             * @param message A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
-             */
-            explicit Exception(const std::string &message) noexcept;
-
-            /**
-             * @brief Standard constructor for an exception.
              * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
              * @param arguments Variadic formatting arguments.
              */
@@ -71,13 +67,13 @@ namespace polutils
              * @brief Obtain a string representation of the exception.
              * @returns A string representation of the exception.
              */
-            const char *to_string(void) const noexcept override;
+            NODISCARD const char *to_string(void) const noexcept override;
 
             /**
              * @brief Overload to interface with the parent exception class.
              * @return A const c string.
              */
-            const char *what(void) const noexcept override;
+            NODISCARD const char *what(void) const noexcept override;
 
             /**
              * @brief Default destructor of the exception.
@@ -97,8 +93,7 @@ namespace polutils
 
 #ifdef EXCEPTION_IMPLEMENTATION
 
-#define BUFFER_IMPLEMENTATION
-#include "../c/collections/buffer.h" // bufer_save, buffer_sprintf, buffer_rewind
+#include <stdexcept> // std::runtime_error
 
 namespace polutils
 {
@@ -109,22 +104,20 @@ namespace polutils
 
     /**
      * @brief Standard constructor for an exception.
-     * @param message A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
-     */
-    Exception::Exception(const std::string &message) noexcept : __name("Exception"), __message(message), __repr(__name.append(": ").append(__message)) {}
-
-    /**
-     * @brief Standard constructor for an exception.
      * @param format A message string (without newline) to be displayed when the exception is thrown. The parameter is marked with const.
      * @param arguments Variadic formatting arguments.
      */
     template <typename ...Arguments>
     Exception::Exception(const std::string &format, const Arguments &...arguments) : __name("Exception"), __message(""), __repr("")
     {
-        std::size_t checkpoint = buffer_save();
-        __message.assign(buffer_sprintf(format.c_str(), arguments...));
+        int count = std::snprintf(nullptr, 0, format.c_str(), arguments...);
+        if (count < 0)
+        {
+            throw std::runtime_error("Failed to format exception message.");
+        }
+        __message.resize(static_cast<std::size_t>(count));
+        std::snprintf(__message.data(), __message.size() + 1, format.c_str(), arguments...);
         _assign_repr();
-        buffer_rewind(checkpoint);
     }
 
     /**
@@ -149,7 +142,7 @@ namespace polutils
      * @brief Obtain a string representation of the exception.
      * @returns A string representation of the exception.
      */
-    const char *Exception::to_string(void) const noexcept
+    NODISCARD const char *Exception::to_string(void) const noexcept
     {
         return what();
     }
@@ -158,7 +151,7 @@ namespace polutils
      * @brief Overload to interface with the parent exception class.
      * @return A const c string.
      */
-    const char *Exception::what(void) const noexcept
+    NODISCARD const char *Exception::what(void) const noexcept
     {
         return (__repr).c_str();
     }
