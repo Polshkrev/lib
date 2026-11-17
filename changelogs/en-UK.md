@@ -1,4 +1,16 @@
 # Changelog
+## v0.44.0 - 2026-11-16
+`Deprecated`
+- CPP
+    - `loader`
+        - Due to its redundancy, `loader.hpp` has been marked for deprecation.
+
+`Removed`
+- CPP
+    - `exception`
+        - Due to its redundancy, all `string view` construstors for `all` exceptions have been removed.
+    - `version`
+        - The `parse` function has been removed.
 ## v0.43.0 - 2026-10-27
 `Added`
 - C
