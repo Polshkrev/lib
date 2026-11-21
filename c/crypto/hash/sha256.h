@@ -244,9 +244,7 @@ static void __sha256_append_byte(sha256_t *algorithm, uint8_t byte)
 {
     algorithm->buffer[algorithm->buffer_counter++] = byte;
     algorithm->n_bits += 8;
-
     if (algorithm->buffer_counter != 64) return;
-    
     algorithm->buffer_counter = 0;
     __sha256_block(algorithm);
 }
@@ -260,7 +258,6 @@ static void __sha256_append_byte(sha256_t *algorithm, uint8_t byte)
 void sha256_append(sha256_t *algorithm, const void *data, size_t n_bytes)
 {
     const uint8_t *bytes = (const uint8_t*)data;
-
     for (size_t i = 0; i < n_bytes; i++)
     {
         __sha256_append_byte(algorithm, bytes[i]);
@@ -274,14 +271,11 @@ void sha256_append(sha256_t *algorithm, const void *data, size_t n_bytes)
 void sha256_finalize(sha256_t *algorithm)
 {
     uint64_t n_bits = algorithm->n_bits;
-
     __sha256_append_byte(algorithm, 0x80);
-
     while (algorithm->buffer_counter != 56)
     {
         __sha256_append_byte(algorithm, 0);
     }
-
     for (int32_t i = 7; i >= 0; i--)
     {
         uint8_t byte = (n_bits >> 8 * i) & 0xff;
@@ -312,12 +306,10 @@ static inline void __finalize_block(const uint32_t *state, size_t index, char **
 void sha256_finalize_hex(sha256_t *algorithm, char *destination)
 {
     sha256_finalize(algorithm);
-
     for (size_t i = 0; i < 8; i++)
     {
         __finalize_block(algorithm->state, i, &destination);
     }
-
     *destination = '\0';
 }
 
